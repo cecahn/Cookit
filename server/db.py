@@ -31,7 +31,7 @@ def db_get_product(gtin: str):
     cursor = cookit_db.cursor()
     # TODO: Lägg till fler kolumner i queryn
     query = f"SELECT varugrupp, namn, tillverkare, hållbarhet \
-              FROM products WHERE gtin = '{gtin}'"
+              FROM products WHERE gtin = '{gtin.zfill(14)}'"
     cursor.execute(query)
 
     result = sql_query_to_json(cursor)
@@ -57,7 +57,6 @@ def sql_query_to_json(cursor):
 
 def main():
     print("Hello Cookit!")
-
 
 if __name__=="__main__":
     main()
