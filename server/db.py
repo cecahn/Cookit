@@ -22,15 +22,12 @@ def db_get_product(gtin: str):
     Keys   = column names
     Values = the value for the corresponding column
     
-    If no match is found for the gtin number an
-    empty object is returned
+    If no match is found for the gtin number 'None' is returned
     '''
-    # Är ett tomt objekt ett bra returvärde?
-    # Kan returnera 'None' istället
 
     cursor = cookit_db.cursor()
     # TODO: Lägg till fler kolumner i queryn
-    query = f"SELECT varugrupp, namn, tillverkare, hållbarhet \
+    query = f"SELECT varugrupp, namn, tillverkare, hållbarhet, allergener \
               FROM products WHERE gtin = '{gtin.zfill(14)}'"
     cursor.execute(query)
 
@@ -50,9 +47,15 @@ def sql_query_to_json(cursor):
     result_dict = {}
     if row:
         for i, column in enumerate(cursor.column_names):
-            result_dict[column] = row[i]
-    return json.dumps(result_dict)
-    
+            # TODO: Fixa hårdkodning
+            if (column == 'allergener'):
+                result_dict[column] = json.loads(row[i])
+            else:
+                result_dict[column] = row[i]
+
+        return result_dict
+    return None
+
 def db_store_product(product):
     '''
     Denna funktion lagrar en produkt i databasen.
