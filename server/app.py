@@ -1,30 +1,33 @@
-from flask import Flask
-from flask import request
-import mysql.connector
+from flask import Flask, request
+from flask_mysqldb import MySQL
 
 from db import db_get_product, db_store_product
 from api import api_get_product
-
-app = Flask(__name__)
 
 HOSTNAME = 'eu-cdbr-west-03.cleardb.net'
 DB_NAME = 'heroku_9f604fd90f29f7f'
 USERNAME = 'b5a5478eb59ef3'
 PASSWORD = 'a007cb73'
 
-cookit_db = mysql.connector.connect(
-    host        = HOSTNAME,
-    user        = USERNAME,
-    password    = PASSWORD,
-    database    = DB_NAME
-)
+app = Flask(__name__)
+
+app.config['MYSQL_HOST'] = HOSTNAME
+app.config['MYSQL_USER'] = USERNAME
+app.config['MYSQL_PASSWORD'] = PASSWORD
+app.config['MYSQL_DB'] = DB_NAME
+
+mysql = MySQL(app)
 
 @app.route("/get/product")
 def fetch_product():
     product_code = request.args.get('id')
 
+    # Kolla att input har korrekt format
+    if not valid_gtin(product_code):
+        return "Invalid product code", 400
+
     # Kolla om produkten finns i databasen
-    product = db_get_product(product_code, cookit_db)
+    product = db_get_product(product_code, mysql)
     
     # Om inte, sök efter den i API:n
     if (product == None):
@@ -33,10 +36,18 @@ def fetch_product():
             # Error hantera
             return "Invalid code", 400
         else:
-            db_store_product(api_product, cookit_db)
+            db_store_product(api_product, mysql)
             return api_product
     else:
         return product
+    
+
+def valid_gtin(gtin: str):
+    '''
+    Checks if 'gtin' is a valid gtin code
+    '''
+    return len(gtin) <= 14 and gtin.isdigit()
+
 
 if __name__ == '__main__':
     app.run(threaded=True)
