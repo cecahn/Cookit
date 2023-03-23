@@ -12,9 +12,10 @@ def db_get_product(gtin: str, cookit_db):
     If no match is found for the gtin number 'None' is returned
     '''
 
-    cursor = cookit_db.cursor()
+    cursor = cookit_db.connection.cursor()
+
     # TODO: Lägg till fler kolumner i queryn
-    query = f"SELECT varugrupp, namn, tillverkare, hållbarhet, allergener \
+    query = f"SELECT varugrupp, gtin, namn, tillverkare, hållbarhet, allergener \
               FROM products WHERE gtin = '{gtin.zfill(14)}'"
     cursor.execute(query)
 
@@ -33,12 +34,13 @@ def sql_query_to_json(cursor):
     row = cursor.fetchone()
     result_dict = {}
     if row:
-        for i, column in enumerate(cursor.column_names):
+        for i, column in enumerate(cursor.description):
             # TODO: Fixa hårdkodning
-            if (column == 'allergener'):
-                result_dict[column] = json.loads(row[i])
+            column_name = column[0]
+            if (column_name == 'allergener'):
+                result_dict[column_name] = json.loads(row[i])
             else:
-                result_dict[column] = row[i]
+                result_dict[column_name] = row[i]
 
         return result_dict
     return None
@@ -52,7 +54,7 @@ def db_store_product(product, cookit_db):
     db är ett interface till MySQL databasen.
     '''
 
-    cursor = cookit_db.cursor()
+    cursor = cookit_db.connection.cursor()
 
     # TODO: Ändra till mindre hårdkodning!
     sql = "INSERT INTO products (gtin, varugrupp, hållbarhet, namn, tillverkare, allergener) VALUES (%s, %s, %s, %s, %s, %s)"
@@ -60,6 +62,6 @@ def db_store_product(product, cookit_db):
     
     cursor.execute(sql, val)
 
-    cookit_db.commit()
+    cookit_db.connection.commit()
 
     cursor.close()
