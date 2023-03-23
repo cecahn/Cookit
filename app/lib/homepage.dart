@@ -15,6 +15,16 @@ final _textController = TextEditingController();
   @override 
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Center(
+          child: Text("CookIt",
+          style: TextStyle(
+            color: Colors.teal,
+            fontSize:30,
+          )),
+            ),
+            backgroundColor: Colors.white,
+      ),
         body: Padding(
             padding: const EdgeInsets.all(100.0),
             child: Column(
