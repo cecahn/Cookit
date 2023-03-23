@@ -53,10 +53,23 @@ def sql_query_to_json(cursor):
             result_dict[column] = row[i]
     return json.dumps(result_dict)
     
+def db_store_product(product):
+    '''
+    Denna funktion lagrar en produkt i databasen.
+    
+    product är en dict med det vi ska spara om produkten.
+    
+    db är ett interface till MySQL databasen.
+    '''
 
+    cursor = cookit_db.cursor()
 
-def main():
-    print("Hello Cookit!")
+    # TODO: Ändra till mindre hårdkodning!
+    sql = "INSERT INTO products (gtin, varugrupp, hållbarhet, namn, tillverkare, allergener) VALUES (%s, %s, %s, %s, %s, %s)"
+    val = (product['gtin'], product['varugrupp'], product['hållbarhet'], product['namn'], product['tillverkare'], json.dumps(product['allergener']))
+    
+    cursor.execute(sql, val)
 
-if __name__=="__main__":
-    main()
+    cookit_db.commit()
+
+    cursor.close()

@@ -1,19 +1,10 @@
 import requests
-import mysql.connector
-import json
 
 BASE_URL = 'https://api.dabas.com/'
 PRODUCT_ENDPOINT = 'DABASService/V2/article/gtin/'
 DATA_FORMAT = '/JSON'
 API_KEY = '10d9b701-e973-42d5-a7cf-ac541f59dcd9'
 CODE_MAX_LEN = 14
-
-db = mysql.connector.connect(
-    host="eu-cdbr-west-03.cleardb.net",
-    database="heroku_9f604fd90f29f7f",
-    user="b5a5478eb59ef3",
-    password="a007cb73"
-)
 
 def api_get_product(code: str):
     '''
@@ -51,25 +42,3 @@ def api_get_product(code: str):
 
     # Returnera svaret som en dict
     return data
-
-# TODO: Flytta till db.py
-def db_store_product(product):
-    '''
-    Denna funktion lagrar en produkt i databasen.
-    
-    product är en dict med det vi ska spara om produkten.
-    
-    db är ett interface till MySQL databasen.
-    '''
-
-    cursor = db.cursor()
-
-    # TODO: Ändra till mindre hårdkodning!
-    sql = "INSERT INTO products (gtin, varugrupp, hållbarhet, namn, tillverkare, allergener) VALUES (%s, %s, %s, %s, %s, %s)"
-    val = (product['gtin'], product['varugrupp'], product['hållbarhet'], product['namn'], product['tillverkare'], json.dumps(product['allergener']))
-    
-    cursor.execute(sql, val)
-
-    db.commit()
-
-    cursor.close()
