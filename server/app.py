@@ -22,6 +22,10 @@ mysql = MySQL(app)
 def fetch_product():
     product_code = request.args.get('id')
 
+    # Kolla att input har korrekt format
+    if not valid_gtin(product_code):
+        return "Invalid product code", 400
+
     # Kolla om produkten finns i databasen
     product = db_get_product(product_code, mysql)
     
@@ -36,6 +40,14 @@ def fetch_product():
             return api_product
     else:
         return product
+    
+
+def valid_gtin(gtin: str):
+    '''
+    Checks if 'gtin' is a valid gtin code
+    '''
+    return len(gtin) <= 14 and gtin.isdigit()
+
 
 if __name__ == '__main__':
     app.run(threaded=True)
