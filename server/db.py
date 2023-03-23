@@ -1,19 +1,6 @@
-import mysql.connector
 import json
 
-HOSTNAME = 'eu-cdbr-west-03.cleardb.net'
-DB_NAME = 'heroku_9f604fd90f29f7f'
-USERNAME = 'b5a5478eb59ef3'
-PASSWORD = 'a007cb73'
-
-cookit_db = mysql.connector.connect(
-    host        = HOSTNAME,
-    user        = USERNAME,
-    password    = PASSWORD,
-    database    = DB_NAME
-)
-
-def db_get_product(gtin: str):
+def db_get_product(gtin: str, cookit_db):
     '''
     Looks up a gtin number in the database and
     returns a JSON object representing the matching item
@@ -56,7 +43,7 @@ def sql_query_to_json(cursor):
         return result_dict
     return None
 
-def db_store_product(product):
+def db_store_product(product, cookit_db):
     '''
     Denna funktion lagrar en produkt i databasen.
     
