@@ -11,6 +11,14 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
 
 final _textController = TextEditingController();
+String _textInput = '';
+final List<String> _list = [];
+
+void _addItem(String item) {
+  setState(() {
+    _list.add(item);
+    });
+}
 
   @override 
   Widget build(BuildContext context) {
@@ -42,7 +50,27 @@ final _textController = TextEditingController();
                         icon: const Icon(Icons.clear),
                     ),
                     ),
-                )
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _textInput = _textController.text;
+                    });
+                    _addItem(_textInput);
+                  },
+                  child: const Text('Save Text Input'),
+                ),
+              Expanded(
+              child: ListView.builder(
+                itemCount: _list.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return ListTile(
+                    title: Text(_list[index]),
+                  );
+                }
+              ),
+              ),
+                //Text('Saved Text Input: $_textInput'),
             ],
         ),
         )
