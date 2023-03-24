@@ -1,5 +1,6 @@
 from flask import Flask, request
 from flask_mysqldb import MySQL
+from flask_cors import CORS
 
 from db import db_get_product, db_store_product
 from api import api_get_product
@@ -17,6 +18,7 @@ app.config['MYSQL_PASSWORD'] = PASSWORD
 app.config['MYSQL_DB'] = DB_NAME
 
 mysql = MySQL(app)
+CORS(app)
 
 @app.route("/get/product")
 def fetch_product():
