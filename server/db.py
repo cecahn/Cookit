@@ -20,21 +20,8 @@ def db_get_product(gtin: str, cookit_db):
     cursor.execute(query)
 
     result = sql_query_to_json(cursor)
-
-    if (result == None):
-        cursor.close()
-        return None
-
-    # Lookup varugrupps namnet från id
-    get_varugrupp = f"SELECT namn FROM varugrupper WHERE id = {result['varugrupp']}"
-    cursor.execute(get_varugrupp)
-    
-    varugrupp = sql_query_to_json(cursor)
-
     cursor.close()
-
-    result['varugrupp'] = varugrupp['namn']
-
+    
     return result
 
 def sql_query_to_json(cursor):
@@ -81,7 +68,7 @@ def db_store_product(product, cookit_db):
 
     cursor.close()
 
-def db_varugrupp_id(varugrupp: str, db):
+def db_varugrupp_id(varugrupp_name: str, db) -> int:
     '''
     Create a new varugrupp if it does not exist.
     Returns an object with the id for the newly created or previously existing varugrupp.
@@ -89,7 +76,7 @@ def db_varugrupp_id(varugrupp: str, db):
     cursor = db.connection.cursor()
     
     # Hämta id för varugruppen
-    get_id = f"SELECT id FROM varugrupper WHERE namn = '{varugrupp.lower()}'"
+    get_id = f"SELECT id FROM varugrupper WHERE namn = '{varugrupp_name.lower()}'"
     
     cursor.execute(get_id)
 
@@ -98,7 +85,7 @@ def db_varugrupp_id(varugrupp: str, db):
     # Om result är None finns inte varugruppen
     if (result == None):
         # Skapa varugruppen
-        insert = f"INSERT INTO varugrupper (namn) VALUES ('{varugrupp}')"
+        insert = f"INSERT INTO varugrupper (namn) VALUES ('{varugrupp_name}')"
         cursor.execute(insert)
         db.connection.commit()
         
@@ -107,3 +94,18 @@ def db_varugrupp_id(varugrupp: str, db):
         
     cursor.close()
     return result
+
+def db_varugrupp_name(varugrupp_id: int, db) -> str:
+    '''
+    Lookup varugrupps namnet från id
+    '''
+    cursor = db.connection.cursor()
+
+    get_varugrupp = f"SELECT namn FROM varugrupper WHERE id = {varugrupp_id}"
+    cursor.execute(get_varugrupp)
+    
+    varugrupp = sql_query_to_json(cursor)
+
+    cursor.close()
+    
+    return varugrupp['namn']
