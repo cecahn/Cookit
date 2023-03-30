@@ -67,7 +67,7 @@ def db_store_product(product, cookit_db):
     '''
 
     # Hämta id för varugruppen som produkten tillhör
-    varugrupp_id = db_create_varugrupp(product['varugrupp'], cookit_db)
+    varugrupp_id = db_varugrupp_id(product['varugrupp'], cookit_db)
 
     cursor = cookit_db.connection.cursor()
 
@@ -81,7 +81,7 @@ def db_store_product(product, cookit_db):
 
     cursor.close()
 
-def db_create_varugrupp(varugrupp: str, db):
+def db_varugrupp_id(varugrupp: str, db):
     '''
     Create a new varugrupp if it does not exist.
     Returns an object with the id for the newly created or previously existing varugrupp.
