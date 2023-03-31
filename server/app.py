@@ -2,7 +2,7 @@ from flask import Flask, request
 from flask_mysqldb import MySQL
 from flask_cors import CORS
 
-from db import db_get_product, db_store_product
+from db import db_get_product, db_store_product, db_varugrupp_name
 from api import api_get_product
 
 HOSTNAME = 'eu-cdbr-west-03.cleardb.net'
@@ -34,15 +34,17 @@ def fetch_product():
     # Om inte, sök efter den i API:n
     if (product == None):
         api_product = api_get_product(product_code)
+        
         if (api_product == None):
-            # Error hantera
             return "Invalid code", 400
-        else:
-            db_store_product(api_product, mysql)
-            return api_product
-    else:
-        return product
+        
+        db_store_product(api_product, mysql)
+        return api_product
     
+    # Ersätt id med namnet för varugruppen
+    product['varugrupp'] = db_varugrupp_name(product['varugrupp'], mysql)
+    return product
+
 
 def valid_gtin(gtin: str):
     '''
