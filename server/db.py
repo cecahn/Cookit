@@ -1,4 +1,5 @@
 import json
+from werkzeug.security import generate_password_hash, check_password_hash
 
 def db_get_product(gtin: str, cookit_db):
     '''
@@ -107,3 +108,38 @@ def db_create_varugrupp(varugrupp: str, db):
         
     cursor.close()
     return result
+
+def db_add_user(db, public_id, name, password):
+    cursor = db.connection.cursor()
+
+    query = f"INSERT INTO users (public_id, name, password) \
+              VALUES ('{public_id}', '{name}', '{password}')"
+    cursor.execute(query)
+    db.connection.commit()
+
+def db_authenticate_user(db, name: str, password: str):
+    cursor = db.connection.cursor()
+
+    query = f"SELECT public_id, password FROM users \
+              WHERE name='{name}'"
+    cursor.execute(query)
+    users = cursor.fetchall()
+    
+    for user in users:
+        if check_password_hash(user[1], password):
+            return user[0]
+    return None
+
+def db_get_username(db, public_id):
+    ''' Test function '''
+    cursor = db.connection.cursor()
+    query = f"SELECT name FROM users\
+              WHERE public_id='{public_id}'"
+    cursor.execute(query)
+    result = cursor.fetchone()
+    cursor.close()
+    
+    if result:
+        return str(result[0])
+    else:
+        return None
