@@ -109,3 +109,82 @@ def db_varugrupp_name(varugrupp_id: int, db) -> str:
     cursor.close()
     
     return varugrupp['namn']
+
+# TODO: hämta skafferiet från användaren i databasen istället
+def db_get_recomendations(skafferi: list[str], db, max_results):
+    '''
+    Returnerar en lista av recept sorterat utifrån hur bra rekomendationerna är.
+    De bästa rekomendationerna kommer först.
+    Ett recept är bättre desto minder varugrupper som saknas för receptet.
+    Listan har som mest längden max_results.
+    '''
+    cursor = db.connection.cursor()
+
+    # Hitta alla varugrupper som skafferiet innehåller
+    find_varugrupper = 'SELECT DISTINCT varugrupp FROM products WHERE gtin = ' + ' OR gtin = '.join(skafferi)
+
+    cursor.execute(find_varugrupper)
+    varugrupper = sql_to_dict(cursor)
+    varugruppID = [str(varugrupp['varugrupp']) for varugrupp in varugrupper]
+
+    # Hitta alla recept som innehåller varugrupperna
+    find_recipes = 'SELECT DISTINCT recipeID FROM recipestovarugrupp WHERE varugruppID = ' + ' OR varugruppID = '.join(varugruppID)
+    cursor.execute(find_recipes)
+    recipeIDS = [x['recipeID'] for x in sql_to_dict(cursor)]
+
+    result = []
+
+    for recipeID in recipeIDS:
+        # Hämta alla varugrupper som receptet kräver
+        recipe_varugrupper = f'SELECT varugruppID FROM recipestovarugrupp WHERE recipeID = {recipeID}'
+        cursor.execute(recipe_varugrupper)
+        recipe_varugrupper_ids = [str(x['varugruppID']) for x in sql_to_dict(cursor)]
+        
+        # Vilka varugrupper finns inte i skafferiet som receptet kräver?
+        missing_ids = set(recipe_varugrupper_ids) - set(varugruppID)
+        
+        # Hämta all information om receptetet från databasen
+        recipe = db_get_recipe(recipeID, db)
+
+        # Lägg till ett fält för alla saknade varugrupper
+        recipe['saknas'] = [db_varugrupp_name(missing, db) for missing in missing_ids]
+
+        result.append(recipe)
+
+    cursor.close()
+
+    # Sortera så att de med minst saknade varugrupper hamnar först
+    sorted_list = sorted(result, key=lambda d: len(d['saknas']))[:max_results]
+
+    return sorted_list
+
+def sql_to_dict(cursor):
+    '''
+    Converts a response with possibly multiple rows to a dict.
+    '''
+    rows = cursor.fetchall()
+    result = []
+
+    for row in rows:
+        for i, column in enumerate(cursor.description):
+            columnName = column[0]
+            stuff = {}
+            stuff[columnName] = row[i]
+            result.append(stuff)
+    
+    return result
+
+def db_get_recipe(recipeID, db):
+    '''
+    Hämta all information om ett recept från databasen.
+    '''
+    cursor = db.connection.cursor()
+
+    query = f'SELECT * FROM recipes WHERE id = {recipeID}'
+
+    cursor.execute(query)
+    result = sql_query_to_json(cursor)
+
+    cursor.close()
+
+    return result

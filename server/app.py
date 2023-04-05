@@ -1,8 +1,9 @@
 from flask import Flask, request
 from flask_mysqldb import MySQL
 from flask_cors import CORS
+import json
 
-from db import db_get_product, db_store_product, db_varugrupp_name
+from db import db_get_product, db_store_product, db_varugrupp_name, db_get_recomendations
 from api import api_get_product
 
 HOSTNAME = 'eu-cdbr-west-03.cleardb.net'
@@ -45,6 +46,23 @@ def fetch_product():
     product['varugrupp'] = db_varugrupp_name(product['varugrupp'], mysql)
     return product
 
+@app.route("/get/recomendations")
+def fetch_recomendations():
+    skafferi = json.loads(request.args.get('products'))
+    
+    if (request.args.get('max')):
+        max_results = int(request.args.get('max'))
+    else:
+        max_results = 10
+    
+    if skafferi:
+        product_codes = skafferi['products']
+
+        recomendations = db_get_recomendations(product_codes, mysql, max_results)
+        
+        return recomendations
+    else:
+        return "You must supply products", 400
 
 def valid_gtin(gtin: str):
     '''
