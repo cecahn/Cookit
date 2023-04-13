@@ -92,12 +92,9 @@ def index():
     else:
         return '<a class="button" href="/login">Google Login</a>'
 
-@login_required
 @app.route("/skafferi")
+@login_required
 def get_skafferi():
-    if not current_user.is_authenticated:
-        return 'You need to sign in first!', 401
-
     user_id = current_user.id
 
     skafferi = db_get_skafferi(user_id, mysql)
