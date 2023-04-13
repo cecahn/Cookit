@@ -14,7 +14,7 @@ from oauthlib.oauth2 import WebApplicationClient
 import requests
 
 # Internal imports
-from db import db_get_product, db_store_product, db_varugrupp_name
+from db import db_get_product, db_store_product, db_varugrupp_name, db_get_skafferi
 from api import api_get_product
 from user import User
 
@@ -92,6 +92,20 @@ def index():
     else:
         return '<a class="button" href="/login">Google Login</a>'
 
+@login_required
+@app.route("/skafferi")
+def get_skafferi():
+    if not current_user.is_authenticated:
+        return 'You need to sign in first!', 401
+
+    user_id = current_user.id
+
+    skafferi = db_get_skafferi(user_id, mysql)
+
+    for product in skafferi:
+        product['varugrupp'] = db_varugrupp_name(product['varugrupp'], mysql)
+    
+    return skafferi
 
 @app.route("/login")
 def login():
