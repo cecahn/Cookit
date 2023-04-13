@@ -151,3 +151,45 @@ def get_product_id(db, gtin):
     cursor.close()
 
     return id
+def db_get_skafferi(user_id, db):
+    '''
+    Hämta en användares skafferi!
+    '''
+    cursor = db.connection.cursor()
+
+    query = f'SELECT product_id, bästföredatum FROM userstoproducts WHERE user_id = {user_id}'
+    cursor.execute(query)
+
+    row = sql_query_to_json(cursor)
+    
+    products = []
+
+    while(row):
+        bfd = str(row['bästföredatum'])
+        product_id = str(row['product_id'])
+       
+        product = get_product_by_id(product_id, db)
+        
+        product['bästföredatum'] = bfd
+        products.append(product)
+
+        row = sql_query_to_json(cursor)
+
+    cursor.close()
+
+    return products
+
+def get_product_by_id(product_id, db):
+    '''
+    Hämta en produkt från databasen utifrån dess id. (inte gtin)
+    '''
+    cursor = db.connection.cursor()
+    query = f'SELECT * FROM products WHERE id = {product_id}'
+
+    cursor.execute(query)
+
+    result = sql_query_to_json(cursor)
+
+    cursor.close()
+
+    return result

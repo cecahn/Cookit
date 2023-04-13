@@ -14,7 +14,7 @@ from oauthlib.oauth2 import WebApplicationClient
 import requests
 
 # Internal imports
-from db import db_get_product, db_store_product, db_varugrupp_name, db_add_to_pantry
+from db import db_get_product, db_store_product, db_varugrupp_name, db_get_skafferi, db_add_to_pantry
 from api import api_get_product
 from user import User
 
@@ -108,6 +108,17 @@ def index():
     else:
         return '<a class="button" href="/login">Google Login</a>'
 
+@app.route("/skafferi")
+@login_required
+def get_skafferi():
+    user_id = current_user.id
+
+    skafferi = db_get_skafferi(user_id, mysql)
+
+    for product in skafferi:
+        product['varugrupp'] = db_varugrupp_name(product['varugrupp'], mysql)
+    
+    return skafferi
 
 @app.route("/login")
 def login():
