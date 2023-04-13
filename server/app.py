@@ -14,7 +14,7 @@ from oauthlib.oauth2 import WebApplicationClient
 import requests
 
 # Internal imports
-from db import db_get_product, db_store_product, db_varugrupp_name
+from db import db_get_product, db_store_product, db_varugrupp_name, db_add_to_pantry
 from api import api_get_product
 from user import User
 
@@ -48,6 +48,7 @@ def load_user(user_id):
     return User.get(user_id, mysql)
 
 @app.route("/get/product")
+@login_required
 def fetch_product():
     product_code = request.args.get('id')
 
@@ -71,6 +72,21 @@ def fetch_product():
     # Ersätt id med namnet för varugruppen
     product['varugrupp'] = db_varugrupp_name(product['varugrupp'], mysql)
     return product
+
+@app.route('/skafferi/spara')
+@login_required
+def pantry_store():
+    user_id = current_user.id
+
+    gtin = request.args.get('id')
+
+    expiration_date = request.args.get('expiration-date')
+
+    db_add_to_pantry(mysql, user_id, gtin, expiration_date)
+
+    # TODO: Hantera fallet då varan inte kan hittas
+
+    return f"Lade till {db_get_product(gtin, mysql)['namn']} i {current_user.email}'s skafferi"
 
 
 def valid_gtin(gtin: str):

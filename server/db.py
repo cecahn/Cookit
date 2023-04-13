@@ -109,3 +109,45 @@ def db_varugrupp_name(varugrupp_id: int, db) -> str:
     cursor.close()
     
     return varugrupp['namn']
+
+def db_add_to_pantry(db, user_id, gtin, expiration_date):
+    '''
+    Lägg till en vara i användarens skafferi
+    '''
+
+    # TODO: Räkna ut bäst-före-datum med hjälp av hållbarhet och dagens datum om inget bäst-före-datum angetts?
+
+    # TODO: Lägg till varan i databasen om den inte redan finns
+
+    product_id = get_product_id(db, gtin)['id']
+
+    cursor = db.connection.cursor()
+
+    if not expiration_date:
+        expiration_date = "NULL"
+    
+    query = f"INSERT INTO userstoproducts (user_id, product_id, bästföredatum) \
+              VALUES ('{user_id}', '{product_id}', {expiration_date})"
+    
+    cursor.execute(query)
+
+    db.connection.commit()
+
+    cursor.close()
+
+
+def get_product_id(db, gtin):
+    '''
+    Hitta en varas id i `products`-tabellen givet gtin-nummer
+    '''
+    cursor = db.connection.cursor()
+
+    query = f"SELECT id FROM products WHERE gtin='{gtin}'"
+
+    cursor.execute(query)
+
+    id = sql_query_to_json(cursor)
+
+    cursor.close()
+
+    return id
