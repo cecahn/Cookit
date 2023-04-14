@@ -1,4 +1,5 @@
 import json
+import datetime
 
 def db_get_product(gtin: str, cookit_db):
     '''
@@ -114,17 +115,20 @@ def db_add_to_pantry(db, user_id, gtin, expiration_date):
     '''
     Lägg till en vara i användarens skafferi
     '''
-
-    # TODO: Räkna ut bäst-före-datum med hjälp av hållbarhet och dagens datum om inget bäst-före-datum angetts?
-
-    # TODO: Lägg till varan i databasen om den inte redan finns
-
     product_id = get_product_id(db, gtin)['id']
 
-    cursor = db.connection.cursor()
-
     if not expiration_date:
-        expiration_date = "NULL"
+        # Inget bäst-före-datum angett
+        product = db_get_product(gtin, db)
+        shelf_life = product['hållbarhet']
+        if shelf_life:
+            # Bäst-före = dagens datum + hållbarhet
+            current_date = datetime.date.today()
+            expiration_date = current_date + datetime.timedelta(days=shelf_life)
+        else:
+            expiration_date = "NULL"
+
+    cursor = db.connection.cursor()
     
     query = f"INSERT INTO userstoproducts (user_id, product_id, bästföredatum) \
               VALUES ('{user_id}', '{product_id}', {expiration_date})"
@@ -151,6 +155,7 @@ def get_product_id(db, gtin):
     cursor.close()
 
     return id
+
 def db_get_skafferi(user_id, db):
     '''
     Hämta en användares skafferi!

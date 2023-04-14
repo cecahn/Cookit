@@ -47,55 +47,6 @@ client = WebApplicationClient(GOOGLE_CLIENT_ID)
 def load_user(user_id):
     return User.get(user_id, mysql)
 
-@app.route("/get/product")
-@login_required
-def fetch_product():
-    product_code = request.args.get('id')
-
-    # Kolla att input har korrekt format
-    if not valid_gtin(product_code):
-        return "Invalid product code", 400
-
-    # Kolla om produkten finns i databasen
-    product = db_get_product(product_code, mysql)
-    
-    # Om inte, sök efter den i API:n
-    if (product == None):
-        api_product = api_get_product(product_code)
-        
-        if (api_product == None):
-            return "Invalid code", 400
-        
-        db_store_product(api_product, mysql)
-        return api_product
-    
-    # Ersätt id med namnet för varugruppen
-    product['varugrupp'] = db_varugrupp_name(product['varugrupp'], mysql)
-    return product
-
-@app.route('/skafferi/spara')
-@login_required
-def pantry_store():
-    user_id = current_user.id
-
-    gtin = request.args.get('id')
-
-    expiration_date = request.args.get('expiration-date')
-
-    db_add_to_pantry(mysql, user_id, gtin, expiration_date)
-
-    # TODO: Hantera fallet då varan inte kan hittas
-
-    return f"Lade till {db_get_product(gtin, mysql)['namn']} i {current_user.email}'s skafferi"
-
-
-def valid_gtin(gtin: str):
-    '''
-    Checks if 'gtin' is a valid gtin code
-    '''
-    return len(gtin) <= 14 and gtin.isdigit()
-
-
 @app.route("/")
 def index():
     if current_user.is_authenticated:
@@ -108,6 +59,47 @@ def index():
     else:
         return '<a class="button" href="/login">Google Login</a>'
 
+
+@app.route("/skafferi/spara")
+@login_required
+def fetch_product():
+    gtin = request.args.get('id')
+
+    # Kolla att input har korrekt format
+    if not valid_gtin(gtin):
+        return "Invalid product code", 400
+
+    # Kolla om produkten finns i databasen
+    product = db_get_product(gtin, mysql)
+    
+    # Om inte, sök efter den i API:n
+    if (product == None):
+        # api_product = api_get_product(gtin)
+        product = api_get_product(gtin)
+        
+        if (product == None):
+            return "Invalid code", 400
+        
+        db_store_product(product, mysql)
+    
+    # Ersätt id med namnet för varugruppen
+    product['varugrupp'] = db_varugrupp_name(product['varugrupp'], mysql)
+
+    # Lägg till varan i användarens skafferi
+    user_id = current_user.id
+    expiration_date = request.args.get('expiration-date')
+    db_add_to_pantry(mysql, user_id, gtin, expiration_date)
+
+    return product
+
+
+def valid_gtin(gtin: str):
+    '''
+    Checks if 'gtin' is a valid gtin code
+    '''
+    return len(gtin) <= 14 and gtin.isdigit()
+
+
 @app.route("/skafferi")
 @login_required
 def get_skafferi():
@@ -119,6 +111,8 @@ def get_skafferi():
         product['varugrupp'] = db_varugrupp_name(product['varugrupp'], mysql)
     
     return skafferi
+
+# AUTH ROUTES ================================================================
 
 @app.route("/login")
 def login():
