@@ -3,22 +3,16 @@ import 'package:flutter/material.dart';
 import 'homepage.dart';
 import 'User/start-screen.dart';
 import 'User/add_food.dart';
-//import 'User/login.dart';
-
-//import 'User/login.dart'
+import 'User/login.dart';
 
 void main(){
-
   WidgetsFlutterBinding.ensureInitialized();
   
   runApp(const MyApp());
-
 }
 
 class MyApp extends StatelessWidget{
   const MyApp({Key? key}) : super(key: key);
-
-
 
   @override 
   Widget build(BuildContext context) {
@@ -31,7 +25,8 @@ class MyApp extends StatelessWidget{
     home: FutureBuilder(
       builder: (context, dataSnapShot)
       {
-        return const TestHomePage();
+        //return const TestHomePage();
+        return const SignInDemo();
       },
     ),
   );
