@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'User/pantry.dart';
 import 'homepage.dart';
 import 'User/start-screen.dart';
 import 'User/add_food.dart';
@@ -31,7 +32,7 @@ class MyApp extends StatelessWidget{
     home: FutureBuilder(
       builder: (context, dataSnapShot)
       {
-        return const TestHomePage();
+        return const Pantry();
       },
     ),
   );
