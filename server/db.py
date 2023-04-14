@@ -157,7 +157,7 @@ def db_get_skafferi(user_id, db):
     '''
     cursor = db.connection.cursor()
 
-    query = f'SELECT product_id, bästföredatum FROM userstoproducts WHERE user_id = {user_id}'
+    query = f'SELECT * FROM userstoproducts WHERE user_id = {user_id}'
     cursor.execute(query)
 
     row = sql_query_to_json(cursor)
@@ -167,10 +167,12 @@ def db_get_skafferi(user_id, db):
     while(row):
         bfd = str(row['bästföredatum'])
         product_id = str(row['product_id'])
+        skafferi_id = str(row['id'])
        
         product = get_product_by_id(product_id, db)
         
         product['bästföredatum'] = bfd
+        product['skafferi_id'] = skafferi_id
         products.append(product)
 
         row = sql_query_to_json(cursor)
