@@ -61,15 +61,15 @@ class _SignInDemoState extends State<SignInDemo> {
     
         final String ?accessToken = googleAuth?.accessToken;
 
-        var cookies = await Requests.getStoredCookies('127.0.0.1:5000');
+        var cookies = await Requests.getStoredCookies('litium.herokuapp.com');
 
         if (!cookies.keys.contains('session')) {
           print('cookie missing triggering signin flow');
           if (accessToken != null) {
-            await Requests.get("http://127.0.0.1:5000/login", queryParameters: {'access_token': accessToken} ); 
+            await Requests.get("https://litium.herokuapp.com/login", queryParameters: {'access_token': accessToken} ); 
           }
         }
-        var r2 = await Requests.get("http://127.0.0.1:5000/skafferi"); 
+        var r2 = await Requests.get("https://litium.herokuapp.com/skafferi"); 
         print(r2.json());
       }
     });
@@ -114,10 +114,10 @@ class _SignInDemoState extends State<SignInDemo> {
   }
 
   Future<void> _handleSignOut() async {
-    await Requests.get("http://127.0.0.1:5000/logout"); 
+    await Requests.get("https://litium.herokuapp.com/logout"); 
 
 
-    await Requests.clearStoredCookies('127.0.0.1:5000');
+    await Requests.clearStoredCookies('litium.herokuapp.com');
 
     _googleSignIn.disconnect();
   }
