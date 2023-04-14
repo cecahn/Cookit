@@ -115,7 +115,7 @@ def db_add_to_pantry(db, user_id, gtin, expiration_date):
     '''
     Lägg till en vara i användarens skafferi
     '''
-    product_id = get_product_id(db, gtin)['id']
+    product_id = get_product_id(db, gtin)
 
     if not expiration_date:
         # Inget bäst-före-datum angett
@@ -139,6 +139,18 @@ def db_add_to_pantry(db, user_id, gtin, expiration_date):
 
     cursor.close()
 
+def db_remove_from_pantry(db, user_id, product_pantry_id):
+    cursor = db.connection.cursor()
+    
+    query = f"DELETE FROM userstoproducts WHERE user_id='{user_id}' AND id={product_pantry_id}"
+
+    result = cursor.execute(query)
+
+    db.connection.commit()
+
+    cursor.close()
+
+    return result # '0' if nothing was removed
 
 def get_product_id(db, gtin):
     '''
@@ -154,7 +166,7 @@ def get_product_id(db, gtin):
 
     cursor.close()
 
-    return id
+    return id['id']
 
 def db_get_skafferi(user_id, db):
     '''

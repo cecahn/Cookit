@@ -14,7 +14,14 @@ from oauthlib.oauth2 import WebApplicationClient
 import requests
 
 # Internal imports
-from db import db_get_product, db_store_product, db_varugrupp_name, db_get_skafferi, db_add_to_pantry
+from db import (
+    db_get_product,
+    db_store_product,
+    db_varugrupp_name,
+    db_get_skafferi,
+    db_add_to_pantry,
+    db_remove_from_pantry
+)
 from api import api_get_product
 from user import User
 
@@ -91,6 +98,18 @@ def fetch_product():
     db_add_to_pantry(mysql, user_id, gtin, expiration_date)
 
     return product
+
+@app.route("/skafferi/ta_bort")
+@login_required
+def delete_from_pantry():
+    user_id = current_user.id
+    product_id = request.args.get('product-pantry-id')
+
+    if db_remove_from_pantry(mysql, user_id, product_id):
+        return "OK"
+    
+    return "Kunde inte ta bort varan"
+
 
 
 def valid_gtin(gtin: str):
