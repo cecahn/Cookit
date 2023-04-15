@@ -1,4 +1,5 @@
 import json
+import datetime
 
 def db_get_product(gtin: str, cookit_db):
     '''
@@ -109,3 +110,105 @@ def db_varugrupp_name(varugrupp_id: int, db) -> str:
     cursor.close()
     
     return varugrupp['namn']
+
+def db_add_to_pantry(db, user_id, gtin, expiration_date):
+    '''
+    Lägg till en vara i användarens skafferi
+    '''
+    product_id = get_product_id(db, gtin)
+
+    if not expiration_date:
+        # Inget bäst-före-datum angett
+        product = db_get_product(gtin, db)
+        shelf_life = product['hållbarhet']
+        if shelf_life:
+            # Bäst-före = dagens datum + hållbarhet
+            current_date = datetime.date.today()
+            expiration_date = current_date + datetime.timedelta(days=shelf_life)
+        else:
+            expiration_date = "NULL"
+
+    cursor = db.connection.cursor()
+    
+    query = f"INSERT INTO userstoproducts (user_id, product_id, bästföredatum) \
+              VALUES ('{user_id}', '{product_id}', {expiration_date})"
+    
+    cursor.execute(query)
+
+    db.connection.commit()
+
+    cursor.close()
+
+def db_remove_from_pantry(db, user_id, product_pantry_id):
+    cursor = db.connection.cursor()
+    
+    query = f"DELETE FROM userstoproducts WHERE user_id='{user_id}' AND id={product_pantry_id}"
+
+    result = cursor.execute(query)
+
+    db.connection.commit()
+
+    cursor.close()
+
+    return result # '0' if nothing was removed
+
+def get_product_id(db, gtin):
+    '''
+    Hitta en varas id i `products`-tabellen givet gtin-nummer
+    '''
+    cursor = db.connection.cursor()
+
+    query = f"SELECT id FROM products WHERE gtin='{gtin}'"
+
+    cursor.execute(query)
+
+    id = sql_query_to_json(cursor)
+
+    cursor.close()
+
+    return id['id']
+
+def db_get_skafferi(user_id, db):
+    '''
+    Hämta en användares skafferi!
+    '''
+    cursor = db.connection.cursor()
+
+    query = f'SELECT * FROM userstoproducts WHERE user_id = {user_id}'
+    cursor.execute(query)
+
+    row = sql_query_to_json(cursor)
+    
+    products = []
+
+    while(row):
+        bfd = str(row['bästföredatum'])
+        product_id = str(row['product_id'])
+        skafferi_id = str(row['id'])
+       
+        product = get_product_by_id(product_id, db)
+        
+        product['bästföredatum'] = bfd
+        product['skafferi_id'] = skafferi_id
+        products.append(product)
+
+        row = sql_query_to_json(cursor)
+
+    cursor.close()
+
+    return products
+
+def get_product_by_id(product_id, db):
+    '''
+    Hämta en produkt från databasen utifrån dess id. (inte gtin)
+    '''
+    cursor = db.connection.cursor()
+    query = f'SELECT * FROM products WHERE id = {product_id}'
+
+    cursor.execute(query)
+
+    result = sql_query_to_json(cursor)
+
+    cursor.close()
+
+    return result
