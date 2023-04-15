@@ -18,7 +18,9 @@ from db import (
     db_varugrupp_name,
     db_get_skafferi,
     db_add_to_pantry,
-    db_remove_from_pantry
+    db_remove_from_pantry,
+    db_set_betyg,
+    db_get_recipe_score
 )
 from api import api_get_product
 from user import User
@@ -109,6 +111,24 @@ def get_skafferi():
     
     return skafferi
 
+@app.route("/betyg/set")
+@login_required
+def set_betyg():
+    user_id = current_user.id
+    recipe_id = request.args.get('recipe-id')
+    betyg = request.args.get('betyg')
+
+    result = db_set_betyg(mysql, user_id, recipe_id, betyg)
+
+    return result
+
+@app.route("/betyg/get")
+def get_betyg():
+    recipe_id = request.args.get('recipe-id')
+
+    return db_get_recipe_score(mysql, recipe_id)
+
+
 # AUTH ROUTES ================================================================
 
 # Flask-Login helper to retrieve a user from our db
@@ -153,4 +173,4 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run(threaded=True)
+    app.run(ssl_context="adhoc", threaded=True)
