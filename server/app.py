@@ -43,7 +43,7 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'None'
 app.config['SESSION_COOKIE_SECURE'] = True
 
 mysql = MySQL(app)
-CORS(app)
+CORS(app, supports_credentials=True)
 login_manager = LoginManager(app)
 login_manager.init_app(app)
 
