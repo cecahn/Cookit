@@ -217,7 +217,8 @@ def db_set_betyg(db, user_id, recipe_id, betyg):
     '''
     Lägger till ett användarbetyg till ett recept i
     tabellen "betyg", eller uppdaterar betyget om användaren
-    redan har betygsatt receptet
+    redan har betygsatt receptet. 
+    Returnerar uppdaterade snittbetyget för recepetet.
     '''
     cursor = db.connection.cursor()
 
@@ -228,14 +229,21 @@ def db_set_betyg(db, user_id, recipe_id, betyg):
     cursor.execute(query)
 
     db.connection.commit()
+    
+    avg = avg_recipe_score(recipe_id, db)
+
+    query2 = f'UPDATE recipes SET betyg={avg} WHERE id={recipe_id}'
+    cursor.execute(query2)
+
+    db.connection.commit()
 
     cursor.close()
 
-    return "Hello from db_set_betyg"
+    return {'avg_score': avg}
 
-def db_get_recipe_score(db, recipe_id):
+def avg_recipe_score(recipe_id, db):
     '''
-    Returnerar ett recepts genomsnittliga betyg avrundat till närmsta heltal
+    Returnerar ett recepts genomsnittliga betyg
     '''
     cursor = db.connection.cursor()
 
@@ -243,8 +251,8 @@ def db_get_recipe_score(db, recipe_id):
 
     cursor.execute(query)
     
-    result = cursor.fetchone()
+    result = sql_query_to_json(cursor)
 
     cursor.close()
 
-    return int(round(result[0]))
+    return result['average']
