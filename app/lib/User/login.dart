@@ -66,10 +66,10 @@ class _SignInDemoState extends State<SignInDemo> {
         if (!cookies.keys.contains('session')) {
           print('cookie missing triggering signin flow');
           if (accessToken != null) {
-            await Requests.get("https://litium.herokuapp.com/login", queryParameters: {'access_token': accessToken} ); 
+            await Requests.get("https://litium.herokuapp.com/login", queryParameters: {'access_token': accessToken}, withCredentials: true); 
           }
         }
-        var r2 = await Requests.get("https://litium.herokuapp.com/skafferi"); 
+        var r2 = await Requests.get("https://litium.herokuapp.com/skafferi", withCredentials: true); 
         print(r2.json());
       }
     });
@@ -114,7 +114,7 @@ class _SignInDemoState extends State<SignInDemo> {
   }
 
   Future<void> _handleSignOut() async {
-    await Requests.get("https://litium.herokuapp.com/logout"); 
+    await Requests.get("https://litium.herokuapp.com/logout", withCredentials: true); 
 
 
     await Requests.clearStoredCookies('litium.herokuapp.com');
