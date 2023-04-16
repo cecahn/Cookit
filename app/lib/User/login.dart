@@ -75,12 +75,12 @@ class LoginPageState extends State<LoginPage> {
           child: ElevatedButton.icon(
                 //icon: const Icon(Icons.Google, color: Colors.black),
                 onPressed: () async {
-                  const url = 'https://www.example.com';
+                  /*const url = 'https://www.example.com';
                   if (await canLaunchUrl(url)) {
                     await launchUrl(url);
                   } else {
                   throw 'Could not launch $url';
-                  }
+                  }*/
                 }, 
                 icon: const Icon(Icons.android),
                 label: const Text("google"),

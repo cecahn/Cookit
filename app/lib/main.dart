@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget{
     home: FutureBuilder(
       builder: (context, dataSnapShot)
       {
-        return const Pantry();
+        return const TestHomePage();
       },
     ),
   );
