@@ -1,4 +1,5 @@
 import json
+import datetime
 
 def db_get_product(gtin: str, cookit_db):
     '''
@@ -110,79 +111,102 @@ def db_varugrupp_name(varugrupp_id: int, db) -> str:
     
     return varugrupp['namn']
 
-# TODO: hämta skafferiet från användaren i databasen istället
-def db_get_recomendations(skafferi: list[str], db, max_results):
+def db_add_to_pantry(db, user_id, gtin, expiration_date):
     '''
-    Returnerar en lista av recept sorterat utifrån hur bra rekomendationerna är.
-    De bästa rekomendationerna kommer först.
-    Ett recept är bättre desto minder varugrupper som saknas för receptet.
-    Listan har som mest längden max_results.
+    Lägg till en vara i användarens skafferi
     '''
+    product_id = get_product_id(db, gtin)
+
+    if not expiration_date:
+        # Inget bäst-före-datum angett
+        product = db_get_product(gtin, db)
+        shelf_life = product['hållbarhet']
+        if shelf_life:
+            # Bäst-före = dagens datum + hållbarhet
+            current_date = datetime.date.today()
+            expiration_date = current_date + datetime.timedelta(days=shelf_life)
+        else:
+            expiration_date = "NULL"
+
     cursor = db.connection.cursor()
+    
+    query = f"INSERT INTO userstoproducts (user_id, product_id, bästföredatum) \
+              VALUES ('{user_id}', '{product_id}', {expiration_date})"
+    
+    cursor.execute(query)
 
-    # Hitta alla varugrupper som skafferiet innehåller
-    find_varugrupper = 'SELECT DISTINCT varugrupp FROM products WHERE gtin = ' + ' OR gtin = '.join(skafferi)
-
-    cursor.execute(find_varugrupper)
-    varugrupper = sql_to_dict(cursor)
-    varugruppID = [str(varugrupp['varugrupp']) for varugrupp in varugrupper]
-
-    # Hitta alla recept som innehåller varugrupperna
-    find_recipes = 'SELECT DISTINCT recipeID FROM recipestovarugrupp WHERE varugruppID = ' + ' OR varugruppID = '.join(varugruppID)
-    cursor.execute(find_recipes)
-    recipeIDS = [x['recipeID'] for x in sql_to_dict(cursor)]
-
-    result = []
-
-    for recipeID in recipeIDS:
-        # Hämta alla varugrupper som receptet kräver
-        recipe_varugrupper = f'SELECT varugruppID FROM recipestovarugrupp WHERE recipeID = {recipeID}'
-        cursor.execute(recipe_varugrupper)
-        recipe_varugrupper_ids = [str(x['varugruppID']) for x in sql_to_dict(cursor)]
-        
-        # Vilka varugrupper finns inte i skafferiet som receptet kräver?
-        missing_ids = set(recipe_varugrupper_ids) - set(varugruppID)
-        
-        # Hämta all information om receptetet från databasen
-        recipe = db_get_recipe(recipeID, db)
-
-        # Lägg till ett fält för alla saknade varugrupper
-        recipe['saknas'] = [db_varugrupp_name(missing, db) for missing in missing_ids]
-
-        result.append(recipe)
+    db.connection.commit()
 
     cursor.close()
 
-    # Sortera så att de med minst saknade varugrupper hamnar först
-    sorted_list = sorted(result, key=lambda d: len(d['saknas']))[:max_results]
-
-    return sorted_list
-
-def sql_to_dict(cursor):
-    '''
-    Converts a response with possibly multiple rows to a dict.
-    '''
-    rows = cursor.fetchall()
-    result = []
-
-    for row in rows:
-        for i, column in enumerate(cursor.description):
-            columnName = column[0]
-            stuff = {}
-            stuff[columnName] = row[i]
-            result.append(stuff)
+def db_remove_from_pantry(db, user_id, product_pantry_id):
+    cursor = db.connection.cursor()
     
-    return result
+    query = f"DELETE FROM userstoproducts WHERE user_id='{user_id}' AND id={product_pantry_id}"
 
-def db_get_recipe(recipeID, db):
+    result = cursor.execute(query)
+
+    db.connection.commit()
+
+    cursor.close()
+
+    return result # '0' if nothing was removed
+
+def get_product_id(db, gtin):
     '''
-    Hämta all information om ett recept från databasen.
+    Hitta en varas id i `products`-tabellen givet gtin-nummer
     '''
     cursor = db.connection.cursor()
 
-    query = f'SELECT * FROM recipes WHERE id = {recipeID}'
+    query = f"SELECT id FROM products WHERE gtin='{gtin}'"
 
     cursor.execute(query)
+
+    id = sql_query_to_json(cursor)
+
+    cursor.close()
+
+    return id['id']
+
+def db_get_skafferi(user_id, db):
+    '''
+    Hämta en användares skafferi!
+    '''
+    cursor = db.connection.cursor()
+
+    query = f'SELECT * FROM userstoproducts WHERE user_id = {user_id}'
+    cursor.execute(query)
+
+    row = sql_query_to_json(cursor)
+    
+    products = []
+
+    while(row):
+        bfd = str(row['bästföredatum'])
+        product_id = str(row['product_id'])
+        skafferi_id = str(row['id'])
+       
+        product = get_product_by_id(product_id, db)
+        
+        product['bästföredatum'] = bfd
+        product['skafferi_id'] = skafferi_id
+        products.append(product)
+
+        row = sql_query_to_json(cursor)
+
+    cursor.close()
+
+    return products
+
+def get_product_by_id(product_id, db):
+    '''
+    Hämta en produkt från databasen utifrån dess id. (inte gtin)
+    '''
+    cursor = db.connection.cursor()
+    query = f'SELECT * FROM products WHERE id = {product_id}'
+
+    cursor.execute(query)
+
     result = sql_query_to_json(cursor)
 
     cursor.close()
