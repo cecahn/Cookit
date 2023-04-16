@@ -212,3 +212,70 @@ def get_product_by_id(product_id, db):
     cursor.close()
 
     return result
+
+def db_get_recipe(recipeID, db):
+    '''
+    Hämta all information om ett recept från databasen.
+    '''
+    cursor = db.connection.cursor()
+
+    query = f'SELECT * FROM recipes WHERE id = {recipeID}'
+
+    cursor.execute(query)
+    result = sql_query_to_json(cursor)
+
+    cursor.close()
+
+    return result
+
+
+def db_get_recomendations(user_id, max_results, db):
+    '''
+    Returnerar en lista av recept sorterat utifrån hur bra rekomendationerna är.
+    De bästa rekomendationerna kommer först.
+    Ett recept är bättre desto mindre varugrupper som saknas för receptet.
+    Listan har som mest längden max_results.
+    '''
+    # Hämta skafferi
+    skafferi = db_get_skafferi(user_id, db)
+
+    skafferi_varugrupper = set([str(produkt['varugrupp']) for produkt in skafferi])
+    
+    cursor = db.connection.cursor()
+
+    get_recipe_ids = 'SELECT DISTINCT recipeID FROM recipestovarugrupp WHERE varugruppID = ' + ' OR varugruppID = '.join(skafferi_varugrupper)
+    cursor.execute(get_recipe_ids)
+
+    recipe_id_row = sql_query_to_json(cursor)
+    result = []
+
+    while recipe_id_row:
+        recipe_id = recipe_id_row['recipeID']
+
+        varugrupp_cursor = db.connection.cursor()
+        # Hämta alla varugrupper som receptet kräver
+        get_recipe_varugrupper = f'SELECT varugruppID FROM recipestovarugrupp WHERE recipeID = {recipe_id}'
+        varugrupp_cursor.execute(get_recipe_varugrupper)
+        
+        varugrupp_row = sql_query_to_json(varugrupp_cursor)
+        recipe_varugrupper = set()
+        
+        while varugrupp_row:
+            recipe_varugrupper.add(str(varugrupp_row['varugruppID']))
+            varugrupp_row = sql_query_to_json(varugrupp_cursor)
+        
+        varugrupp_cursor.close()
+
+        missing_varugrupper = recipe_varugrupper - skafferi_varugrupper
+
+        recipe = db_get_recipe(recipe_id, db)
+
+        recipe['missing'] = [db_varugrupp_name(missing, db) for missing in missing_varugrupper]
+        result.append(recipe)
+
+        recipe_id_row = sql_query_to_json(cursor)
+
+    cursor.close()
+    sorted_list = sorted(result, key=lambda d: len(d['missing']))
+
+    return sorted_list[:max_results]
