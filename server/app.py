@@ -39,10 +39,12 @@ app.config['MYSQL_HOST'] = HOSTNAME
 app.config['MYSQL_USER'] = USERNAME
 app.config['MYSQL_PASSWORD'] = PASSWORD
 app.config['MYSQL_DB'] = DB_NAME
+app.config['SESSION_COOKIE_SAMESITE'] = 'None'
+app.config['SESSION_COOKIE_SECURE'] = True
 
 mysql = MySQL(app)
 CORS(app)
-login_manager = LoginManager()
+login_manager = LoginManager(app)
 login_manager.init_app(app)
 
 @app.route("/skafferi/spara")
