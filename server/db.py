@@ -117,23 +117,27 @@ def db_add_to_pantry(db, user_id, gtin, expiration_date):
     '''
     product_id = get_product_id(db, gtin)
 
+    current_date = datetime.date.today()
+    
     if not expiration_date:
         # Inget bäst-före-datum angett
         product = db_get_product(gtin, db)
         shelf_life = product['hållbarhet']
         if shelf_life:
             # Bäst-före = dagens datum + hållbarhet
-            current_date = datetime.date.today()
             expiration_date = current_date + datetime.timedelta(days=shelf_life)
         else:
-            expiration_date = "NULL"
+            expiration_date = None
 
     cursor = db.connection.cursor()
-    
-    query = f"INSERT INTO userstoproducts (user_id, product_id, bästföredatum) \
-              VALUES ('{user_id}', '{product_id}', {expiration_date})"
-    
-    cursor.execute(query)
+
+    current_date_str = current_date.strftime("%Y-%m-%d")
+
+    query = "INSERT INTO userstoproducts (user_id, product_id, bästföredatum, tilläggsdatum) \
+             VALUES (%s, %s, %s, %s)"
+    vals = (user_id, product_id, expiration_date, current_date_str)
+
+    cursor.execute(query, vals)
 
     db.connection.commit()
 
@@ -192,12 +196,14 @@ def db_get_skafferi(user_id, db):
 
     while(row):
         bfd = str(row['bästföredatum'])
+        tilläggsdatum = str(row['tilläggsdatum'])
         product_id = str(row['product_id'])
         skafferi_id = str(row['id'])
        
         product = get_product_by_id(product_id, db)
         
         product['bästföredatum'] = bfd
+        product['tilläggsdatum'] = tilläggsdatum
         product['skafferi_id'] = skafferi_id
         products.append(product)
 
