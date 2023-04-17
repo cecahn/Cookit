@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
+import 'package:first/Widgets/bottomBar.dart';
 
 import 'pantry.dart';
 import 'recipes.dart';
@@ -106,6 +107,12 @@ class _TestHomePageState extends State<TestHomePage> {
 
   int _currentIndex = 1;
 
+  void _onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
   final List<Widget> _pages = [
     const Pantry(),
     const TestHomePage(),
@@ -130,14 +137,6 @@ class _TestHomePageState extends State<TestHomePage> {
             ),
           ),
           actions: [
-             ClipPath(
-              clipper: QuarterCircleClipper(),
-              child: Container(
-                color: Colors.teal.withOpacity(0.5),
-                width: 20,
-                height: AppBar().preferredSize.height,
-              ),
-            ),
             /*IconButton(
               icon: SizedBox (
               width: 40,
@@ -222,42 +221,11 @@ class _TestHomePageState extends State<TestHomePage> {
             ]
         ),
       ),
-      bottomNavigationBar:
-            BottomNavigationBar(
-            currentIndex: _currentIndex, 
-            onTap: (int index) {
-              setState(() {
-                _currentIndex = index;
-              });
-            },
-            items: [
-            BottomNavigationBarItem(
-              icon: SizedBox (
-                width: 40,
-                height: 40,
-                child: Image.asset('Images/png/004-healthy-food-1.png'),
-              ),
-              label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: SizedBox (
-              width: 40,
-              height: 40,
-              child:  Image.asset('Images/png/006-add.png'),
-            ),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon:SizedBox (
-              width: 40,
-              height: 40,
-              child: Image.asset('Images/png/005-recipe.png'),
-            ),
-            label: '',
-          ),
-        ],
-        
-        )
+      bottomNavigationBar: CustomNavBar(
+        currentIndex: 1,
+        onTap: _onTabTapped, 
+      ),
+            
     );
   }
 }

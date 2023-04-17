@@ -11,6 +11,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
+import 'package:google_fonts/google_fonts.dart';
 
 /// The scopes required by this application.
 const List<String> scopes = <String>['email', 'profile', 'openid'];
@@ -178,7 +179,28 @@ class _SignInDemoState extends State<SignInDemo> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Google Sign In'),
+          title: Padding(
+            padding: EdgeInsets.only(left: 20.0),
+            child: Text("CookIt.",
+                style: GoogleFonts.alfaSlabOne(
+                  textStyle: const TextStyle(
+                  fontSize: 30,
+                ),
+                color: Colors.teal,
+              )
+            ),
+          ),
+          actions: [
+            /*IconButton(
+              icon: SizedBox (
+              width: 40,
+              height: 40,
+              child: Image.asset('Images/png/003-settings.png'),
+              ),
+              onPressed: () {},
+            ),*/
+          ],
+          backgroundColor: Colors.white,
         ),
         body: ConstrainedBox(
           constraints: const BoxConstraints.expand(),
