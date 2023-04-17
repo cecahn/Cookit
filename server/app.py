@@ -18,7 +18,8 @@ from db import (
     db_varugrupp_name,
     db_get_skafferi,
     db_add_to_pantry,
-    db_remove_from_pantry
+    db_remove_from_pantry,
+    db_set_betyg
 )
 from api import api_get_product
 from user import User
@@ -110,6 +111,18 @@ def get_skafferi():
         product['varugrupp'] = db_varugrupp_name(product['varugrupp'], mysql)
     
     return skafferi
+
+@app.route("/betyg/set")
+@login_required
+def set_betyg():
+    user_id = current_user.id
+    recipe_id = request.args.get('recipe-id')
+    betyg = request.args.get('betyg')
+
+    result = db_set_betyg(mysql, user_id, recipe_id, betyg)
+
+    return result
+
 
 # AUTH ROUTES ================================================================
 
