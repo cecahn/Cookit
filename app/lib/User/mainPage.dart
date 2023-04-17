@@ -1,9 +1,11 @@
 import 'package:first/User/add_food.dart';
 import 'package:first/User/recipes.dart';
+import 'package:first/User/pantry.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -17,11 +19,28 @@ class _MainPageState extends State<MainPage> {
     Pantry(),
     TestHomePage(),
     Recipes(),
-  ]
+  ];
+  int currentIndex = 1;
+  void onTap(int index){
+    setState(() {
+      currentIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      body: pages[currentIndex],
       bottomNavigationBar: BottomNavigationBar(
+      unselectedFontSize: 0,
+      selectedFontSize: 0,
+      type: BottomNavigationBarType.shifting,
+      backgroundColor: Colors.transparent,
+      selectedItemColor: Colors.black,
+      unselectedItemColor: Colors.grey,
+      showUnselectedLabels: false,  
+      showSelectedLabels: false, 
+      elevation: 0,
       currentIndex: currentIndex,
       onTap: onTap,
       items: [
@@ -50,7 +69,7 @@ class _MainPageState extends State<MainPage> {
           label: 'Recept',
         ),
       ],
-    );
+    ),
     );
   }
 }

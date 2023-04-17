@@ -197,40 +197,11 @@ class _TestHomePageState extends State<TestHomePage> {
             ]
         ),
       ),
-      bottomNavigationBar: 
-            BottomNavigationBar(
-            currentIndex: _index, 
-            onTap: (int index) => setState(() =>_index = index),
-            items: [
-            BottomNavigationBarItem(
-              icon: SizedBox (
-                width: 40,
-                height: 40,
-                child: Image.asset('Images/png/004-healthy-food-1.png'),
-              ),
-              label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: SizedBox (
-              width: 40,
-              height: 40,
-              child:  Image.asset('Images/png/006-add.png'),
-            ),
-            label: '',
-            
-          ),
-          BottomNavigationBarItem(
-            icon:SizedBox (
-              width: 40,
-              height: 40,
-              child: Image.asset('Images/png/005-recipe.png'),
-            ),
-            label: '',
-          ),
-        ],
+      
+      
         
         
-        )
+        
     );
   }
 

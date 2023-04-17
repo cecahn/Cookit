@@ -1,4 +1,5 @@
 
+import 'package:first/User/mainPage.dart';
 import 'package:flutter/material.dart';
 import 'User/pantry.dart';
 import 'homepage.dart';
@@ -27,7 +28,7 @@ class MyApp extends StatelessWidget{
       builder: (context, dataSnapShot)
       {
         //return const TestHomePage();
-        return const SignInDemo();
+        return const MainPage();
       },
     ),
   );

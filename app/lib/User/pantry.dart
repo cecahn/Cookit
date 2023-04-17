@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'dart:ui';
 import 'package:google_fonts/google_fonts.dart';
-import "package:multiselect/multiselect.dart";
+//import "package:multiselect/multiselect.dart";
 
 bool sortActivated = false;
 bool sortBytime = false;
@@ -168,8 +168,8 @@ class PantryState extends State<Pantry> {
                         ),
                         height: 44,
                         width: 170,
-                        child: 
-                        DropDownMultiSelect(
+                        
+                        /*DropDownMultiSelect(
 
 
                 
@@ -185,7 +185,8 @@ class PantryState extends State<Pantry> {
                           scale: 0.0,
                           child: const Icon(Icons.menu),
                         ),
-                        ),
+                        ),*/
+                      
                       ),
                       ),
 
