@@ -202,9 +202,23 @@ class _SignInDemoState extends State<SignInDemo> {
           ],
           backgroundColor: Colors.white,
         ),
-        body: ConstrainedBox(
-          constraints: const BoxConstraints.expand(),
-          child: _buildBody(),
-        ));
+        body: Center(
+          child: ElevatedButton.icon(
+                //icon: const Icon(Icons.Google, color: Colors.black),
+                onPressed: () async {
+                  /*const url = 'https://www.example.com';
+                  if (await canLaunchUrl(url)) {
+                    await launchUrl(url);
+                  } else {
+                  throw 'Could not launch $url';
+                  }*/
+                }, 
+                icon: const Icon(Icons.android),
+                label: const Text("google"),
+            )
+        )
+    
+    
+    );
   }
 }

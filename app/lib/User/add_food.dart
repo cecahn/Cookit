@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:first/Widgets/bottomBar.dart';
 
+//import '../Routes/routes.dart';
 import 'pantry.dart';
 import 'recipes.dart';
 
@@ -13,11 +14,6 @@ import 'recipes.dart';
 //köttfärs 7350054730198
 // halloumi 07340062810241
 // mjölk 07310865001818
-
-
-
-
-
 
 
 late String stringResponse;
@@ -28,44 +24,8 @@ final List<String> list = [];
 late String inputmj;
 final _textController = TextEditingController();
 //String inputmj = "07310865001818";
-
 late String output;
 List<String> food = [];
-
-class QuarterCircleClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    Path path = Path();
-    path.lineTo(size.width - 20, 0);
-    path.arcToPoint(
-      Offset(size.width - 20, 20),
-      radius: Radius.circular(20),
-      clockwise: false,
-    );
-    path.lineTo(size.width, size.height / 2);
-    path.lineTo(size.width - 20, size.height - 20);
-    path.arcToPoint(
-      Offset(size.width - 20, size.height),
-      radius: Radius.circular(20),
-      clockwise: false,
-    );
-    path.lineTo(0, size.height);
-    path.lineTo(0, 0);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) {
-    return false;
-  }
-}
-
-
-
-
-
-
 
 
 class TestHomePage extends StatefulWidget {
@@ -75,7 +35,7 @@ class TestHomePage extends StatefulWidget {
   _TestHomePageState createState() => _TestHomePageState();
 }
 
-class _TestHomePageState extends State<TestHomePage> {
+class _TestHomePageState extends State<TestHomePage> { 
   
   void fetchProduct() async {
   try {
@@ -105,6 +65,7 @@ class _TestHomePageState extends State<TestHomePage> {
     super.initState();
   }
 
+  int _index = 0;
   int _currentIndex = 1;
 
   void _onTabTapped(int index) {
@@ -123,6 +84,21 @@ class _TestHomePageState extends State<TestHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    Widget child = Container();
+
+    switch(_index) {
+      case 0:
+        child = Recipes();
+        break;
+
+      case 1:
+        child = TestHomePage();
+        break;
+    
+      case 2:
+        child = Pantry();
+    }
+
     return Scaffold(
         appBar: AppBar(
           title: Padding(
@@ -137,14 +113,14 @@ class _TestHomePageState extends State<TestHomePage> {
             ),
           ),
           actions: [
-            /*IconButton(
-              icon: SizedBox (
-              width: 40,
-              height: 40,
-              child: Image.asset('Images/png/003-settings.png'),
+            IconButton(
+              icon: Image.asset('Images/png/download.png',
+              width: 100,
+              height: 100,
               ),
+              
               onPressed: () {},
-            ),*/
+            ),
           ],
           backgroundColor: Colors.white,
         ),
@@ -179,7 +155,7 @@ class _TestHomePageState extends State<TestHomePage> {
           children: [
             Text(
               "Nyligen skannad mat: ",
-              style: GoogleFonts.breeSerif(
+              style: GoogleFonts.alfaSlabOne(
                 textStyle: TextStyle(fontSize: 10),
                 color: Colors.teal
               ),
@@ -221,11 +197,43 @@ class _TestHomePageState extends State<TestHomePage> {
             ]
         ),
       ),
-      bottomNavigationBar: CustomNavBar(
-        currentIndex: 1,
-        onTap: _onTabTapped, 
-      ),
+      bottomNavigationBar: 
+            BottomNavigationBar(
+            currentIndex: _index, 
+            onTap: (int index) => setState(() =>_index = index),
+            items: [
+            BottomNavigationBarItem(
+              icon: SizedBox (
+                width: 40,
+                height: 40,
+                child: Image.asset('Images/png/004-healthy-food-1.png'),
+              ),
+              label: '',
+          ),
+          BottomNavigationBarItem(
+            icon: SizedBox (
+              width: 40,
+              height: 40,
+              child:  Image.asset('Images/png/006-add.png'),
+            ),
+            label: '',
             
+          ),
+          BottomNavigationBarItem(
+            icon:SizedBox (
+              width: 40,
+              height: 40,
+              child: Image.asset('Images/png/005-recipe.png'),
+            ),
+            label: '',
+          ),
+        ],
+        
+        
+        )
     );
   }
+
+    
 }
+
