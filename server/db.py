@@ -217,9 +217,6 @@ def db_get_recipe(recipeID, db):
     '''
     Hämta all information om ett recept från databasen.
     '''
-    if not recipeID.isdigit():
-        return "Invalid recipe ID", 400
-
     cursor = db.connection.cursor()
 
     query = f'SELECT * FROM recipes WHERE id = {recipeID}'

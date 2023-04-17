@@ -130,6 +130,9 @@ def fetch_recomendations():
 @login_required
 def fetch_recipe():
     recipe_id = request.args.get('recipe-id')
+
+    if not recipe_id.isdigit():
+        return "Invalid recipe ID", 400
     
     return db_get_recipe(recipe_id, mysql)
 
