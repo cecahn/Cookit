@@ -19,7 +19,8 @@ from db import (
     db_get_skafferi,
     db_add_to_pantry,
     db_remove_from_pantry,
-    db_get_recomendations
+    db_get_recomendations,
+    db_get_recipe
 )
 from api import api_get_product
 from user import User
@@ -124,6 +125,13 @@ def fetch_recomendations():
     recomendations = db_get_recomendations(user_id, max_results, mysql)
 
     return recomendations
+
+@app.route("/get/recipe")
+@login_required
+def fetch_recipe():
+    recipe_id = request.args.get('recipe-id')
+    
+    return db_get_recipe(recipe_id, mysql)
 
 # AUTH ROUTES ================================================================
 
