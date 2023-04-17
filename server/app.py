@@ -94,7 +94,13 @@ def fetch_product():
 
     # Lägg till varan i användarens skafferi
     user_id = current_user.id
+
     expiration_date = request.args.get('expiration-date')
+
+    # Sanera input - kontrollera att formatet är 'YYYYMMDD'
+    if expiration_date and not (len(expiration_date) == 8 and expiration_date.isdigit()):
+        return "Invalid date format", 400
+    
     db_add_to_pantry(mysql, user_id, gtin, expiration_date)
 
     return product
@@ -103,12 +109,18 @@ def fetch_product():
 @login_required
 def delete_from_pantry():
     user_id = current_user.id
-    product_id = request.args.get('product-pantry-id')
+    product_id = request.args.get('product-id')
 
-    if db_remove_from_pantry(mysql, user_id, product_id):
-        return "OK"
+    # Sanera input
+    if not product_id.isdigit():
+        return "Invalid product id", 400
+
+    product_name = db_remove_from_pantry(mysql, user_id, product_id)
+
+    if product_name:
+        return f"Tog bort '{product_name}' ur skafferiet", 200
     
-    return "Kunde inte ta bort varan"
+    return "Kunde inte hitta varan", 404
 
 
 

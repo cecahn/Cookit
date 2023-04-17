@@ -139,18 +139,27 @@ def db_add_to_pantry(db, user_id, gtin, expiration_date):
 
     cursor.close()
 
-def db_remove_from_pantry(db, user_id, product_pantry_id):
+def db_remove_from_pantry(db, user_id, product_id):
     cursor = db.connection.cursor()
     
-    query = f"DELETE FROM userstoproducts WHERE user_id='{user_id}' AND id={product_pantry_id}"
+    query = f"DELETE FROM userstoproducts WHERE user_id='{user_id}' AND product_id={product_id}"
 
     result = cursor.execute(query)
 
     db.connection.commit()
 
+    if result:
+        name_query = f"SELECT namn FROM products WHERE id = '{product_id}'"
+
+        cursor.execute(name_query)
+
+        name_result = cursor.fetchone()
+
+        result = name_result[0]
+
     cursor.close()
 
-    return result # '0' if nothing was removed
+    return result if result else None
 
 def get_product_id(db, gtin):
     '''
