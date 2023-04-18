@@ -226,3 +226,47 @@ def get_product_by_id(product_id, db):
     cursor.close()
 
     return result
+
+def db_set_betyg(db, user_id, recipe_id, betyg):
+    '''
+    Lägger till ett användarbetyg till ett recept i
+    tabellen "betyg", eller uppdaterar betyget om användaren
+    redan har betygsatt receptet. 
+    Returnerar uppdaterade snittbetyget för recepetet.
+    '''
+    cursor = db.connection.cursor()
+
+    query = f"INSERT INTO betyg (user_id, recipe_id, betyg) \
+              VALUES ('{user_id}', '{recipe_id}', '{betyg}') \
+              ON DUPLICATE KEY UPDATE betyg = VALUES(betyg)"
+    
+    cursor.execute(query)
+
+    db.connection.commit()
+    
+    avg = avg_recipe_score(recipe_id, db)
+
+    query2 = f'UPDATE recipes SET betyg={avg} WHERE id={recipe_id}'
+    cursor.execute(query2)
+
+    db.connection.commit()
+
+    cursor.close()
+
+    return {'avg_score': avg}
+
+def avg_recipe_score(recipe_id, db):
+    '''
+    Returnerar ett recepts genomsnittliga betyg
+    '''
+    cursor = db.connection.cursor()
+
+    query = f"SELECT AVG(betyg) as average FROM betyg WHERE recipe_id = '{recipe_id}'"
+
+    cursor.execute(query)
+    
+    result = sql_query_to_json(cursor)
+
+    cursor.close()
+
+    return result['average']
