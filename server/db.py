@@ -283,3 +283,67 @@ def db_get_recomendations(user_id, max_results, db):
     sorted_list = sorted(result, key=lambda d: len(d['missing']))
 
     return sorted_list[:max_results]
+
+def db_save_recipe(recipe, db):
+    '''
+    Assumes the recipe is not alredy in the database!
+    '''
+    cursor = db.connection.cursor()
+
+    recipe_id = recipe['Id']
+    titel = recipe['Title']
+    instruktion = json.dumps(recipe['CookingSteps']) # Array med steg
+    betyg = 0
+    bild = recipe['ImageUrl']
+
+    insert = f"INSERT INTO recipes (id, titel, instruktion, betyg, bild) \
+              VALUES ({recipe_id}, '{titel}', '{instruktion}', {betyg}, '{bild}')"
+
+    cursor.execute(insert)
+    db.connection.commit()
+
+    # Skapa koppling till varugrupper
+    ingredients = recipe['IngredientGroups'][0]['Ingredients']
+
+    for x in ingredients:
+        name = x['Ingredient']
+        found_vg = get_varugrupp(name, db)
+
+        if not found_vg:
+            for substr in name.split():
+                found_vg = get_varugrupp(substr, db)
+
+                if found_vg:
+                    break
+
+        if found_vg:
+            # Skapa koppling
+            query = f"INSERT INTO recipestovarugrupp (recipeID, varugruppID) \
+                    VALUES ({recipe_id}, {found_vg['id']})"
+            cursor.execute(query)
+            db.connection.commit()
+        
+
+    cursor.close()
+    
+    result = {
+        'id': recipe_id,
+        'titel': titel,
+        'instruktion': instruktion,
+        'betyg': betyg,
+        'bild': bild
+    }
+
+    return result
+
+def get_varugrupp(name, db):
+    cursor = db.connection.cursor()
+
+    query = f"SELECT * FROM varugrupper WHERE namn = '{name.lower()}'"
+
+    cursor.execute(query)
+    result = sql_query_to_json(cursor)
+
+    cursor.close()
+
+    return result

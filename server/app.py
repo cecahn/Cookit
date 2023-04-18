@@ -20,9 +20,10 @@ from db import (
     db_add_to_pantry,
     db_remove_from_pantry,
     db_get_recomendations,
+    db_save_recipe,
     db_get_recipe
 )
-from api import api_get_product
+from api import api_get_product, IcaAPI
 from user import User
 
 HOSTNAME = 'eu-cdbr-west-03.cleardb.net'
@@ -47,6 +48,8 @@ CORS(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
+ica = IcaAPI()
+
 @app.route("/skafferi/spara")
 @login_required
 def fetch_product():
@@ -68,9 +71,9 @@ def fetch_product():
             return "Invalid code", 400
         
         db_store_product(product, mysql)
-    
-    # Ersätt id med namnet för varugruppen
-    product['varugrupp'] = db_varugrupp_name(product['varugrupp'], mysql)
+    else:
+        # Ersätt id med namnet för varugruppen
+        product['varugrupp'] = db_varugrupp_name(product['varugrupp'], mysql)
 
     # Lägg till varan i användarens skafferi
     user_id = current_user.id
@@ -135,6 +138,32 @@ def fetch_recipe():
         return "Invalid recipe ID", 400
     
     return db_get_recipe(recipe_id, mysql)
+
+@app.route("/search")
+@login_required
+def search_recipe():
+    phrase = request.args.get('phrase')
+    max_results = request.args.get('max_results')
+
+    search_results = ica.search_recipes(phrase, max_results)
+    result = []
+
+    for search_result in search_results['Recipes']:
+        recipe_id = search_result['Id']
+
+        found_recipe = db_get_recipe(recipe_id, mysql)
+
+        if found_recipe != None:
+            result.append(found_recipe)
+            continue
+
+        recipe = ica.get_recipe(recipe_id)
+
+        saved_recipe = db_save_recipe(recipe, mysql)
+        result.append(saved_recipe)
+    
+    return result, 200
+
 
 # AUTH ROUTES ================================================================
 
