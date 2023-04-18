@@ -81,16 +81,15 @@ def fetch_product():
     
     # Om inte, sök efter den i API:n
     if (product == None):
-        # api_product = api_get_product(gtin)
         product = api_get_product(gtin)
         
         if (product == None):
             return "Invalid code", 400
         
         db_store_product(product, mysql)
-    
-    # Ersätt id med namnet för varugruppen
-    product['varugrupp'] = db_varugrupp_name(product['varugrupp'], mysql)
+    else:
+        # Ersätt id med namnet för varugruppen om hämtad från db
+        product['varugrupp'] = db_varugrupp_name(product['varugrupp'], mysql)
 
     # Lägg till varan i användarens skafferi
     user_id = current_user.id
@@ -101,7 +100,11 @@ def fetch_product():
     if expiration_date and not (len(expiration_date) == 8 and expiration_date.isdigit()):
         return "Invalid date format", 400
     
-    db_add_to_pantry(mysql, user_id, gtin, expiration_date)
+    result = db_add_to_pantry(mysql, user_id, gtin, expiration_date)
+
+    product['skafferi_id'] = result['skafferi_id']
+    product['bästföre'] = result['bästföre']
+    product['tilläggsdatum'] = result['tilläggsdatum']
 
     return product
 
@@ -109,19 +112,18 @@ def fetch_product():
 @login_required
 def delete_from_pantry():
     user_id = current_user.id
-    product_id = request.args.get('product-id')
+    skafferi_id = request.args.get('skafferi_id')
 
     # Sanera input
-    if not product_id.isdigit():
+    if not skafferi_id.isdigit():
         return "Invalid product id", 400
 
-    product_name = db_remove_from_pantry(mysql, user_id, product_id)
+    result = db_remove_from_pantry(mysql, user_id, skafferi_id)
 
-    if product_name:
-        return f"Tog bort '{product_name}' ur skafferiet", 200
+    if result:
+        return f"Tog bort produkten med id:'{skafferi_id}' ur skafferiet", 200
     
     return "Kunde inte hitta varan", 404
-
 
 
 def valid_gtin(gtin: str):

@@ -16,8 +16,7 @@ def db_get_product(gtin: str, cookit_db):
     cursor = cookit_db.connection.cursor()
 
     # Get product information
-    query = f"SELECT varugrupp, gtin, namn, tillverkare, hållbarhet, allergener \
-              FROM products WHERE gtin = '{gtin.zfill(14)}'"
+    query = f"SELECT * FROM products WHERE gtin = '{gtin.zfill(14)}'"
     cursor.execute(query)
 
     result = sql_query_to_json(cursor)
@@ -140,26 +139,26 @@ def db_add_to_pantry(db, user_id, gtin, expiration_date):
     cursor.execute(query, vals)
 
     db.connection.commit()
-
+    
+    # Spara id för produkten i skafferiet
+    result = {
+        'skafferi_id': cursor.lastrowid,
+        'bästföre': expiration_date.strftime("%Y-%m-%d"),
+        'tilläggsdatum': current_date_str
+    } 
     cursor.close()
 
-def db_remove_from_pantry(db, user_id, product_id):
+    return result
+
+
+def db_remove_from_pantry(db, user_id, skafferi_id):
     cursor = db.connection.cursor()
     
-    query = f"DELETE FROM userstoproducts WHERE user_id='{user_id}' AND product_id={product_id}"
+    query = f"DELETE FROM userstoproducts WHERE user_id='{user_id}' AND id={skafferi_id}"
 
     result = cursor.execute(query)
 
     db.connection.commit()
-
-    if result:
-        name_query = f"SELECT namn FROM products WHERE id = '{product_id}'"
-
-        cursor.execute(name_query)
-
-        name_result = cursor.fetchone()
-
-        result = name_result[0]
 
     cursor.close()
 
