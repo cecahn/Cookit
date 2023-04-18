@@ -42,6 +42,7 @@ dependencies:
   multiselect: ^0.1.0
   requests: ^4.7.0
   google_sign_in: ^6.1.0
+  flutter_bloc: ^8.1.2
 
 dev_dependencies:
   flutter_test:
@@ -54,6 +55,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
+  bloc:
+  equatable:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

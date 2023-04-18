@@ -1,6 +1,6 @@
-import 'package:first/User/add_food.dart';
-import 'package:first/User/recipes.dart';
-import 'package:first/User/pantry.dart';
+import 'package:first/User/RoutingPages/add_food.dart';
+import 'package:first/User/RoutingPages/recipes.dart';
+import 'package:first/User/RoutingPages/pantry.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';

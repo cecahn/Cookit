@@ -1,11 +1,18 @@
 
 import 'package:first/User/mainPage.dart';
+import 'package:first/User/DetailPages/productPage.dart';
+import 'package:first/cubit/appCubitLogic.dart';
 import 'package:flutter/material.dart';
-import 'User/pantry.dart';
+import 'Services/getSkafferi.dart';
+import 'User/RoutingPages/pantry.dart';
 import 'homepage.dart';
 import 'User/start-screen.dart';
-import 'User/add_food.dart';
+import 'User/RoutingPages/add_food.dart';
 import 'User/login.dart';
+import 'package:bloc/bloc.dart';
+import 'package:first/cubit/appCubit.dart';
+import 'package:first/cubit/appCubitStates.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main(){
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,14 +31,13 @@ class MyApp extends StatelessWidget{
       theme:ThemeData(
         primarySwatch: Colors.purple,
         ),
-    home: FutureBuilder(
-      builder: (context, dataSnapShot)
-      {
-        //return const TestHomePage();
-        return const MainPage();
-      },
-    ),
-  );
+    home: BlocProvider<AppCubits>(
+      create:(context)=>AppCubits(
+        skafferi: GetSkafferi()),
+      child: AppCubitLogics(),
+    )
+    );
+
 }
 
 }

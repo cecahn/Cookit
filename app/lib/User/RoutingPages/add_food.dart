@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:first/Widgets/bottomBar.dart';
+import 'package:requests/requests.dart';
 
 //import '../Routes/routes.dart';
 import 'pantry.dart';
@@ -39,7 +40,8 @@ class _TestHomePageState extends State<TestHomePage> {
   
   void fetchProduct() async {
   try {
-    final response = await http.get(Uri.parse('https://litium.herokuapp.com/get/product?id=$inputmj'));
+    final response = await Requests.get("https://litium.herokuapp.com/skafferi/spara?id=$inputmj", withCredentials: true);
+    //final response = await http.get(Uri.parse('https://litium.herokuapp.com/get/product?id=$inputmj'));
     if (response.statusCode == 200) {
       // If the call to the server was successful, parse the JSON.
       setState((){

@@ -6,12 +6,15 @@
 
 import 'dart:async';
 import 'dart:convert' show json;
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:requests/requests.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
+
+import '../cubit/appCubit.dart';
 
 /// The scopes required by this application.
 const List<String> scopes = <String>['email', 'profile', 'openid'];
@@ -140,7 +143,18 @@ class _SignInDemoState extends State<SignInDemo> {
           const Text('Signed in successfully.'),
           if (_isAuthorized) ...<Widget>[
             // The user has Authorized all required scopes
-            const Text("Hejsan")
+            const Text("Hejsan"),
+            GestureDetector(
+            onTap:(){
+              BlocProvider.of<AppCubits>(context).getLogin();
+            },
+            child: Container(
+              width: 200,
+              child: ElevatedButton.icon(
+                onPressed: null,
+                icon: Icon(Icons.home),
+                label: Text("hej"))),
+              ),
           ],
           if (!_isAuthorized) ...<Widget>[
             // The user has NOT Authorized all required scopes.
@@ -203,19 +217,32 @@ class _SignInDemoState extends State<SignInDemo> {
           backgroundColor: Colors.white,
         ),
         body: Center(
-          child: ElevatedButton.icon(
+          child: 
+          Column(
+            children: [
+            
+            GestureDetector(
+            onTap:(){
+              BlocProvider.of<AppCubits>(context).getLogin();
+            },
+            child: Container(
+              width: 200,
+              child: ElevatedButton.icon(
+                onPressed: null,
+                icon: Icon(Icons.home),
+                label: Text("hej"))),
+              ),
+            
+          
+
+           ElevatedButton.icon(
                 //icon: const Icon(Icons.Google, color: Colors.black),
-                onPressed: () async {
-                  /*const url = 'https://www.example.com';
-                  if (await canLaunchUrl(url)) {
-                    await launchUrl(url);
-                  } else {
-                  throw 'Could not launch $url';
-                  }*/
-                }, 
+                onPressed:_handleSignIn,
                 icon: const Icon(Icons.android),
                 label: const Text("google"),
             )
+            ]
+          )
         )
     
     
