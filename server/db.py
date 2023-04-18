@@ -224,7 +224,7 @@ def db_get_recipe(recipeID, db):
     found = cursor.execute(query)
 
     if not found:
-        return "Could not find the requested recipe", 404
+        return None
 
     result = sql_query_to_json(cursor)
 
@@ -296,17 +296,20 @@ def db_save_recipe(recipe, db):
     betyg = 0
     bild = recipe['ImageUrl']
 
-    insert = f"INSERT INTO recipes (id, titel, instruktion, betyg, bild) \
-              VALUES ({recipe_id}, '{titel}', '{instruktion}', {betyg}, '{bild}')"
+    ingredients = recipe['IngredientGroups'][0]['Ingredients']
+
+    mått = json.dumps([ingredient['Text'] for ingredient in ingredients])
+
+    insert = f"INSERT INTO recipes (id, titel, instruktion, betyg, bild, mått) \
+              VALUES ({recipe_id}, '{titel}', '{instruktion}', {betyg}, '{bild}', '{mått}')"
 
     cursor.execute(insert)
     db.connection.commit()
 
     # Skapa koppling till varugrupper
-    ingredients = recipe['IngredientGroups'][0]['Ingredients']
-
-    for x in ingredients:
-        name = x['Ingredient']
+    for ingredient in ingredients:
+        name = ingredient['Ingredient']
+        
         found_vg = get_varugrupp(name, db)
 
         if not found_vg:
@@ -331,7 +334,8 @@ def db_save_recipe(recipe, db):
         'titel': titel,
         'instruktion': instruktion,
         'betyg': betyg,
-        'bild': bild
+        'bild': bild,
+        'mått': mått
     }
 
     return result
