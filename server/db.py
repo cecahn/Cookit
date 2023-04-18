@@ -16,8 +16,7 @@ def db_get_product(gtin: str, cookit_db):
     cursor = cookit_db.connection.cursor()
 
     # Get product information
-    query = f"SELECT varugrupp, gtin, namn, tillverkare, hållbarhet, allergener \
-              FROM products WHERE gtin = '{gtin.zfill(14)}'"
+    query = f"SELECT * FROM products WHERE gtin = '{gtin.zfill(14)}'"
     cursor.execute(query)
 
     result = sql_query_to_json(cursor)
@@ -117,32 +116,45 @@ def db_add_to_pantry(db, user_id, gtin, expiration_date):
     '''
     product_id = get_product_id(db, gtin)
 
+    current_date = datetime.date.today()
+    
     if not expiration_date:
         # Inget bäst-före-datum angett
         product = db_get_product(gtin, db)
         shelf_life = product['hållbarhet']
         if shelf_life:
             # Bäst-före = dagens datum + hållbarhet
-            current_date = datetime.date.today()
-            expiration_date = current_date + datetime.timedelta(days=shelf_life)
+            expiration_date = (current_date + datetime.timedelta(days=shelf_life)).strftime("%Y-%m-%d")
         else:
-            expiration_date = "NULL"
+            expiration_date = None
 
     cursor = db.connection.cursor()
-    
-    query = f"INSERT INTO userstoproducts (user_id, product_id, bästföredatum) \
-              VALUES ('{user_id}', '{product_id}', {expiration_date})"
-    
-    cursor.execute(query)
+
+    current_date_str = current_date.strftime("%Y-%m-%d")
+
+    query = "INSERT INTO userstoproducts (user_id, product_id, bästföredatum, tilläggsdatum) \
+             VALUES (%s, %s, %s, %s)"
+    vals = (user_id, product_id, expiration_date, current_date_str)
+
+    cursor.execute(query, vals)
 
     db.connection.commit()
-
+    
+    # Spara id för produkten i skafferiet
+    result = {
+        'skafferi_id': cursor.lastrowid,
+        'bästföre': expiration_date,
+        'tilläggsdatum': current_date_str
+    } 
     cursor.close()
 
-def db_remove_from_pantry(db, user_id, product_pantry_id):
+    return result
+
+
+def db_remove_from_pantry(db, user_id, skafferi_id):
     cursor = db.connection.cursor()
     
-    query = f"DELETE FROM userstoproducts WHERE user_id='{user_id}' AND id={product_pantry_id}"
+    query = f"DELETE FROM userstoproducts WHERE user_id='{user_id}' AND id={skafferi_id}"
 
     result = cursor.execute(query)
 
@@ -150,7 +162,7 @@ def db_remove_from_pantry(db, user_id, product_pantry_id):
 
     cursor.close()
 
-    return result # '0' if nothing was removed
+    return result if result else None
 
 def get_product_id(db, gtin):
     '''
@@ -183,12 +195,14 @@ def db_get_skafferi(user_id, db):
 
     while(row):
         bfd = str(row['bästföredatum'])
+        tilläggsdatum = str(row['tilläggsdatum'])
         product_id = str(row['product_id'])
         skafferi_id = str(row['id'])
        
         product = get_product_by_id(product_id, db)
         
         product['bästföredatum'] = bfd
+        product['tilläggsdatum'] = tilläggsdatum
         product['skafferi_id'] = skafferi_id
         products.append(product)
 
