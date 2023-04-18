@@ -69,9 +69,9 @@ def fetch_product():
             return "Invalid code", 400
         
         db_store_product(product, mysql)
-    
-    # Ersätt id med namnet för varugruppen
-    product['varugrupp'] = db_varugrupp_name(product['varugrupp'], mysql)
+    else:
+        # Ersätt id med namnet för varugruppen
+        product['varugrupp'] = db_varugrupp_name(product['varugrupp'], mysql)
 
     # Lägg till varan i användarens skafferi
     user_id = current_user.id
