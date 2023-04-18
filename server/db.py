@@ -124,7 +124,7 @@ def db_add_to_pantry(db, user_id, gtin, expiration_date):
         shelf_life = product['hållbarhet']
         if shelf_life:
             # Bäst-före = dagens datum + hållbarhet
-            expiration_date = current_date + datetime.timedelta(days=shelf_life)
+            expiration_date = (current_date + datetime.timedelta(days=shelf_life)).strftime("%Y-%m-%d")
         else:
             expiration_date = None
 
@@ -143,7 +143,7 @@ def db_add_to_pantry(db, user_id, gtin, expiration_date):
     # Spara id för produkten i skafferiet
     result = {
         'skafferi_id': cursor.lastrowid,
-        'bästföre': expiration_date.strftime("%Y-%m-%d"),
+        'bästföre': expiration_date,
         'tilläggsdatum': current_date_str
     } 
     cursor.close()
