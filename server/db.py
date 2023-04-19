@@ -283,11 +283,8 @@ def db_get_recomendations(user_id, max_results, db):
     sorted_list = sorted(result, key=lambda d: len(d['missing']))
 
     return sorted_list[:max_results]
-
+'''
 def db_save_recipe(recipe, db):
-    '''
-    Assumes the recipe is not alredy in the database!
-    '''
     cursor = db.connection.cursor()
 
     recipe_id = recipe['Id']
@@ -339,6 +336,8 @@ def db_save_recipe(recipe, db):
     }
 
     return result
+'''
+
 
 def get_varugrupp(name, db):
     cursor = db.connection.cursor()
@@ -348,6 +347,25 @@ def get_varugrupp(name, db):
     cursor.execute(query)
     result = sql_query_to_json(cursor)
 
+    cursor.close()
+
+    return result
+
+def db_search_recipe(phrase, limit, db):
+    cursor = db.connection.cursor()
+    
+    query = f"SELECT * FROM recipes WHERE titel LIKE '%{phrase}%' LIMIT {limit}"
+
+    cursor.execute(query)
+
+    row = sql_query_to_json(cursor) 
+
+    result = []
+
+    while row:
+        result.append(row)
+        row = sql_query_to_json(cursor)
+    
     cursor.close()
 
     return result
