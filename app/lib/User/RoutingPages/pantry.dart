@@ -103,8 +103,8 @@ class Pantry extends StatefulWidget {
 }
 
 class PantryState extends State<Pantry> {
-  String dropdownValue = 'Filter';
-  String dropdownValue2 = 'Sortera';
+
+  String dropdownValue = '                Varugrupp';
   List<String> selected = [];
   @override
   Widget build(BuildContext context) {
@@ -163,66 +163,58 @@ class PantryState extends State<Pantry> {
                           ),
                         ),
                       ),
-                      Padding(
-                        padding:
-                            const EdgeInsets.only(top: 30.0, left: 30.0, right: 10.0),
-                        child: Row(
-                          children: [
-                            const SizedBox(width: 10),
-                            Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.green),
-                                borderRadius: BorderRadius.circular(5),
+                     Padding (padding: const EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.green),
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          height: 44,
+                          width: 220,
+                          child: DropdownButton<String>(
+
+                              value: dropdownValue,
+                              icon: Transform.scale(
+                                scale: 0.0,
+                                child: const Icon(Icons.menu),
                               ),
-                              padding: const EdgeInsets.only(
-                                left: 50.0,
-                                top: 8,
+                              style: const TextStyle(
+                                color: Colors.black54,
+                                fontSize: 15,
                               ),
-                              height: 44,
-                              width: 170,
-                              child: DropdownButton<String>(
-                                  value: dropdownValue2,
-                                  icon: Transform.scale(
-                                    scale: 0.0,
-                                    child: const Icon(Icons.menu),
-                                  ),
-                                  style: const TextStyle(
-                                    color: Colors.black54,
-                                    fontSize: 20,
-                                  ),
-                                  isExpanded: true,
-                                  isDense: true,
-                                  items: const [
-                                    DropdownMenuItem(
-                                      value: 'Utgångsdatum',
-                                      child: Text('Utgångsdatum'),
-                                    ),
-                                    DropdownMenuItem(
-                                      value: 'Senast tillagd',
-                                      child: Text('Senast tillagd'),
-                                    ),
-                                    DropdownMenuItem(
-                                      value: 'Sortera',
-                                      child: Text('Sortera'),
-                                    ),
-                                  ],
-                                  onChanged: (String? newValue) {
-                                    setState(() {
-                                      dropdownValue = dropdownValue;
-                                      if (newValue == 'Senast tillagd') {
-                                        skafferi2.sort(sortByUtgang);
-                                        sortActivated = true;
-                                      }
-                                      if (newValue == 'Utgångsdatum') {
-                                        skafferi2.sort(sortByTime);
-                                        sortActivated = true;
-                                      }
-                                    });
-                                  }),
-                            ),
-                        ]
-                      )
-                      ),
+                              isExpanded: true, 
+                              items: [
+                                DropdownMenuItem(
+                                  value: '                Utgångsdatum',
+                                  child: Text('                Utgångsdatum'),
+                                ),
+                                DropdownMenuItem(
+                                  value: '                Senast tillagd',
+                                  child: Text('                Senast tillagd'),
+                                ),
+                                DropdownMenuItem(
+                                  value: '                Varugrupp',
+                                  child: Text('                Varugrupp'),
+                                ),
+                              ],
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  dropdownValue = newValue!;
+                                  if (newValue == '                Senast tillagd') {
+                                    
+                                    sortActivated = true;
+                                  }
+                                  if (newValue == '                Utgångsdatum') {
+                                    
+                                    sortActivated = true;
+                                  }
+                                  if (newValue == '                Varugrupp') {
+                                    sortActivated = false; 
+                                  }
+                                });
+                              }),
+                        ),
+                  ),
                           
                         
                       
@@ -266,28 +258,20 @@ class PantryState extends State<Pantry> {
                                       },
                                     )
                                   : ListView.builder(
-                                      itemCount: info.length,
-                                      itemBuilder: (BuildContext context, int index) {
-                                        return Padding(
-                                          padding: EdgeInsets.only(top: 9.0),
-                                          child: Container(
-                                            child: ListTile(
-                                              title: Text(skafferi[index].kategori,
-                                                  style: GoogleFonts.alfaSlabOne(
-                                                      textStyle: const TextStyle(
-                                                    fontSize: 30,
-                                                    color: Colors.teal,
-                                                  ))),
-                                                subtitle: Text(
-                                                skafferi[index].produkter.join(", ")
-                                                )
-                                              ) 
-                                            ),
-                                          
-                                        );
-                                      }
-
-                                      )
+                                        itemCount: info.length,
+                                        itemBuilder: (_, index) {
+                                          return ExpansionTile(
+                                            title: Text(info[index].namn),
+                                            children: [
+                                              ...skafferi.map((e) {
+                                              if (info[index] == info[index]) {
+                                              return Text(info[index].namn);
+                                                  }
+                                            return Container();
+                                            }).toList(),
+                                          ]);
+                                        },
+                                      ),
                                       )
                     )
             ]
