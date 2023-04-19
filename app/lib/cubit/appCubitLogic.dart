@@ -6,6 +6,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../User/DetailPages/productPage.dart';
 import '../User/RoutingPages/add_food.dart';
 import 'appCubit.dart';
 import 'appCubitStates.dart';
@@ -27,6 +28,9 @@ class _AppCubitLogicsState extends State<AppCubitLogics> {
             return SignInDemo();
           }if(state is LoadedState){
             return MainPage();
+          }if(state is DetailState){
+            return ProductPage();
+
           }if(state is LoadingState){
             return Center(child: CircularProgressIndicator());
 

@@ -29,3 +29,11 @@ class LoadedState extends CubitStates{
   @override
   List<Object?> get props => [mat];
 }
+
+
+class DetailState extends CubitStates{
+  DetailState(this.produkt);
+  final Produkt produkt;
+  @override
+  List<Object?> get props => [produkt];
+}

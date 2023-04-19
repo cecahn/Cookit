@@ -4,6 +4,8 @@ import 'package:first/cubit/appCubitStates.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:first/Services/getSkafferi.dart';
 
+import '../Services/dataModel.dart';
+
 
 
 class AppCubits extends Cubit<CubitStates>{
@@ -22,5 +24,13 @@ class AppCubits extends Cubit<CubitStates>{
     }catch(e){
 
     }
+  }
+
+  detailPage(Produkt produkt){
+    emit(DetailState(produkt));
+  }
+
+  goHome(){
+    emit(LoadedState(mat));
   }
 }
