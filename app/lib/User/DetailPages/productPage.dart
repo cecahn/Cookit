@@ -5,6 +5,7 @@ import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../Constants/Utils/image_constants.dart';
 import '../../cubit/appCubit.dart';
 import '../../cubit/appCubitStates.dart';
 
@@ -32,9 +33,9 @@ class _ProductPageState extends State<ProductPage> {
                   child: Container(
                     width:double.maxFinite,
                     height: 300,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: AssetImage('Images/png/Bild_saknas.png'),
+                        image: AssetImage(ImageConstant.saknas),
                         fit:BoxFit.cover
                         ),
                       

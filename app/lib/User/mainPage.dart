@@ -7,6 +7,8 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../Constants/Utils/image_constants.dart';
+
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
 
@@ -48,7 +50,7 @@ class _MainPageState extends State<MainPage> {
           icon: SizedBox (
                 width: 40,
                 height: 40,
-                child: Image.asset('Images/png/004-healthy-food-1.png'),
+                child: Image.asset(ImageConstant.pantry),
               ),
           label: 'Skafferi',
         ),
@@ -56,7 +58,7 @@ class _MainPageState extends State<MainPage> {
           icon: SizedBox (
               width: 40,
               height: 40,
-              child:  Image.asset('Images/png/006-add.png'),
+              child:  Image.asset(ImageConstant.add),
             ),
           label: 'Lägg till',
         ),
@@ -64,7 +66,7 @@ class _MainPageState extends State<MainPage> {
           icon: SizedBox (
               width: 40,
               height: 40,
-              child: Image.asset('Images/png/005-recipe.png'),
+              child: Image.asset(ImageConstant.recipes),
             ),
           label: 'Recept',
         ),

@@ -3,6 +3,7 @@ import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../Constants/Utils/image_constants.dart';
 
 class RecipePage extends StatefulWidget {
   const RecipePage({Key? key}) : super(key: key);
@@ -26,9 +27,9 @@ class _RecipePageState extends State<RecipePage> {
               child: Container(
                 width:double.maxFinite,
                 height: 300,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage('Images/png/tacos.png'),
+                    image: AssetImage(ImageConstant.tacos),
                     fit:BoxFit.cover
                     ),
                   
