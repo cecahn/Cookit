@@ -23,18 +23,21 @@ class _AppCubitLogicsState extends State<AppCubitLogics> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocBuilder<AppCubits, CubitStates>(
-        builder: (context, state){
+        builder: (context, state) {
           if(state is WelcomeState){
+            print('Är i WelcomeState');
             return SignInDemo();
           }if(state is LoadedState){
+            print('Är i LoadedState');
             return MainPage();
           }if(state is DetailState){
+            print('Är i DetailState');
             return ProductPage();
-
           }if(state is LoadingState){
+              print('Är i LoadingState');
             return Center(child: CircularProgressIndicator());
-
           }else{
+            print('Är i nåt weird state');
             return Container();
           }
         }

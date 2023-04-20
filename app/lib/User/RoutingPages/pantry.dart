@@ -1,3 +1,4 @@
+import 'package:first/Services/getSkafferi.dart';
 import 'package:first/User/DetailPages/productPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
@@ -139,7 +140,11 @@ class PantryState extends State<Pantry> {
         body: BlocBuilder<AppCubits, CubitStates> (
           builder: (context, state){
             if (state is LoadedState) {
-              var info = state.mat;
+              // Vill hämta skafferiet från!
+              // var info = state.skafferi;
+              var idk = GetSkafferi();
+              var info = idk.skafferi();
+
               return Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
