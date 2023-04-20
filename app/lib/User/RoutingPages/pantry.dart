@@ -27,7 +27,7 @@ class Pantry extends StatefulWidget {
 }
 
 class PantryState extends State<Pantry> {
-  List<dynamic> skafferi = [];
+  String dropdownValue = 'Varugrupp';
 
   @override
   Widget build(BuildContext context) {
@@ -48,18 +48,127 @@ class PantryState extends State<Pantry> {
           } else if (snapshot.hasData) {
             // Extracting data from snapshot object
             final data = snapshot.data as List<Produkt>;
-            return ListView.builder(
-              itemCount: data.length,
-              itemBuilder: (product, index) {
-                  return ListTile(
-                      title: Text(data[index].namn),
-                      subtitle: Text(data[index].varugrupp)
-                  );
-              }
+            final unikaVarugrupper = data.map((e) => e.varugrupp).toSet();
+
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Padding(
+                  padding:
+                      const EdgeInsets.only(top: 10.0, left: 10.0, right: 10.0),
+                  child: TextField(
+                      controller: _textController,
+                      decoration: InputDecoration(
+                        hintText: 'Leta efter produkt i skafferiet',
+                        border: const OutlineInputBorder(),
+                        suffixIcon: IconButton(
+                            icon: const Icon(Icons.search, color: Colors.black),
+                            onPressed: () {
+                              setState(() async {
+                                input = _textController.text;
+                                _textController.clear();
+                                initState();
+                              });
+                            }),
+                      )),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.green),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    height: 44,
+                    width: 220,
+                    child: DropdownButton<String>(
+                        value: dropdownValue,
+                        icon: Transform.scale(
+                          scale: 0.0,
+                          child: const Icon(Icons.menu),
+                        ),
+                        style: const TextStyle(
+                          color: Colors.black54,
+                          fontSize: 15,
+                        ),
+                        items: [
+                          DropdownMenuItem(
+                            value: 'Utgångsdatum',
+                            child: Text('Utgångsdatum'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'Senast tillagd',
+                            child: Text('Senast tillagd'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'Varugrupp',
+                            child: Text('Varugrupp'),
+                          ),
+                        ],
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            dropdownValue = newValue!;
+                          });
+                        }),
+                  ),
+                ),
+                Padding(
+                    padding: const EdgeInsets.only(top: 7.0),
+                    child: SizedBox(
+                      height: 300,
+                      width: 400,
+                      child: dropdownValue != 'Varugrupp'
+                          ? ListView.builder(
+                              itemCount: data.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return Padding(
+                                  padding: EdgeInsets.only(top: 9.0),
+                                  child: Container(
+                                    height: 80,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                          width: 0.5, color: Colors.teal),
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    child: ListTile(
+                                      /*shape: RoundedRectangleBorder(
+                                            side: const BorderSide(
+                                                color: Colors.teal, width: 0.2),
+                                            borderRadius: BorderRadius.circular(5),
+                                          ),*/
+                                      title: Text(data[index].namn,
+                                          style: GoogleFonts.breeSerif(
+                                              textStyle: const TextStyle(
+                                            fontSize: 30,
+                                            color: Colors.black,
+                                          ))),
+                                      onTap: () {
+                                        BlocProvider.of<AppCubits>(context)
+                                            .detailPage(data[index]);
+                                      },
+                                    ),
+                                  ),
+                                );
+                              },
+                            )
+                          : ListView.builder(
+                              itemCount: unikaVarugrupper.length,
+                              itemBuilder: (_, index) {
+                                // Vill lägga till produkter efter varugrupp   
+                                final varugrupp = unikaVarugrupper.elementAt(index);
+                              return ExpansionTile(
+                                    title: Text(varugrupp),
+                                    children: data.where((e) => e.varugrupp == varugrupp).map((e) => Text(e.namn)).toList()
+                                );
+                              },
+                            ),
+                    ))
+              ],
             );
           }
         }
-        
+        // Väntar på att hämta skafferiet
         return Center(
           child: CircularProgressIndicator(),
         );
@@ -69,7 +178,7 @@ class PantryState extends State<Pantry> {
   }
 }
 
-Future<List<dynamic>> getSkafferi() async {
+Future<List<Produkt>> getSkafferi() async {
   var r2 = await Requests.get("https://litium.herokuapp.com/skafferi",
       withCredentials: true);
   List<dynamic> list = jsonDecode(r2.body);
