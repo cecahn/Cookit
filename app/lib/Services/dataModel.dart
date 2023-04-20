@@ -1,3 +1,13 @@
+Map<String, String> myMap = {
+  'Grönsaksinläggningar': 'Konserver',
+  'Mjölk': 'Mejeri',
+  'Griskött': 'Kött',
+  'Övrig ost': 'Mejeri',
+  'Charkuterier utom korv': 'Pålägg',
+  'Pasta, lång': 'Pasta',
+  'Risgryn, polerat': 'Ris',
+  'Matbröd, styck': 'Bröd',
+};
 
 class Produkt {
   final List<String> allergener;
@@ -8,6 +18,7 @@ class Produkt {
   final String namn;
   final String tillverkare;
   final String skafferi_id;
+  String category;
 
   Produkt({
     required this.gtin,
@@ -18,6 +29,7 @@ class Produkt {
     required this.tillverkare,
     required this.bastforedatum,
     required this.skafferi_id,
+    required this.category,
   });
 
   factory Produkt.fromJson(Map<String, dynamic> json) {
@@ -29,6 +41,16 @@ class Produkt {
         namn: json['namn'],
         tillverkare: json['tillverkare'],
         skafferi_id: json['skafferi_id'],
-        bastforedatum: json['bästföredatum']);
+        bastforedatum: json['bästföredatum'],
+        category: 'Övrigt');
+  }
+  void changeCategory() {
+    if (myMap.containsKey(varugrupp)) {
+      category = myMap[varugrupp].toString();
+    }
+  }
+
+  String getcategory() {
+    return category; 
   }
 }

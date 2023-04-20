@@ -15,7 +15,11 @@ import 'recipes.dart';
 //köttfärs 7350054730198
 // halloumi 07340062810241
 // mjölk 07310865001818
-
+// syltlök 07393756085005
+// skånemejerier 07310867000178
+// Griskött 02320101100002
+// Charkuterier utom korv 07312333006974
+// Matbröd 07313830012529
 
 late String stringResponse;
 late Map<dynamic, dynamic>? mapResponse;
