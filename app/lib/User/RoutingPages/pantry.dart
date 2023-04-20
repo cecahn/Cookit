@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:first/Services/getSkafferi.dart';
 import 'package:first/User/DetailPages/productPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';

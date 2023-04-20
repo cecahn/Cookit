@@ -3,7 +3,6 @@ import 'package:bloc/bloc.dart';
 import 'package:first/User/mainPage.dart';
 import 'package:first/cubit/appCubitStates.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:first/Services/getSkafferi.dart';
 
 import '../Services/dataModel.dart';
 
