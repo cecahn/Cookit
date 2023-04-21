@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:first/User/DetailPages/productPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
@@ -6,8 +8,10 @@ import 'dart:ui';
 import 'package:google_fonts/google_fonts.dart';
 import "package:multiselect/multiselect.dart";
 import 'package:first/Services/dataModel.dart';
+import 'package:requests/requests.dart';
 
 import '../../cubit/appCubit.dart';
+import '../../Services/dataModel.dart';
 import '../../cubit/appCubitStates.dart';
 import '../DetailPages/productPage.dart';
 import '../DetailPages/productPage.dart';
@@ -74,53 +78,43 @@ class Pantry extends StatefulWidget {
 }
 
 class PantryState extends State<Pantry> {
-  String dropdownValue = '                Varugrupp';
-  List<String> selected = [];
+  String dropdownValue = 'Varugrupp';
+  late final Future<List<Produkt>> skafferi;
+
+  @override
+  void initState() {
+    super.initState();
+    skafferi = getSkafferi();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Padding(
-            padding: EdgeInsets.only(left: 20.0),
-            child: Text("Skafferi",
-                style: GoogleFonts.alfaSlabOne(
-                  textStyle: const TextStyle(
-                    fontSize: 30,
-                  ),
-                  color: Colors.teal,
-                )),
-          ),
-          actions: [
-            IconButton(
-              icon: SizedBox(
-                width: 40,
-                height: 40,
-                child: Image.asset('Images/png/download.png'),
+    return FutureBuilder(
+      builder: (ctx, snapshot) {
+        // Checking if future is resolved or not
+        if (snapshot.connectionState == ConnectionState.done) {
+          // If we got an error
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                '${snapshot.error} occurred',
+                style: TextStyle(fontSize: 18),
               ),
-              onPressed: () {},
-            ),
-          ],
-          backgroundColor: Colors.white,
-        ),
-        body: BlocBuilder<AppCubits, CubitStates>(builder: (context, state) {
-          if (state is LoadedState) {
-            var info = state.mat;
-            for (int i = 0; i < info.length; i++) {
-              info.elementAt(i).changeCategory();
-              if (selectedCategories
-                      .contains(info.elementAt(i).getcategory()) ==
-                  false) {
-                selectedCategories.add(info.elementAt(i).getcategory());
-              }
-            }
+            );
+
+            // if we got our data
+          } else if (snapshot.hasData) {
+            // Extracting data from snapshot object
+            final data = snapshot.data as List<Produkt>;
+            final unikaVarugrupper = data.map((e) => e.varugrupp).toSet();
+
             return Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        top: 10.0, left: 10.0, right: 10.0),
-                    child: TextField(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Padding(
+                  padding:
+                      const EdgeInsets.only(top: 10.0, left: 10.0, right: 10.0),
+                  child: TextField(
                       controller: _textController,
                       decoration: InputDecoration(
                         hintText: 'Leta efter produkt i skafferiet',
@@ -134,120 +128,118 @@ class PantryState extends State<Pantry> {
                                 initState();
                               });
                             }),
-                      ),
+                      )),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.only(top: 20.0, left: 20.0, right: 20.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.green),
+                      borderRadius: BorderRadius.circular(5),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        top: 20.0, left: 20.0, right: 20.0),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.green),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      height: 44,
-                      width: 220,
-                      child: DropdownButton<String>(
-                          value: dropdownValue,
-                          icon: Transform.scale(
-                            scale: 0.0,
-                            child: const Icon(Icons.menu),
+                    height: 44,
+                    width: 220,
+                    child: DropdownButton<String>(
+                        value: dropdownValue,
+                        icon: Transform.scale(
+                          scale: 0.0,
+                          child: const Icon(Icons.menu),
+                        ),
+                        style: const TextStyle(
+                          color: Colors.black54,
+                          fontSize: 15,
+                        ),
+                        items: [
+                          DropdownMenuItem(
+                            value: 'Utgångsdatum',
+                            child: Text('Utgångsdatum'),
                           ),
-                          style: const TextStyle(
-                            color: Colors.black54,
-                            fontSize: 15,
+                          DropdownMenuItem(
+                            value: 'Senast tillagd',
+                            child: Text('Senast tillagd'),
                           ),
-                          isExpanded: true,
-                          items: [
-                            DropdownMenuItem(
-                              value: '                Utgångsdatum',
-                              child: Text('                Utgångsdatum'),
-                            ),
-                            DropdownMenuItem(
-                              value: '                Senast tillagd',
-                              child: Text('                Senast tillagd'),
-                            ),
-                            DropdownMenuItem(
-                              value: '                Varugrupp',
-                              child: Text('                Varugrupp'),
-                            ),
-                          ],
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              dropdownValue = newValue!;
-                              if (newValue ==
-                                  '                Senast tillagd') {
-                                sortActivated = true;
-                              }
-                              if (newValue == '                Utgångsdatum') {
-                                sortActivated = true;
-                              }
-                              if (newValue == '                Varugrupp') {
-                                sortActivated = false;
-                              }
-                            });
-                          }),
-                    ),
+                          DropdownMenuItem(
+                            value: 'Varugrupp',
+                            child: Text('Varugrupp'),
+                          ),
+                        ],
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            dropdownValue = newValue!;
+                          });
+                        }),
                   ),
-                  Padding(
-                      padding: const EdgeInsets.only(top: 7.0),
-                      child: SizedBox(
-                        height: 500,
-                        width: 400,
-                        child: sortActivated
-                            ? ListView.builder(
-                                itemCount: info.length,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return Padding(
-                                    padding: EdgeInsets.only(top: 9.0),
-                                    child: Container(
-                                      height: 80,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                            width: 0.5, color: Colors.teal),
-                                        borderRadius: BorderRadius.circular(15),
-                                      ),
-                                      child: ListTile(
-                                        /*shape: RoundedRectangleBorder(
+                ),
+                Padding(
+                    padding: const EdgeInsets.only(top: 7.0),
+                    child: SizedBox(
+                      height: 300,
+                      width: 400,
+                      child: dropdownValue != 'Varugrupp'
+                          ? ListView.builder(
+                              itemCount: data.length,
+                              itemBuilder: (BuildContext context, int index) {
+                                return Padding(
+                                  padding: EdgeInsets.only(top: 9.0),
+                                  child: Container(
+                                    height: 80,
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                          width: 0.5, color: Colors.teal),
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    child: ListTile(
+                                      /*shape: RoundedRectangleBorder(
                                             side: const BorderSide(
                                                 color: Colors.teal, width: 0.2),
                                             borderRadius: BorderRadius.circular(5),
                                           ),*/
-                                        title: Text(info[index].namn,
-                                            style: GoogleFonts.breeSerif(
-                                                textStyle: const TextStyle(
-                                              fontSize: 30,
-                                              color: Colors.black,
-                                            ))),
-                                        onTap: () {
-                                          BlocProvider.of<AppCubits>(context)
-                                              .detailPage(info[index]);
-                                        },
-                                      ),
+                                      title: Text(data[index].namn,
+                                          style: GoogleFonts.breeSerif(
+                                              textStyle: const TextStyle(
+                                            fontSize: 30,
+                                            color: Colors.black,
+                                          ))),
+                                      onTap: () {
+                                        BlocProvider.of<AppCubits>(context)
+                                            .detailPage(data[index]);
+                                      },
                                     ),
-                                  );
-                                },
-                              )
-                            : ListView.builder(
-                                itemCount: selectedCategories.length,
-                                itemBuilder: (_, index) {
-                                  return ExpansionTile(
-                                      title: Text(selectedCategories[index]),
-                                      children: [
-                                        ...info.map((e) {
-                                          if (e.category == selectedCategories[index]) {
-                                            return Text(e.namn);
-                                          }
-                                          return Container();
-                                        }).toList(),
-                                      ]);
-                                },
-                              ),
-                      ))
-                ]);
-          } else {
-            return Container();
+                                  ),
+                                );
+                              },
+                            )
+                          : ListView.builder(
+                              itemCount: unikaVarugrupper.length,
+                              itemBuilder: (_, index) {
+                                // Vill lägga till produkter efter varugrupp   
+                                final varugrupp = unikaVarugrupper.elementAt(index);
+                              return ExpansionTile(
+                                    title: Text(varugrupp),
+                                    children: data.where((e) => e.varugrupp == varugrupp).map((e) => Text(e.namn)).toList()
+                                );
+                              },
+                            ),
+                    ))
+              ],
+            );
           }
-        }));
+        }
+        // Väntar på att hämta skafferiet
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+      future: skafferi,
+    );
   }
+}
+
+Future<List<Produkt>> getSkafferi() async {
+  var r2 = await Requests.get("https://litium.herokuapp.com/skafferi",
+      withCredentials: true);
+  List<dynamic> list = jsonDecode(r2.body);
+  print(list);
+  return list.map((e) => Produkt.fromJson(e)).toList();
 }

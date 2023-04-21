@@ -14,5 +14,8 @@ class ImageConstant {
 
   static String ellips = "assets/images/png/download.png";
 
+  static String saknas = "assets/images/png/Bild_saknas.png";
+  
+  static String tacos = "assets/images/png/tacos.png";
 
 }

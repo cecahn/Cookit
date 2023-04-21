@@ -6,6 +6,7 @@
 
 import 'dart:async';
 import 'dart:convert' show json;
+import 'package:first/cubit/appCubitStates.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:requests/requests.dart';
 import 'package:flutter/foundation.dart';
@@ -61,28 +62,37 @@ class _SignInDemoState extends State<SignInDemo> {
       // can call the REST API.
       if (isAuthorized) {
         // Vi är inloggade!
-        final GoogleSignInAuthentication? googleAuth = await _currentUser?.authentication;
-    
-        final String ?accessToken = googleAuth?.accessToken;
+        final GoogleSignInAuthentication? googleAuth =
+            await _currentUser?.authentication;
+
+        final String? accessToken = googleAuth?.accessToken;
 
         var cookies = await Requests.getStoredCookies('litium.herokuapp.com');
 
         if (!cookies.keys.contains('session')) {
           print('cookie missing triggering signin flow');
           if (accessToken != null) {
-            await Requests.get("https://litium.herokuapp.com/login", queryParameters: {'access_token': accessToken}, withCredentials: true); 
+            await Requests.get("https://litium.herokuapp.com/login",
+                queryParameters: {'access_token': accessToken},
+                withCredentials: true);
           }
         }
-        var r2 = await Requests.get("https://litium.herokuapp.com/skafferi", withCredentials: true); 
-        print(r2.json());
+        /*    
+        var r2 = await Requests.get("https://litium.herokuapp.com/skafferi",
+            withCredentials: true);
+        print(r2.json()); 
+        */
+        print('hallå!!');
+        BlocProvider.of<AppCubits>(context).emit(LoadedState());
       }
+
     });
 
     // In the web, _googleSignIn.signInSilently() triggers the One Tap UX.
     //
     // It is recommended by Google Identity Services to render both the One Tap UX
     // and the Google Sign In button together to "reduce friction and improve
-    // sign-in rates" ([docs](https://developers.google.com/identity/gsi/web/guides/display-button#html)).
+    // sign-in rates" ([docs](https://developers.google.com/identity/gsi/web/guides/display-button#html)).    
     _googleSignIn.signInSilently();
   }
 
@@ -97,8 +107,6 @@ class _SignInDemoState extends State<SignInDemo> {
       print(error);
       return;
     }
-
-
   }
 
   // Prompts the user to authorize `scopes`.
@@ -118,8 +126,8 @@ class _SignInDemoState extends State<SignInDemo> {
   }
 
   Future<void> _handleSignOut() async {
-    await Requests.get("https://litium.herokuapp.com/logout", withCredentials: true); 
-
+    await Requests.get("https://litium.herokuapp.com/logout",
+        withCredentials: true);
 
     await Requests.clearStoredCookies('litium.herokuapp.com');
 
@@ -128,6 +136,7 @@ class _SignInDemoState extends State<SignInDemo> {
 
   Widget _buildBody() {
     final GoogleSignInAccount? user = _currentUser;
+    /*   
     if (user != null) {
       // The user is Authenticated
       return Column(
@@ -144,17 +153,6 @@ class _SignInDemoState extends State<SignInDemo> {
           if (_isAuthorized) ...<Widget>[
             // The user has Authorized all required scopes
             const Text("Hejsan"),
-            GestureDetector(
-            onTap:(){
-              BlocProvider.of<AppCubits>(context).getLogin();
-            },
-            child: Container(
-              width: 200,
-              child: ElevatedButton.icon(
-                onPressed: null,
-                icon: Icon(Icons.home),
-                label: Text("hej"))),
-              ),
           ],
           if (!_isAuthorized) ...<Widget>[
             // The user has NOT Authorized all required scopes.
@@ -171,22 +169,22 @@ class _SignInDemoState extends State<SignInDemo> {
           ),
         ],
       );
-    } else {
-      // The user is NOT Authenticated
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          const Text('You are not currently signed in.'),
-          // This method is used to separate mobile from web code with conditional exports.
-          // See: src/sign_in_button.dart
-          ElevatedButton.icon(
-              //icon: const Icon(Icons.Google, color: Colors.black),
-              onPressed: _handleSignIn,
-              icon: const Icon(Icons.android),
-              label: const Text("google")),
-        ],
-      );
-    }
+    } else { 
+      */
+    // The user is NOT Authenticated
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: <Widget>[
+        const Text('You are not currently signed in.'),
+        // This method is used to separate mobile from web code with conditional exports.
+        // See: src/sign_in_button.dart
+        ElevatedButton.icon(
+            //icon: const Icon(Icons.Google, color: Colors.black),
+            onPressed: _handleSignIn,
+            icon: const Icon(Icons.android),
+            label: const Text("google")),
+      ],
+    );
   }
 
   @override
@@ -198,11 +196,10 @@ class _SignInDemoState extends State<SignInDemo> {
             child: Text("CookIt.",
                 style: GoogleFonts.alfaSlabOne(
                   textStyle: const TextStyle(
-                  fontSize: 30,
-                ),
-                color: Colors.teal,
-              )
-            ),
+                    fontSize: 30,
+                  ),
+                  color: Colors.teal,
+                )),
           ),
           actions: [
             /*IconButton(
@@ -217,35 +214,13 @@ class _SignInDemoState extends State<SignInDemo> {
           backgroundColor: Colors.white,
         ),
         body: Center(
-          child: 
-          Column(
-            children: [
-            
-            GestureDetector(
-            onTap:(){
-              BlocProvider.of<AppCubits>(context).getLogin();
-            },
-            child: Container(
-              width: 200,
-              child: ElevatedButton.icon(
-                onPressed: null,
-                icon: Icon(Icons.home),
-                label: Text("hej"))),
-              ),
-            
-          
-
-           ElevatedButton.icon(
-                //icon: const Icon(Icons.Google, color: Colors.black),
-                onPressed:_handleSignIn,
-                icon: const Icon(Icons.android),
-                label: const Text("google"),
-            )
-            ]
+            child: Column(children: [
+          ElevatedButton.icon(
+            //icon: const Icon(Icons.Google, color: Colors.black),
+            onPressed: _handleSignIn,
+            icon: const Icon(Icons.android),
+            label: const Text("google"),
           )
-        )
-    
-    
-    );
+        ])));
   }
 }

@@ -8,6 +8,7 @@ import 'package:first/Widgets/bottomBar.dart';
 import 'package:requests/requests.dart';
 
 //import '../Routes/routes.dart';
+import '../../Constants/Utils/image_constants.dart';
 import 'pantry.dart';
 import 'recipes.dart';
 
@@ -120,7 +121,7 @@ class _TestHomePageState extends State<TestHomePage> {
           ),
           actions: [
             IconButton(
-              icon: Image.asset('Images/png/download.png',
+              icon: Image.asset(ImageConstant.ellips,
               width: 100,
               height: 100,
               ),

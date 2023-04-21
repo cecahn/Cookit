@@ -8,6 +8,7 @@ import '../../Constants/Utils/dimensions.dart';
 import '../../cubit/appCubit.dart';
 import '../../cubit/appCubitStates.dart';
 //import 'package:myapp/utils.dart';
+import '../../Constants/Utils/image_constants.dart';
 
 final _textController = TextEditingController();
 String input = "";
@@ -43,7 +44,7 @@ class RecipesState extends State<Recipes> {
               icon: SizedBox(
                 width: 40,
                 height: 40,
-                child: Image.asset('Images/png/003-settings.png'),
+                child: Image.asset(ImageConstant.settings),
               ),
               onPressed: () {},
             ),

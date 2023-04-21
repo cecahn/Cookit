@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:bloc/bloc.dart';
+import 'package:first/User/mainPage.dart';
 import 'package:first/cubit/appCubitStates.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:first/Services/getSkafferi.dart';
 
 import '../Services/dataModel.dart';
 import '../Services/getLogin.dart';
@@ -11,13 +11,14 @@ import '../Services/getRecipes.dart';
 
 
 class AppCubits extends Cubit<CubitStates>{
-  AppCubits({required this.skafferi}) : super(InitialState()){
+  AppCubits() : super(InitialState()){
     emit(WelcomeState());
   }
 
-  final GetSkafferi skafferi;
-  late final mat; 
-  late final recept;
+  // late final GetSkafferi skafferi;
+  // late final mat; 
+  // final bool inloggad;
+  /*   
   void getLogin()async{
 
     try{
@@ -29,7 +30,7 @@ class AppCubits extends Cubit<CubitStates>{
 
     }
   }
-
+  */
   detailPage(Produkt produkt){
     emit(ProductState(produkt));
   }
@@ -39,6 +40,7 @@ class AppCubits extends Cubit<CubitStates>{
   }
 
   goHome(){
-    emit(LoadedState(mat));
+    // emit(LoadedState(mat));
+    emit(LoadedState());
   }
 }

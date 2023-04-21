@@ -1,3 +1,4 @@
+import 'package:first/Constants/Utils/image_constants.dart';
 import 'package:flutter/material.dart';
 
 
@@ -17,7 +18,7 @@ class CustomNavBar extends StatelessWidget {
           icon: SizedBox (
                 width: 40,
                 height: 40,
-                child: Image.asset('Images/png/004-healthy-food-1.png'),
+                child: Image.asset(ImageConstant.pantry),
               ),
           label: 'Skafferi',
         ),
@@ -25,7 +26,7 @@ class CustomNavBar extends StatelessWidget {
           icon: SizedBox (
               width: 40,
               height: 40,
-              child:  Image.asset('Images/png/006-add.png'),
+              child:  Image.asset(ImageConstant.goback),
             ),
           label: 'Lägg till',
         ),
@@ -33,7 +34,7 @@ class CustomNavBar extends StatelessWidget {
           icon: SizedBox (
               width: 40,
               height: 40,
-              child: Image.asset('Images/png/005-recipe.png'),
+              child: Image.asset(ImageConstant.recipes),
             ),
           label: 'Recept',
         ),

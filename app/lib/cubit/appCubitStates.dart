@@ -25,8 +25,12 @@ class LoadingState extends CubitStates{
 }
 
 class LoadedState extends CubitStates{
+  /*   
   LoadedState(this.mat);
   final List<Produkt> mat;
+  @override
+  List<Object?> get props => [mat]; 
+  */
   @override
   List<Object?> get props => [];
 }
