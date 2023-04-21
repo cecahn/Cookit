@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:ui';
 import 'package:google_fonts/google_fonts.dart';
+
+import '../../Constants/Utils/dimensions.dart';
+import '../../cubit/appCubit.dart';
+import '../../cubit/appCubitStates.dart';
 //import 'package:myapp/utils.dart';
 
 final _textController = TextEditingController();
@@ -22,14 +27,16 @@ class RecipesState extends State<Recipes> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Padding(
+          title: Padding(
             padding: EdgeInsets.only(left: 20.0),
             child: Text("Recept",
-                style: TextStyle(
-                  color: Colors.teal,
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
-                )),
+                  style: GoogleFonts.alfaSlabOne(
+                        textStyle: const TextStyle(
+                        fontSize: 30,
+                          ),
+                          color: Colors.teal,
+                        )
+                      ),
           ),
           actions: [
             IconButton(
@@ -43,7 +50,12 @@ class RecipesState extends State<Recipes> {
           ],
           backgroundColor: Colors.white,
         ),
-        body: Center(
+        body: BlocBuilder<AppCubits, CubitStates> (
+          builder: (context, state){
+            if (state is LoadedState) {
+              var info = state.mat;
+
+          return Center(
           child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
             Padding(
               padding:
@@ -177,9 +189,95 @@ class RecipesState extends State<Recipes> {
                   ),
                 ],
               ),
-            ),
+              ),
+               
+            
+            Expanded (
+              child: SingleChildScrollView(
+              //listan av recept
+            child: Container(
+                height:500,
+                child: Padding(
+                  padding: EdgeInsets.only(top: 30, left: Dimensions.width15, right: Dimensions.width15),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    physics: AlwaysScrollableScrollPhysics(),
+                    itemCount: 10,
+                    itemBuilder: (context, index){
+                    return GestureDetector(
+                     onTap:(){
+
+                       BlocProvider.of<AppCubits>(context).detailPage(info[index]);
+              
+                            },
+                    
+                    child: Container(
+                      margin: EdgeInsets.only(left: Dimensions.width20, right: Dimensions.width20, bottom: Dimensions.width15 ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 70,
+                            height: 70,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(Dimensions.radius20),
+                              color: Colors.white,
+                              image: const DecorationImage(
+                                      image: AssetImage('Images/png/tacos.png'),
+                                      fit:BoxFit.cover
+                                      ), 
+                            )
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 30),
+                            child: Container(
+                                height: 100,
+                                decoration: BoxDecoration(
+                                borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(Dimensions.radius20),
+                                bottomRight: Radius.circular(Dimensions.radius20),
+                              ),
+                              color: Colors.white,
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.only(left: Dimensions.width10, top: Dimensions.width10),
+                              child: Column(
+                                children: [
+                                  Text(info[index].namn,
+                                      style: GoogleFonts.alfaSlabOne(
+                                        textStyle: const TextStyle(
+                                        fontSize: 30,
+                                      ),
+                                      color: Colors.black,
+                                      )
+                                    ),
+                                ],)
+                            )
+                          ),
+                            ),
+                            ),
+                          
+                          
+                        ],
+                      )
+                    ),
+                    );
+                    },)
+                ),
+            )
+              )
+            )
+
           ]),
-        ),
+        );
+        
+        
+            }
+            else{
+              return Container();
+            }
+            }
+            )
         
         
         );

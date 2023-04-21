@@ -30,7 +30,8 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: pages[currentIndex],
+      body:  pages[currentIndex],
+      
       bottomNavigationBar: BottomNavigationBar(
       unselectedFontSize: 0,
       selectedFontSize: 0,

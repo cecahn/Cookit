@@ -19,7 +19,7 @@ class _ProductPageState extends State<ProductPage> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AppCubits, CubitStates>(builder: (context, state){
-      DetailState detail = state as DetailState;
+      ProductState detail = state as ProductState;
       return Scaffold(
           body: Container(
             width: double.maxFinite,

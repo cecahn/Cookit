@@ -1,8 +1,11 @@
 
+import 'package:first/Services/getLogin.dart';
+import 'package:first/Services/getRecipes.dart';
 import 'package:first/User/mainPage.dart';
 import 'package:first/User/DetailPages/productPage.dart';
 import 'package:first/cubit/appCubitLogic.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'Services/getSkafferi.dart';
 import 'User/RoutingPages/pantry.dart';
 import 'homepage.dart';
@@ -25,7 +28,7 @@ class MyApp extends StatelessWidget{
 
   @override 
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: "CookIt",
       debugShowCheckedModeBanner: false,
       theme:ThemeData(
@@ -33,7 +36,9 @@ class MyApp extends StatelessWidget{
         ),
     home: BlocProvider<AppCubits>(
       create:(context)=>AppCubits(
-        skafferi: GetSkafferi()),
+        skafferi: GetSkafferi()
+        ),
+        
       child: AppCubitLogics(),
     )
     );

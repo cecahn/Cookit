@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import '../Services/dataModel.dart';
+import '../Services/receptModel.dart';
 
 abstract class CubitStates extends Equatable{
 
@@ -27,12 +28,19 @@ class LoadedState extends CubitStates{
   LoadedState(this.mat);
   final List<Produkt> mat;
   @override
-  List<Object?> get props => [mat];
+  List<Object?> get props => [];
 }
 
 
-class DetailState extends CubitStates{
-  DetailState(this.produkt);
+class ProductState extends CubitStates{
+  ProductState(this.produkt);
+  final Produkt produkt;
+  @override
+  List<Object?> get props => [produkt];
+}
+
+class RecipeState extends CubitStates{
+  RecipeState(this.produkt);
   final Produkt produkt;
   @override
   List<Object?> get props => [produkt];

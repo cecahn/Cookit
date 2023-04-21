@@ -6,28 +6,19 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'dart:async';
 import 'dart:convert' show json, jsonDecode;
 
-const List<String> scopes = <String>['email', 'profile', 'openid'];
+
 
  
 
-class GetSkafferi {
+class GetRecipes {
 
-skafferi () async{
+recipes () async{
 
 
-        var r2 = await Requests.get("https://litium.herokuapp.com/skafferi", withCredentials: true); 
+        var r2 = await Requests.get("https://litium.herokuapp.com/get/recomendations?max=1", withCredentials: true); 
         List<dynamic> list = jsonDecode(r2.body);
         print(list);
         return list.map((e) => Produkt.fromJson(e)).toList();
   }
 
 }
-
-
-
-
-
-
-        
-
-
