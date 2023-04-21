@@ -28,6 +28,13 @@ class Pantry extends StatefulWidget {
 
 class PantryState extends State<Pantry> {
   String dropdownValue = 'Varugrupp';
+  late final Future<List<Produkt>> skafferi;
+
+  @override
+  void initState() {
+    super.initState();
+    skafferi = getSkafferi();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -173,7 +180,7 @@ class PantryState extends State<Pantry> {
           child: CircularProgressIndicator(),
         );
       },
-      future: getSkafferi(),
+      future: skafferi,
     );
   }
 }
