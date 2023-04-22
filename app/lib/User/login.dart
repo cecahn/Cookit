@@ -6,6 +6,8 @@
 
 import 'dart:async';
 import 'dart:convert' show json;
+import 'package:first/Constants/Utils/image_constants.dart';
+import 'package:first/Widgets/appBar.dart';
 import 'package:first/cubit/appCubitStates.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:requests/requests.dart';
@@ -190,29 +192,7 @@ class _SignInDemoState extends State<SignInDemo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Padding(
-            padding: EdgeInsets.only(left: 20.0),
-            child: Text("CookIt.",
-                style: GoogleFonts.alfaSlabOne(
-                  textStyle: const TextStyle(
-                    fontSize: 30,
-                  ),
-                  color: Colors.teal,
-                )),
-          ),
-          actions: [
-            /*IconButton(
-              icon: SizedBox (
-              width: 40,
-              height: 40,
-              child: Image.asset('Images/png/003-settings.png'),
-              ),
-              onPressed: () {},
-            ),*/
-          ],
-          backgroundColor: Colors.white,
-        ),
+        appBar: customAppBar("CookIt.", ImageConstant.ellips),
         body: Center(
             child: Column(children: [
           ElevatedButton.icon(
