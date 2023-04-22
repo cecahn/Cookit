@@ -229,7 +229,7 @@ class RecipesState extends State<Recipes> {
                   child: ListView.builder(
                     shrinkWrap: true,
                     physics: AlwaysScrollableScrollPhysics(),
-                    itemCount: 10,
+                    itemCount: data.length,
                     itemBuilder: (context, index){
                     return GestureDetector(
                      onTap:(){
@@ -248,8 +248,8 @@ class RecipesState extends State<Recipes> {
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(Dimensions.radius20),
                               color: Colors.white,
-                              image: const DecorationImage(
-                                      image: AssetImage('Images/png/tacos.png'),
+                              image: DecorationImage(
+                                      image: NetworkImage(data[index].bild),
                                       fit:BoxFit.cover
                                       ), 
                             )
@@ -319,6 +319,5 @@ Future<List<Recept>> getRecept() async {
   var r2 = await Requests.get("https://litium.herokuapp.com/get/recomendations?max=1",
       withCredentials: true);
   List<dynamic> list = jsonDecode(r2.body);
-  print(list);
   return list.map((e) => Recept.fromJson(e)).toList();
 }

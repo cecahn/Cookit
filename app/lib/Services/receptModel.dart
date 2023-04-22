@@ -1,6 +1,6 @@
+import 'dart:convert';
 
 class Recept {
-  
   final int betyg; 
   final String bild;
   final int id;
@@ -8,7 +8,6 @@ class Recept {
   final List<String> matt;
   final String titel;
   
-
   Recept({
     required this.betyg,
     required this.bild,
@@ -19,9 +18,11 @@ class Recept {
   });
 
   factory Recept.fromJson(Map<String, dynamic> json) {
+    final List<dynamic> instruktioner  = jsonDecode(json['instruktion']);
+    final List<dynamic> matt  = jsonDecode(json['mått']);
     return Recept(
-        instruktion: List<String>.from(json['instruktion'] ?? []),
-        matt: List<String>.from(json['instruktion'] ?? []),
+        instruktion: instruktioner.map((e) => e.toString()).toList(),
+        matt: matt.map((e) => e.toString()).toList(),
         titel: json['titel'],
         bild: json['bild'],
         betyg: json['betyg'],
