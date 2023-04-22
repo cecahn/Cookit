@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 class Recept {
-  final int betyg; 
+  final num betyg; 
   final String bild;
-  final int id;
+  final num id;
   final List<String> instruktion;
   final List<String> matt;
   final String titel;

@@ -37,7 +37,7 @@ class Produkt {
         gtin: json['gtin'],
         varugrupp: json['varugrupp'],
         allergener: List<String>.from(json['allergener'] ?? []),
-        hallbarhet: json['hallbarhet'],
+        hallbarhet: json['hållbarhet'],
         namn: json['namn'],
         tillverkare: json['tillverkare'],
         skafferi_id: json['skafferi_id'],
