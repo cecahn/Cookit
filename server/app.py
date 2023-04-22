@@ -19,7 +19,10 @@ from db import (
     db_get_skafferi,
     db_add_to_pantry,
     db_remove_from_pantry,
-    db_set_betyg
+    db_set_betyg,
+    db_search_recipe,
+    db_get_recomendations,
+    db_get_recipe
 )
 from api import api_get_product
 from user import User
@@ -47,6 +50,41 @@ mysql = MySQL(app)
 CORS(app, supports_credentials=True)
 login_manager = LoginManager(app)
 login_manager.init_app(app)
+
+@app.route("/get/recomendations")
+@login_required
+def fetch_recomendations():
+    user_id = current_user.id
+
+    # Max antal rekomendationer att få tillbaks
+    if (request.args.get('max')):
+        max_results = int(request.args.get('max'))
+    else:
+        max_results = 10
+
+    recomendations = db_get_recomendations(user_id, max_results, mysql)
+
+    return recomendations
+
+@app.route("/get/recipe")
+@login_required
+def fetch_recipe():
+    recipe_id = request.args.get('recipe-id')
+
+    if not recipe_id.isdigit():
+        return "Invalid recipe ID", 400
+    
+    return db_get_recipe(recipe_id, mysql)
+
+@app.route("/search")
+@login_required
+def search_recipe():
+    phrase = request.args.get('phrase')
+    limit = request.args.get('limit')
+
+    result = db_search_recipe(phrase, limit, mysql)
+
+    return result, 200
 
 @app.route("/skafferi/spara")
 @login_required
