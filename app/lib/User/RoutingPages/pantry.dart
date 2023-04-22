@@ -24,7 +24,7 @@ List<String> filter = ['Mejeri', 'Kött'];
 List<String> selectedCategories = [];
 
 //import 'package:myapp/utils.dart';
-class Produkt {
+/*class Produkt {
   final String varugrupp;
   final String namn;
   final int utgang;
@@ -37,11 +37,11 @@ class Produkt {
       required this.namn,
       required this.utgang,
       required this.tid});
-}
+}*/
 
 List<Produkt> skafferi = [];
 
-int sortByUtgang(Produkt produkta, Produkt produktb) {
+/*int sortByUtgang(Produkt produkta, Produkt produktb) {
   int a = produkta.utgang;
   int b = produktb.utgang;
 
@@ -65,7 +65,7 @@ int sortByTime(Produkt produkta, Produkt produktb) {
   } else {
     return 0;
   }
-}
+}*/
 
 final _textController = TextEditingController();
 String input = "";
@@ -178,7 +178,7 @@ class PantryState extends State<Pantry> {
                       width: 400,
                       child: dropdownValue != 'Varugrupp'
                           ? ListView.builder(
-                              itemCount: data.length,
+                              itemCount: data!.length,
                               itemBuilder: (BuildContext context, int index) {
                                 return Padding(
                                   padding: EdgeInsets.only(top: 9.0),
@@ -203,7 +203,7 @@ class PantryState extends State<Pantry> {
                                           ))),
                                       onTap: () {
                                         BlocProvider.of<AppCubits>(context)
-                                            .detailPage(data[index]);
+                                            .ProduktPage(data[index]);
                                       },
                                     ),
                                   ),
@@ -243,3 +243,6 @@ Future<List<Produkt>> getSkafferi() async {
   print(list);
   return list.map((e) => Produkt.fromJson(e)).toList();
 }
+
+
+

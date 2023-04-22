@@ -44,8 +44,14 @@ class ProductState extends CubitStates{
 }
 
 class RecipeState extends CubitStates{
-  RecipeState(this.produkt);
-  final Produkt produkt;
+  RecipeState(this.recept);
+  final Recept recept;
   @override
-  List<Object?> get props => [produkt];
+  List<Object?> get props => [recept];
+}
+
+class PantryState extends CubitStates{
+ 
+  @override
+  List<Object?> get props => [];
 }

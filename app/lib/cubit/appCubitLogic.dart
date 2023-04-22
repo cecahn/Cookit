@@ -30,15 +30,14 @@ class _AppCubitLogicsState extends State<AppCubitLogics> {
             return SignInDemo();
           }if(state is LoadedState){
             print('Är i LoadedState');
-            return MainPage();
-          }if(state is DetailState){
-            print('Är i DetailState');
-          }if(state is RecipeState){
-            return ProductPage();
-
+            return MainPage(index:1);
           }if(state is ProductState){
+            print('Är i DetailState');
+            return ProductPage();
+          }if(state is RecipeState){
             return RecipePage();
-
+          }if(state is PantryState){
+            return MainPage(index:0);
           }if(state is LoadingState){
               print('Är i LoadingState');
             return Center(child: CircularProgressIndicator());

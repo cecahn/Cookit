@@ -2,24 +2,30 @@
 class Recept {
   
   final int betyg; 
-  final String namn;
-  final List<String> ingredienser;
-  final String instruktioner;
+  final String bild;
+  final int id;
+  final List<String> instruktion;
+  final List<String> matt;
+  final String titel;
   
 
   Recept({
     required this.betyg,
-    required this.namn,
-    required this.ingredienser,
-    required this.instruktioner,
+    required this.bild,
+    required this.instruktion,
+    required this.id,
+    required this.matt,
+    required this.titel,
   });
 
   factory Recept.fromJson(Map<String, dynamic> json) {
     return Recept(
-        ingredienser: List<String>.from(json['ingredienser'] ?? []),
-        instruktioner: json['instruktioner'],
+        instruktion: List<String>.from(json['instruktion'] ?? []),
+        matt: List<String>.from(json['instruktion'] ?? []),
+        titel: json['titel'],
+        bild: json['bild'],
         betyg: json['betyg'],
-        namn: json['namn'],
+        id: json['id'],
         );
   }
 }

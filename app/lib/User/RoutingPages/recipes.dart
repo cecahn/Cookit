@@ -1,10 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:ui';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:requests/requests.dart';
 
 import '../../Constants/Utils/dimensions.dart';
+import '../../Services/receptModel.dart';
 import '../../cubit/appCubit.dart';
 import '../../cubit/appCubitStates.dart';
 //import 'package:myapp/utils.dart';
@@ -23,10 +27,36 @@ class Recipes extends StatefulWidget {
 class RecipesState extends State<Recipes> {
   String dropdownValue = 'Filter';
   String dropdownValue2 = 'Sortera';
+  late final Future<List<Recept>> recept;
+
+  @override
+  void initState() {
+    super.initState();
+    recept = getRecept();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return FutureBuilder(
+      builder: (ctx, snapshot) {
+        // Checking if future is resolved or not
+        if (snapshot.connectionState == ConnectionState.done) {
+          // If we got an error
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                '${snapshot.error} occurred',
+                style: TextStyle(fontSize: 18),
+              ),
+            );
+
+            // if we got our data
+          } else if (snapshot.hasData) {
+            // Extracting data from snapshot object
+            final data = snapshot.data as List<Recept>;
+            //final unikaVarugrupper = data.map((e) => e.varugrupp).toSet();
+
+              return Scaffold(
         appBar: AppBar(
           title: Padding(
             padding: EdgeInsets.only(left: 20.0),
@@ -44,19 +74,15 @@ class RecipesState extends State<Recipes> {
               icon: SizedBox(
                 width: 40,
                 height: 40,
-                child: Image.asset(ImageConstant.settings),
+                child: Image.asset('Images/png/003-settings.png'),
               ),
               onPressed: () {},
             ),
           ],
           backgroundColor: Colors.white,
         ),
-        body: BlocBuilder<AppCubits, CubitStates> (
-          builder: (context, state){
-            if (state is LoadedState) {
-              var info = state.mat;
-
-          return Center(
+        body: 
+           Center(
           child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
             Padding(
               padding:
@@ -208,7 +234,7 @@ class RecipesState extends State<Recipes> {
                     return GestureDetector(
                      onTap:(){
 
-                       BlocProvider.of<AppCubits>(context).detailPage(info[index]);
+                       BlocProvider.of<AppCubits>(context).ReceptPage(data[index]);
               
                             },
                     
@@ -244,7 +270,7 @@ class RecipesState extends State<Recipes> {
                               padding: EdgeInsets.only(left: Dimensions.width10, top: Dimensions.width10),
                               child: Column(
                                 children: [
-                                  Text(info[index].namn,
+                                  Text(data[index].titel,
                                       style: GoogleFonts.alfaSlabOne(
                                         textStyle: const TextStyle(
                                         fontSize: 30,
@@ -270,17 +296,29 @@ class RecipesState extends State<Recipes> {
             )
 
           ]),
-        );
-        
-        
-            }
-            else{
-              return Container();
-            }
-            }
-            )
+        )
+           
         
         
         );
-  }
+      
+          }
+        }
+         return Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+      future: recept,
+    );
+}
+
+}
+
+
+Future<List<Recept>> getRecept() async {
+  var r2 = await Requests.get("https://litium.herokuapp.com/get/recomendations?max=1",
+      withCredentials: true);
+  List<dynamic> list = jsonDecode(r2.body);
+  print(list);
+  return list.map((e) => Recept.fromJson(e)).toList();
 }

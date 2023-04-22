@@ -10,7 +10,9 @@ import 'package:google_fonts/google_fonts.dart';
 import '../Constants/Utils/image_constants.dart';
 
 class MainPage extends StatefulWidget {
-  const MainPage({Key? key}) : super(key: key);
+
+  final int index;
+  MainPage({required this.index});
 
   @override
   State<MainPage> createState() => _MainPageState();
@@ -22,7 +24,8 @@ class _MainPageState extends State<MainPage> {
     TestHomePage(),
     Recipes(),
   ];
-  int currentIndex = 1;
+  
+  late int currentIndex = widget.index;
   void onTap(int index){
     setState(() {
       currentIndex = index;

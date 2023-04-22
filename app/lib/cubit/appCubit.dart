@@ -7,6 +7,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import '../Services/dataModel.dart';
 import '../Services/getLogin.dart';
 import '../Services/getRecipes.dart';
+import '../Services/receptModel.dart';
 
 
 
@@ -31,16 +32,16 @@ class AppCubits extends Cubit<CubitStates>{
     }
   }
   */
-  detailPage(Produkt produkt){
+  ProduktPage(Produkt produkt){
     emit(ProductState(produkt));
   }
 
-  detailPage2(Produkt produkt){
-    emit(RecipeState(produkt));
+  ReceptPage(Recept recept){
+    emit(RecipeState(recept));
   }
 
   goHome(){
     // emit(LoadedState(mat));
-    emit(LoadedState());
+    emit(PantryState());
   }
 }
