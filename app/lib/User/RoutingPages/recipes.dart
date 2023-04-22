@@ -74,7 +74,7 @@ class RecipesState extends State<Recipes> {
               icon: SizedBox(
                 width: 40,
                 height: 40,
-                child: Image.asset('Images/png/003-settings.png'),
+                child: Image.asset(ImageConstant.settings),
               ),
               onPressed: () {},
             ),
