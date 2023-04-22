@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'dart:ui';
 import 'package:google_fonts/google_fonts.dart';
 //import 'package:myapp/utils.dart';
+import '../Constants/Utils/image_constants.dart';
 
 class StartScreen extends StatefulWidget{
   const StartScreen({Key? key}) : super(key: key);
@@ -21,7 +22,7 @@ class StartScreenState extends State<StartScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
            Image.asset(
-              'Images/png/002-cooking.png',
+              ImageConstant.logo,
               width: 200,
               height: 200,
             ),

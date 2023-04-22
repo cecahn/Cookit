@@ -4,8 +4,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
+import 'package:first/Widgets/bottomBar.dart';
+import 'package:requests/requests.dart';
 
 //import '../Routes/routes.dart';
+import '../../Constants/Utils/image_constants.dart';
 import 'pantry.dart';
 import 'recipes.dart';
 
@@ -13,7 +16,11 @@ import 'recipes.dart';
 //köttfärs 7350054730198
 // halloumi 07340062810241
 // mjölk 07310865001818
-
+// syltlök 07393756085005
+// skånemejerier 07310867000178
+// Griskött 02320101100002
+// Charkuterier utom korv 07312333006974
+// Matbröd 07313830012529
 
 late String stringResponse;
 late Map<dynamic, dynamic>? mapResponse;
@@ -38,7 +45,8 @@ class _TestHomePageState extends State<TestHomePage> {
   
   void fetchProduct() async {
   try {
-    final response = await http.get(Uri.parse('https://litium.herokuapp.com/get/product?id=$inputmj'));
+    final response = await Requests.get("https://litium.herokuapp.com/skafferi/spara?id=$inputmj", withCredentials: true);
+    //final response = await http.get(Uri.parse('https://litium.herokuapp.com/get/product?id=$inputmj'));
     if (response.statusCode == 200) {
       // If the call to the server was successful, parse the JSON.
       setState((){
@@ -65,6 +73,19 @@ class _TestHomePageState extends State<TestHomePage> {
   }
 
   int _index = 0;
+  int _currentIndex = 1;
+
+  void _onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
+  final List<Widget> _pages = [
+    const Pantry(),
+    const TestHomePage(),
+    const Recipes(),
+  ];
 
   
 
@@ -100,7 +121,7 @@ class _TestHomePageState extends State<TestHomePage> {
           ),
           actions: [
             IconButton(
-              icon: Image.asset('Images/png/download.png',
+              icon: Image.asset(ImageConstant.ellips,
               width: 100,
               height: 100,
               ),
@@ -183,40 +204,11 @@ class _TestHomePageState extends State<TestHomePage> {
             ]
         ),
       ),
-      bottomNavigationBar: 
-            BottomNavigationBar(
-            currentIndex: _index, 
-            onTap: (int index) => setState(() =>_index = index),
-            items: [
-            BottomNavigationBarItem(
-              icon: SizedBox (
-                width: 40,
-                height: 40,
-                child: Image.asset('Images/png/004-healthy-food-1.png'),
-              ),
-              label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: SizedBox (
-              width: 40,
-              height: 40,
-              child:  Image.asset('Images/png/006-add.png'),
-            ),
-            label: '',
-            
-          ),
-          BottomNavigationBarItem(
-            icon:SizedBox (
-              width: 40,
-              height: 40,
-              child: Image.asset('Images/png/005-recipe.png'),
-            ),
-            label: '',
-          ),
-        ],
+      
+      
         
         
-        )
+        
     );
   }
 

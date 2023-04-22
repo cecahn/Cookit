@@ -28,7 +28,7 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  http: ^0.12.0
+  http: ^0.13.4
   url_launcher: ^6.0.3 
   flutter:
     sdk: flutter
@@ -38,8 +38,11 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   get: ^4.6.1
-  google_fonts: ^1.1.2
+  google_fonts: ^4.0.3
   multiselect: ^0.1.0
+  requests: ^4.7.0
+  google_sign_in: ^6.1.0
+  flutter_bloc: ^8.1.2
 
 dev_dependencies:
   flutter_test:
@@ -52,6 +55,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
+  bloc:
+  equatable:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
