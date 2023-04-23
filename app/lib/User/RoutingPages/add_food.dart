@@ -9,6 +9,7 @@ import 'package:requests/requests.dart';
 
 //import '../Routes/routes.dart';
 import '../../Constants/Utils/image_constants.dart';
+import '../../Widgets/appBar.dart';
 import 'pantry.dart';
 import 'recipes.dart';
 
@@ -107,30 +108,7 @@ class _TestHomePageState extends State<TestHomePage> {
     }
 
     return Scaffold(
-        appBar: AppBar(
-          title: Padding(
-            padding: EdgeInsets.only(left: 20.0),
-            child: Text("CookIt.",
-                style: GoogleFonts.alfaSlabOne(
-                  textStyle: const TextStyle(
-                  fontSize: 30,
-                ),
-                color: Colors.teal,
-              )
-            ),
-          ),
-          actions: [
-            IconButton(
-              icon: Image.asset(ImageConstant.ellips,
-              width: 100,
-              height: 100,
-              ),
-              
-              onPressed: () {},
-            ),
-          ],
-          backgroundColor: Colors.white,
-        ),
+        appBar: customAppBar("CookIt.", ImageConstant.ellips),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

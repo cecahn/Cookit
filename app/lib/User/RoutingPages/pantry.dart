@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:first/Widgets/appBar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -102,27 +103,7 @@ class PantryState extends State<Pantry> {
             final unikaVarugrupper = data.map((e) => e.varugrupp).toSet();
 
             return Scaffold(
-                appBar: AppBar(
-                  title: Padding(
-                      padding: EdgeInsets.only(left: 20.0),
-                      child: Text("Skafferi",
-                          style: GoogleFonts.alfaSlabOne(
-                              textStyle: const TextStyle(
-                                fontSize: 30,
-                              ),
-                              color: Colors.teal))),
-                  actions: [
-                    IconButton(
-                      icon: Image.asset(
-                        ImageConstant.ellips,
-                        width: 100,
-                        height: 100,
-                      ),
-                      onPressed: () {},
-                    ),
-                  ],
-                  backgroundColor: Colors.white,
-                ),
+                appBar: customAppBar("Skafferi", ImageConstant.ellips),
                 body: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [

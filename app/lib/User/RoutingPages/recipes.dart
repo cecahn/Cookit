@@ -9,6 +9,7 @@ import 'package:requests/requests.dart';
 
 import '../../Constants/Utils/dimensions.dart';
 import '../../Services/receptModel.dart';
+import '../../Widgets/appBar.dart';
 import '../../cubit/appCubit.dart';
 import '../../cubit/appCubitStates.dart';
 //import 'package:myapp/utils.dart';
@@ -57,30 +58,7 @@ class RecipesState extends State<Recipes> {
             //final unikaVarugrupper = data.map((e) => e.varugrupp).toSet();
 
               return Scaffold(
-        appBar: AppBar(
-          title: Padding(
-            padding: EdgeInsets.only(left: 20.0),
-            child: Text("Recept",
-                  style: GoogleFonts.alfaSlabOne(
-                        textStyle: const TextStyle(
-                        fontSize: 30,
-                          ),
-                          color: Colors.teal,
-                        )
-                      ),
-          ),
-          actions: [
-            IconButton(
-              icon: SizedBox(
-                width: 40,
-                height: 40,
-                child: Image.asset(ImageConstant.settings),
-              ),
-              onPressed: () {},
-            ),
-          ],
-          backgroundColor: Colors.white,
-        ),
+        appBar: customAppBar("Recept", ImageConstant.settings),
         body: 
            Center(
           child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
