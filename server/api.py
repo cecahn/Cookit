@@ -39,6 +39,7 @@ def api_get_product(code: str):
 
     data['gtin'] = respone_json['GTIN']
     data['varugrupp'] = respone_json['Varugrupp']['VarugruppBenamning']
+    data['huvudvarugrupp'] = respone_json['Varugrupp']['HuvudgruppBenamning']
     data['hållbarhet'] = respone_json['TotalHallbarhetAntalDagar']
     data['namn'] = respone_json['Artikelbenamning']
     data['tillverkare'] = respone_json['Varumarke']['Tillverkare']['Namn']

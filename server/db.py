@@ -54,7 +54,7 @@ def db_store_product(product, cookit_db):
     '''
 
     # Hämta id för varugruppen som produkten tillhör
-    varugrupp_id = db_varugrupp_id(product['varugrupp'], cookit_db)
+    varugrupp_id = db_varugrupp_id(product, cookit_db)
 
     cursor = cookit_db.connection.cursor()
 
@@ -68,15 +68,18 @@ def db_store_product(product, cookit_db):
 
     cursor.close()
 
-def db_varugrupp_id(varugrupp_name: str, db) -> int:
+def db_varugrupp_id(product, db) -> int:
     '''
     Create a new varugrupp if it does not exist.
     Returns an object with the id for the newly created or previously existing varugrupp.
     '''
     cursor = db.connection.cursor()
     
+    varugrupp = product['varugrupp']
+    huvudvarugrupp = product['huvudvarugrupp']
+
     # Hämta id för varugruppen
-    get_id = f"SELECT id FROM varugrupper WHERE namn = '{varugrupp_name.lower()}'"
+    get_id = f"SELECT id FROM varugrupper WHERE namn = '{varugrupp.lower()}'"
     
     cursor.execute(get_id)
 
@@ -84,9 +87,12 @@ def db_varugrupp_id(varugrupp_name: str, db) -> int:
     
     # Om result är None finns inte varugruppen
     if (result == None):
+        # Skapa huvudvarugruppen
+        create_huvudvarugrupp(huvudvarugrupp, db)
+
         # Skapa varugruppen
-        insert = f"INSERT INTO varugrupper (namn) VALUES ('{varugrupp_name}')"
-        cursor.execute(insert)
+        insert_varugrupp = f"INSERT INTO varugrupper (namn, huvudvarugrupp) VALUES ('{varugrupp}', '{huvudvarugrupp}')"
+        cursor.execute(insert_varugrupp)
         db.connection.commit()
         
         # Svara med id för varugruppen.
@@ -94,6 +100,23 @@ def db_varugrupp_id(varugrupp_name: str, db) -> int:
         
     cursor.close()
     return result
+
+def create_huvudvarugrupp(huvudvarugrupp: str, db):
+    '''
+    Skapa huvudvarugruppen om den inte finns
+    '''
+    cursor = db.connection.cursor()
+
+    exists = f"SELECT namn FROM huvudvarugrupper WHERE namn = '{huvudvarugrupp.lower()}'"
+    cursor.execute(exists)
+
+    if (not sql_query_to_json(cursor)):
+        insert = f"INSERT INTO huvudvarugrupper (namn) VALUES ('{huvudvarugrupp}')"
+        cursor.execute(insert)
+        db.connection.commit()
+
+    cursor.close()
+
 
 def db_varugrupp_name(varugrupp_id: int, db) -> str:
     '''
@@ -222,10 +245,25 @@ def get_product_by_id(product_id, db):
     cursor.execute(query)
 
     result = sql_query_to_json(cursor)
+    
+    result['huvudvarugrupp'] = get_huvudvarugrupp(result['varugrupp'], db)
 
     cursor.close()
 
     return result
+
+def get_huvudvarugrupp(varugrupp_id: int, db) -> str:
+    cursor = db.connection.cursor()
+
+    query = f"SELECT * FROM varugrupper WHERE id = {varugrupp_id}"
+    
+    cursor.execute(query)
+    varugrupp = sql_query_to_json(cursor)
+
+    cursor.close()
+
+    return varugrupp['huvudvarugrupp']
+
 
 def db_set_betyg(db, user_id, recipe_id, betyg):
     '''
