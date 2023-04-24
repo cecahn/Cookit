@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../Constants/Utils/image_constants.dart';
+import '../../cubit/appCubit.dart';
+import '../../cubit/appCubitStates.dart';
 
 class RecipePage extends StatefulWidget {
   const RecipePage({Key? key}) : super(key: key);
@@ -15,7 +18,10 @@ class RecipePage extends StatefulWidget {
 class _RecipePageState extends State<RecipePage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BlocBuilder<AppCubits, CubitStates>(builder: (context, state) {
+      RecipeState detail = state as RecipeState;
+
+      return Scaffold(
       body: Container(
         width: double.maxFinite,
         height: double.maxFinite,
@@ -29,7 +35,7 @@ class _RecipePageState extends State<RecipePage> {
                 height: 300,
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage(ImageConstant.tacos),
+                    image: NetworkImage(detail.recept.bild),
                     fit:BoxFit.cover
                     ),
                   
@@ -41,7 +47,7 @@ class _RecipePageState extends State<RecipePage> {
               top:20,
               child: Row(
             children: [
-              IconButton(onPressed: () {  }, icon: Icon(Icons.arrow_back_ios), color:Colors.white)
+              IconButton(onPressed: () { BlocProvider.of<AppCubits>(context).goHome2(); }, icon: Icon(Icons.arrow_back_ios), color:Colors.white)
             ],
               )
             ),
@@ -67,12 +73,13 @@ class _RecipePageState extends State<RecipePage> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       
                       children:[
-                        Text("Tacos",
+                        Text(detail.recept.titel,
                         style: GoogleFonts.alfaSlabOne(
                         textStyle: const TextStyle(
                         color: Colors.teal,
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
+                        overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ),
@@ -87,6 +94,8 @@ class _RecipePageState extends State<RecipePage> {
           ]
         )
       ),
+    ); 
+    }
     );
   }
 }

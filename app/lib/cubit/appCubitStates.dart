@@ -55,3 +55,9 @@ class PantryState extends CubitStates{
   @override
   List<Object?> get props => [];
 }
+
+class RecipesState extends CubitStates{
+ 
+  @override
+  List<Object?> get props => [];
+}

@@ -38,6 +38,8 @@ class _AppCubitLogicsState extends State<AppCubitLogics> {
             return RecipePage();
           }if(state is PantryState){
             return MainPage(index:0);
+          }if(state is RecipesState){
+            return MainPage(index:2);
           }if(state is LoadingState){
               print('Är i LoadingState');
             return Center(child: CircularProgressIndicator());
