@@ -22,7 +22,8 @@ from db import (
     db_set_betyg,
     db_search_recipe,
     db_get_recomendations,
-    db_get_recipe
+    db_get_recipe,
+    db_update_exp_date
 )
 from api import api_get_product
 from user import User
@@ -116,7 +117,7 @@ def fetch_product():
     expiration_date = request.args.get('expiration-date')
 
     # Sanera input - kontrollera att formatet är 'YYYYMMDD'
-    if expiration_date and not (len(expiration_date) == 8 and expiration_date.isdigit()):
+    if expiration_date and not valid_date(expiration_date):
         return "Invalid date format", 400
     
     result = db_add_to_pantry(mysql, user_id, gtin, expiration_date)
@@ -127,6 +128,8 @@ def fetch_product():
 
     return product
 
+def valid_date(date):
+    return (len(date) == 8 and date.isdigit())
 
 @app.route("/skafferi/ta_bort")
 @login_required
@@ -150,6 +153,31 @@ def valid_gtin(gtin: str):
     Checks if 'gtin' is a valid gtin code
     '''
     return len(gtin) <= 14 and gtin.isdigit()
+
+@app.route('/skafferi/update_exp_date')
+@login_required
+def update_exp_date():
+    user_id = current_user.id
+    skafferi_id = request.args.get('skafferi_id')
+    expiration_date = request.args.get('expiration-date')
+
+    if not expiration_date:
+        return "Missing argument 'expiration-date'", 400
+    
+    if not valid_date(expiration_date):
+        return "Invalid date format", 400
+
+    # Sanera input
+    if not skafferi_id.isdigit():
+        return "Invalid product id", 400
+
+    result = db_update_exp_date(mysql, user_id, skafferi_id, expiration_date)
+
+    if result:
+        return f"Uppdaterade utgångsdatum för produkten med id:'{skafferi_id}'", 200
+    
+    # Varan finns inte i skafferiet, eller användaren satte samma datum som redan var sparat
+    return "Varan finns inte, eller hade samma utgångsdatum redan", 400
 
 
 @app.route("/skafferi")
