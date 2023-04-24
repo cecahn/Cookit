@@ -164,6 +164,21 @@ def db_remove_from_pantry(db, user_id, skafferi_id):
 
     return result if result else None
 
+def db_update_exp_date(db, user_id, pantry_id, new_exp_date):
+    cursor = db.connection.cursor()
+    
+    query = f"UPDATE userstoproducts SET bästföredatum = '{new_exp_date}' \
+              WHERE user_id = '{user_id}' and id = '{pantry_id}'"
+
+    result = cursor.execute(query)
+
+    db.connection.commit()
+
+    cursor.close()
+
+    return result if result else None
+
+
 def get_product_id(db, gtin):
     '''
     Hitta en varas id i `products`-tabellen givet gtin-nummer
