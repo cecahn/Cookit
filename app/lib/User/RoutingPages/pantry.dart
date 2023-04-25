@@ -10,9 +10,9 @@ import 'package:requests/requests.dart';
 import '../../Constants/Utils/image_constants.dart';
 import '../../cubit/appCubit.dart';
 
-bool sortActivated = false;
-bool sortBytime = false;
-bool sortByalfabet = false;
+// bool sortActivated = false;
+// bool sortBytime = false;
+// bool sortByalfabet = false;
 
 // List<String> filter = ['Mejeri', 'Kött'];
 // List<String> selectedCategories = [];
@@ -35,31 +35,35 @@ bool sortByalfabet = false;
 
 // List<Produkt> skafferi = [];
 
-/*int sortByUtgang(Produkt produkta, Produkt produktb) {
-  int a = produkta.utgang;
-  int b = produktb.utgang;
+int sortByUtgang(Produkt produkta, Produkt produktb) {
+  String produktaString = produkta.bastforedatum;
+  String produktbString = produktb.bastforedatum;
 
-  if (a < b) {
-    return -1;
-  } else if (a > b) {
-    return 1;
-  } else {
-    return 0;
-  }
+  List<String> splitA = produktaString.split('-');
+  List<String> splitB = produktbString.split('-');
+
+  DateTime dateA = DateTime(int.tryParse(splitA.elementAt(0))!,
+      int.tryParse(splitA.elementAt(1))!, int.tryParse(splitA.elementAt(2))!);
+  DateTime dateB = DateTime(int.tryParse(splitB.elementAt(0))!,
+      int.tryParse(splitB.elementAt(1))!, int.tryParse(splitB.elementAt(2))!);
+
+  return dateA.compareTo(dateB); 
 }
 
 int sortByTime(Produkt produkta, Produkt produktb) {
-  int a = produkta.tid;
-  int b = produktb.tid;
+  String produktaString = produkta.tillagning_datum;
+  String produktbString = produktb.tillagning_datum;
 
-  if (a < b) {
-    return -1;
-  } else if (a > b) {
-    return 1;
-  } else {
-    return 0;
-  }
-}*/
+  List<String> splitA = produktaString.split('-');
+  List<String> splitB = produktbString.split('-');
+
+  DateTime dateA = DateTime(int.tryParse(splitA.elementAt(0))!,
+      int.tryParse(splitA.elementAt(1))!, int.tryParse(splitA.elementAt(2))!);
+  DateTime dateB = DateTime(int.tryParse(splitB.elementAt(0))!,
+      int.tryParse(splitB.elementAt(1))!, int.tryParse(splitB.elementAt(2))!);
+
+  return dateA.compareTo(dateB); 
+}
 
 final _textController = TextEditingController();
 
@@ -164,6 +168,12 @@ class PantryState extends State<Pantry> {
                             onChanged: (String? newValue) {
                               setState(() {
                                 dropdownValue = newValue!;
+                                if (dropdownValue == 'Utgångsdatum') {
+                                  data.sort(sortByUtgang);
+                                }
+                                if (dropdownValue == 'Senast tillagd') {
+                                  data.sort(sortByTime);
+                                }
                               });
                             }),
                       ),
@@ -171,7 +181,7 @@ class PantryState extends State<Pantry> {
                     Padding(
                         padding: const EdgeInsets.only(top: 7.0),
                         child: SizedBox(
-                          height: 300,
+                          height: 550,
                           width: 400,
                           child: dropdownValue != 'Varugrupp'
                               ? ListView.builder(
