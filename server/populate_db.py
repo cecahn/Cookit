@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import requests
 import json
 import mysql.connector
+import re
 
 from api import api_fritext, api_get_product
 
@@ -149,7 +150,12 @@ def save_recipe(recipe, db):
     # Först skapa receptet
     recipe_id = recipe['Id']
     titel = recipe['Title']
+
+    for (i, x) in enumerate(recipe['CookingSteps']):
+        recipe['CookingSteps'][i] = re.sub('<[^<]+?>', '', x)
+
     instruktion = json.dumps(recipe['CookingSteps'])
+
     betyg = 0
     bild = recipe['ImageUrl']
 
