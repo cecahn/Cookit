@@ -1,3 +1,4 @@
+import 'package:first/Constants/export.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -10,7 +11,8 @@ customAppBar(String header, String image) {
                     textStyle: const TextStyle(
                       fontSize: 30,
                     ),
-                    color: Colors.teal))),
+                    // color: Colors.teal))),
+                    color: ColorConstant.primaryColor))),
         actions: [
           IconButton(
             icon: Image.asset(

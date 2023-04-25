@@ -14,6 +14,10 @@ class ColorConstant {
 
   static Color gray50 = fromHex('#f9f9f9');
 
+  static Color primaryColor = lightGreen700;
+
+  static Color listTextColor = Colors.black87;
+
   static Color fromHex(String hexString) {
     final buffer = StringBuffer();
     if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');

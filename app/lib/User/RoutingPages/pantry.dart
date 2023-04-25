@@ -8,7 +8,9 @@ import 'package:first/Services/dataModel.dart';
 import 'package:requests/requests.dart';
 
 import '../../Constants/Utils/image_constants.dart';
+import '../../Constants/Utils/color_constant.dart';
 import '../../cubit/appCubit.dart';
+import '../../Widgets/app_list_text.dart';
 
 bool sortActivated = false;
 bool sortBytime = false;
@@ -137,35 +139,33 @@ class PantryState extends State<Pantry> {
                         ),
                         height: 44,
                         width: 220,
-                        child: DropdownButton<String>(
+                        child: Center(child: DropdownButton<String>(
+                            alignment: Alignment.center,
                             value: dropdownValue,
-                            icon: Transform.scale(
-                              scale: 0.0,
-                              child: const Icon(Icons.menu),
-                            ),
-                            style: const TextStyle(
-                              color: Colors.black54,
-                              fontSize: 15,
-                            ),
-                            items: [
+                            iconSize: 0,
+                            style: TextStyle(
+                                color: ColorConstant.primaryColor,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold),
+                            items: const [
                               DropdownMenuItem(
                                 value: 'Utgångsdatum',
-                                child: Text('Utgångsdatum'),
+                                child: Center(child: Text('Utgångsdatum')),
                               ),
                               DropdownMenuItem(
                                 value: 'Senast tillagd',
-                                child: Text('Senast tillagd'),
+                                child: Center(child: Text('Senast tillagd')),
                               ),
                               DropdownMenuItem(
                                 value: 'Varugrupp',
-                                child: Text('Varugrupp'),
+                                child: Center(child: Text('Varugrupp')),
                               ),
                             ],
                             onChanged: (String? newValue) {
                               setState(() {
                                 dropdownValue = newValue!;
                               });
-                            }),
+                            })),
                       ),
                     ),
                     Padding(
@@ -220,7 +220,8 @@ class PantryState extends State<Pantry> {
                                         children: data
                                             .where(
                                                 (e) => e.varugrupp == varugrupp)
-                                            .map((e) => Text(e.namn))
+                                            // .map((e) => Text(e.namn))
+                                            .map((e) => AppListText(text: e.namn, color: ColorConstant.listTextColor))
                                             .toList());
                                   },
                                 ),
