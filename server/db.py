@@ -372,6 +372,9 @@ def db_get_recomendations(user_id, max_results, db):
     # Hämta skafferi
     skafferi = db_get_skafferi(user_id, db)
 
+    if len(skafferi) == 0:
+        return []
+
     skafferi_varugrupper = set([str(produkt['varugrupp']) for produkt in skafferi])
     
     cursor = db.connection.cursor()
