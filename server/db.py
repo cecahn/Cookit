@@ -338,7 +338,7 @@ def db_get_recipe(recipeID, db):
         return None
 
     result = sql_query_to_json(cursor)
-
+    result['instruktion'] = json.loads(result['instruktion'])
     cursor.close()
 
     return result
@@ -355,6 +355,7 @@ def db_search_recipe(phrase, limit, db):
     result = []
 
     while row:
+        row['instruktion'] = json.loads(row['instruktion'])
         result.append(row)
         row = sql_query_to_json(cursor)
     
@@ -403,15 +404,18 @@ def db_get_recomendations(user_id, max_results, db):
         varugrupp_cursor.close()
 
         missing_varugrupper = recipe_varugrupper - skafferi_varugrupper
+        used_varugrupper = recipe_varugrupper.intersection(skafferi_varugrupper)
 
         recipe = db_get_recipe(recipe_id, db)
 
         recipe['missing'] = [db_varugrupp_name(missing, db) for missing in missing_varugrupper]
+        recipe['used'] = [db_varugrupp_name(used, db) for used in used_varugrupper]
+        
         result.append(recipe)
 
         recipe_id_row = sql_query_to_json(cursor)
 
     cursor.close()
-    sorted_list = sorted(result, key=lambda d: len(d['missing']))
+    sorted_list = sorted(result, key=lambda d: len(d['used']), reverse=True)
 
     return sorted_list[:max_results]
