@@ -68,7 +68,9 @@ def fetch_recomendations():
     else:
         sorting = 0
 
-    recomendations = db_get_recomendations(user_id, max_results, sorting, mysql)
+    filters = request.args.getlist('filter')
+    
+    recomendations = db_get_recomendations(user_id, max_results, sorting, filters, mysql)
 
     return recomendations
 
