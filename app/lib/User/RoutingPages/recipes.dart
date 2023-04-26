@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:requests/requests.dart';
 
 import '../../Constants/Utils/dimensions.dart';
+import '../../Constants/Utils/color_constant.dart';
 import '../../Services/receptModel.dart';
 import '../../Widgets/appBar.dart';
 import '../../cubit/appCubit.dart';
@@ -36,8 +37,76 @@ class RecipesState extends State<Recipes> {
     recept = getRecept();
   }
 
+  Widget buildDropdownButton(List<String> items, initValue, variableName) {
+    return DropdownButton<String>(
+      alignment: Alignment.center,
+      value: initValue,
+      icon: Transform.scale(
+        scale: 0.0,
+        child: const Icon(Icons.menu),
+      ),
+      iconSize: 0,
+      elevation: 16,
+      style: TextStyle(
+        color: ColorConstant.primaryColor,
+        fontSize: 16,
+        fontWeight: FontWeight.bold
+      ),
+      underline: Container(),
+      onChanged: (String? newValue) {
+        setState(() {
+          if (variableName == "dropdownValue") {
+            dropdownValue = newValue!;
+          } else if (variableName == "dropdownValue2") {
+            dropdownValue2 = newValue!;
+          }
+        });
+      },
+      items: items.map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Center(child: Text(value)),
+        );
+      }).toList(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Filter Dropdown List
+    List<String> filterOptions = ["Filter","Vegan","Vegetarian","Mjölkfri","Äggfri","Gluten","Laktosfri"];
+    Widget filterDropdownButton = buildDropdownButton(filterOptions, dropdownValue, "dropdownValue");
+
+    Widget filterDropdown = Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: ColorConstant.primaryColor),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        height: 44,
+        width: 170,
+        child: Center(child: filterDropdownButton));
+
+// Sort Dropdown List
+    List<String> sortOptions = ["Sortera","Senast tillagd","Utgångsdatum"];
+    Widget sortDropdownButton = buildDropdownButton(sortOptions, dropdownValue2, "dropdownValue2");
+
+
+    Widget sortDropdown = Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: ColorConstant.primaryColor),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+      /* padding: EdgeInsets.only(
+        left: 50.0,
+        top: 8,
+      ), */
+      height: 44,
+      width: 170,
+      child: Center(child: sortDropdownButton)
+    );
+
     return FutureBuilder(
       builder: (ctx, snapshot) {
         // Checking if future is resolved or not
@@ -57,244 +126,160 @@ class RecipesState extends State<Recipes> {
             final data = snapshot.data as List<Recept>;
             //final unikaVarugrupper = data.map((e) => e.varugrupp).toSet();
 
-              return Scaffold(
-        appBar: customAppBar("Recept", ImageConstant.settings),
-        body: 
-           Center(
-          child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-            Padding(
-              padding:
-                  const EdgeInsets.only(top: 10.0, left: 10.0, right: 10.0),
-              child: TextField(
-                controller: _textController,
-                decoration: InputDecoration(
-                  hintText: 'Leta efter Recept',
-                  border: const OutlineInputBorder(),
-                  suffixIcon: IconButton(
-                      icon: const Icon(Icons.search, color: Colors.black),
-                      onPressed: () {
-                        setState(() async {
-                          input = _textController.text;
-                          _textController.clear();
-                          initState();
-                        });
-                      }),
-                ),
-              ),
-            ),
-            Padding(
-              padding:
-                  const EdgeInsets.only(top: 15.0, left: 30.0, right: 10.0),
-              child: Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.green),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      padding: EdgeInsets.only(
-                        left: 60.0,
-                        top: 8,
-                      ),
-                      height: 44,
-                      width: 170,
-                      child: DropdownButton<String>(
-                          value: dropdownValue,
-                          icon: Transform.scale(
-                            scale: 0.0,
-                            child: const Icon(Icons.menu),
-                          ),
-                          style: const TextStyle(
-                            color: Colors.black54,
-                            fontSize: 20,
-                          ),
-                          isExpanded: true,
-                          isDense: true,
-                          items: const [
-                            DropdownMenuItem<String>(
-                              value: 'Vegan',
-                              child: Text('Vegan'),
-                            ),
-                            DropdownMenuItem<String>(
-                                value: 'Vegetarian', child: Text('Vegetarian')),
-                            DropdownMenuItem(
-                              value: 'Mjölkfri',
-                              child: Text('Mjölkfri'),
-                            ),
-                            DropdownMenuItem(
-                              value: 'Äggfri',
-                              child: Text('Äggfri'),
-                            ),
-                            DropdownMenuItem(
-                              value: 'Gluten',
-                              child: Text('Gluten'),
-                            ),
-                            DropdownMenuItem(
-                              value: 'Laktosfri',
-                              child: Text('Laktosfri'),
-                            ),
-                            DropdownMenuItem(
-                              value: 'Filter',
-                              child: Text('Filter'),
-                            ),
-                          ],
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              dropdownValue = dropdownValue;
-                            });
-                          }),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.green),
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    padding: EdgeInsets.only(
-                      left: 50.0,
-                      top: 8,
-                    ),
-                    height: 44,
-                    width: 170,
-                    child: DropdownButton<String>(
-                        value: dropdownValue2,
-                        icon: Transform.scale(
-                          scale: 0.0,
-                          child: const Icon(Icons.menu),
-                        ),
-                        style: const TextStyle(
-                          color: Colors.black54,
-                          fontSize: 20,
-                        ),
-                        isExpanded: true,
-                        isDense: true,
-                        items: const [
-                          DropdownMenuItem<String>(
-                            value: 'Utgångsdatum',
-                            child: Text('Utgångsdatum'),
-                          ),
-
-                          DropdownMenuItem(
-                            value: 'Senast tillagd',
-                            child: Text('Senast tillagd'),
-                          ),
-                          DropdownMenuItem(
-                            value: 'Sortera',
-                            child: Text('Sortera'),
-                          ),
-                        ],
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            dropdownValue = dropdownValue;
-                          });
-                        }),
-                  ),
-                ],
-              ),
-              ),
-               
-            
-            Expanded (
-              child: SingleChildScrollView(
-              //listan av recept
-            child: Container(
-                height:500,
-                child: Padding(
-                  padding: EdgeInsets.only(top: 30, left: Dimensions.width15, right: Dimensions.width15),
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    physics: AlwaysScrollableScrollPhysics(),
-                    itemCount: data.length,
-                    itemBuilder: (context, index){
-                    return GestureDetector(
-                     onTap:(){
-
-                       BlocProvider.of<AppCubits>(context).ReceptPage(data[index]);
-              
-                            },
-                    
-                    child: Container(
-                      margin: EdgeInsets.only(left: Dimensions.width20, right: Dimensions.width20, bottom: Dimensions.width15 ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 70,
-                            height: 70,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(Dimensions.radius20),
-                              color: Colors.white,
-                              image: DecorationImage(
-                                      image: NetworkImage(data[index].bild),
-                                      fit:BoxFit.cover
-                                      ), 
-                            )
-                          ),
-                          Expanded(
-                            child: Padding(
-                              padding: EdgeInsets.only(top: 30),
-                            child: Container(
-                                height: 100,
-                                decoration: BoxDecoration(
-                                borderRadius: BorderRadius.only(
-                                topRight: Radius.circular(Dimensions.radius20),
-                                bottomRight: Radius.circular(Dimensions.radius20),
+            return Scaffold(
+                appBar: customAppBar("Recept", ImageConstant.settings),
+                body: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Center(
+                      child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  // top: 10.0, left: 10.0, right: 10.0),
+                                  top: 10.0,
+                                  bottom: 10.0),
+                              child: TextField(
+                                controller: _textController,
+                                decoration: InputDecoration(
+                                  hintText: 'Leta efter Recept',
+                                  border: const OutlineInputBorder(),
+                                  suffixIcon: IconButton(
+                                      icon: const Icon(Icons.search,
+                                          color: Colors.black),
+                                      onPressed: () {
+                                        setState(() async {
+                                          input = _textController.text;
+                                          _textController.clear();
+                                          initState();
+                                        });
+                                      }),
+                                ),
                               ),
-                              color: Colors.white,
                             ),
-                            child: Padding(
-                              padding: EdgeInsets.only(left: Dimensions.width10, top: Dimensions.width10),
-                              child: Column(
-                                children: [
-                                  Text(data[index].titel,
-                                      style: GoogleFonts.alfaSlabOne(
-                                        textStyle: const TextStyle(
-                                        fontSize: 30,
-                                      ),
-                                      color: Colors.black,
-                                      )
-                                    ),
-                                ],)
-                            )
-                          ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  // top: 15.0, left: 10.0, right: 10.0),
+                                  bottom: 10.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [ // DROPDOWN_BUTTONS
+                                  Expanded(child: filterDropdown),
+                                  const SizedBox(width: 10),
+                                  Expanded(child: sortDropdown)
+                                ],
+                              ),
                             ),
-                            ),
-                          
-                          
-                        ],
-                      )
-                    ),
-                    );
-                    },)
-                ),
-            )
-              )
-            )
-
-          ]),
-        )
-           
-        
-        
-        );
-      
+                            Expanded(
+                                child: SingleChildScrollView(
+                                    //listan av recept
+                                    child: Container(
+                              height: 500,
+                              child: Padding(
+                                  padding: EdgeInsets.only(
+                                      top: 30,
+                                      left: Dimensions.width15,
+                                      right: Dimensions.width15),
+                                  child: ListView.builder(
+                                    shrinkWrap: true,
+                                    physics: AlwaysScrollableScrollPhysics(),
+                                    itemCount: data.length,
+                                    itemBuilder: (context, index) {
+                                      return GestureDetector(
+                                        onTap: () {
+                                          BlocProvider.of<AppCubits>(context)
+                                              .ReceptPage(data[index]);
+                                        },
+                                        child: Container(
+                                            margin: EdgeInsets.only(
+                                                left: Dimensions.width20,
+                                                right: Dimensions.width20,
+                                                bottom: Dimensions.width15),
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                    width: 70,
+                                                    height: 70,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              Dimensions
+                                                                  .radius20),
+                                                      color: Colors.white,
+                                                      image: DecorationImage(
+                                                          image: NetworkImage(
+                                                              data[index].bild),
+                                                          fit: BoxFit.cover),
+                                                    )),
+                                                Expanded(
+                                                  child: Padding(
+                                                    padding: EdgeInsets.only(
+                                                        top: 30),
+                                                    child: Container(
+                                                        height: 100,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius.only(
+                                                            topRight:
+                                                                Radius.circular(
+                                                                    Dimensions
+                                                                        .radius20),
+                                                            bottomRight:
+                                                                Radius.circular(
+                                                                    Dimensions
+                                                                        .radius20),
+                                                          ),
+                                                          color: Colors.white,
+                                                        ),
+                                                        child: Padding(
+                                                            padding: EdgeInsets.only(
+                                                                left: Dimensions
+                                                                    .width10,
+                                                                top: Dimensions
+                                                                    .width10),
+                                                            child: Column(
+                                                              children: [
+                                                                Text(
+                                                                    data[index]
+                                                                        .titel,
+                                                                    style: GoogleFonts
+                                                                        .alfaSlabOne(
+                                                                      textStyle:
+                                                                          const TextStyle(
+                                                                        fontSize:
+                                                                            30,
+                                                                      ),
+                                                                      color: Colors
+                                                                          .black,
+                                                                    )),
+                                                              ],
+                                                            ))),
+                                                  ),
+                                                ),
+                                              ],
+                                            )),
+                                      );
+                                    },
+                                  )),
+                            )))
+                          ]),
+                    )));
           }
         }
-         return Center(
+        return Center(
           child: CircularProgressIndicator(),
         );
       },
       future: recept,
     );
+  }
 }
-
-}
-
 
 Future<List<Recept>> getRecept() async {
-  var r2 = await Requests.get("https://litium.herokuapp.com/get/recomendations?max=5",
+  var r2 = await Requests.get(
+      "https://litium.herokuapp.com/get/recomendations?max=1",
       withCredentials: true);
   List<dynamic> list = jsonDecode(r2.body);
   return list.map((e) => Recept.fromJson(e)).toList();
