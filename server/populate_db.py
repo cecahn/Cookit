@@ -150,6 +150,7 @@ def save_recipe(recipe, db):
     # Först skapa receptet
     recipe_id = recipe['Id']
     titel = recipe['Title']
+    filters = json.dumps(recipe['MdsaCategories'], ensure_ascii=False)
 
     for (i, x) in enumerate(recipe['CookingSteps']):
         recipe['CookingSteps'][i] = re.sub('<[^<]+?>', '', x)
@@ -159,8 +160,8 @@ def save_recipe(recipe, db):
     betyg = 0
     bild = recipe['ImageUrl']
 
-    query = f"INSERT INTO recipes (id, titel, instruktion, betyg, bild) VALUES \
-        ({recipe_id}, '{titel}', '{instruktion}', {betyg}, '{bild}')"
+    query = f"INSERT INTO recipes (id, titel, instruktion, betyg, bild, filter) VALUES \
+        ({recipe_id}, '{titel}', '{instruktion}', {betyg}, '{bild}', '{filters}')"
     
     cursor.execute(query)
     db.commit()

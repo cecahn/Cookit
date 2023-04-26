@@ -339,6 +339,7 @@ def db_get_recipe(recipeID, db):
 
     result = sql_query_to_json(cursor)
     result['instruktion'] = json.loads(result['instruktion'])
+    result['filter'] = json.loads(result['filter'])
     cursor.close()
 
     return result
@@ -356,6 +357,7 @@ def db_search_recipe(phrase, limit, db):
 
     while row:
         row['instruktion'] = json.loads(row['instruktion'])
+        row['filter'] = json.loads(row['filter'])
         result.append(row)
         row = sql_query_to_json(cursor)
     
@@ -363,7 +365,7 @@ def db_search_recipe(phrase, limit, db):
 
     return result
 
-def db_get_recomendations(user_id, max_results, sorting, db):
+def db_get_recomendations(user_id, max_results, sorting, filters, db):
     '''
     Returnerar en lista av recept sorterat utifrån hur bra rekomendationerna är.
     De bästa rekomendationerna kommer först.
@@ -391,6 +393,15 @@ def db_get_recomendations(user_id, max_results, sorting, db):
 
     while recipe_id_row:
         recipe_id = recipe_id_row['recipeID']
+        recipe = db_get_recipe(recipe_id, db)
+
+        # Kolla så att alla filter finns med i receptet
+        recipe_filters = recipe['filter']
+        valid = all([x in recipe_filters for x in filters])
+
+        if not valid:
+            recipe_id_row = sql_query_to_json(cursor) 
+            continue
 
         varugrupp_cursor = db.connection.cursor()
         # Hämta alla varugrupper som receptet kräver
@@ -412,8 +423,7 @@ def db_get_recomendations(user_id, max_results, sorting, db):
         # Dessa varugrupper för receptet har vi redan i skafferiet 
         used_varugrupper = recipe_varugrupper.intersection(skafferi_varugrupper)
 
-        recipe = db_get_recipe(recipe_id, db)
-
+    
         earliest_expiration = min([datetime.datetime.strptime(produkt['bästföredatum'], "%Y-%m-%d")for produkt in skafferi if str(produkt['varugrupp']) in used_varugrupper])
         
         recipe['earliest_expiration'] = earliest_expiration
