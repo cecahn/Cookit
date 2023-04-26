@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-
 import 'package:first/Widgets/appBar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -185,11 +184,26 @@ class PantryState extends State<Pantry> {
                                       key: Key(item.skafferi_id),
                                       onDismissed: (right) {
                                         setState(() {
-                                          final response = ServerCall.deleteFromPantry(item.skafferi_id);
+                                          final response =
+                                              ServerCall.deleteFromPantry(
+                                                  item.skafferi_id);
                                           data.removeAt(index);
                                         });
-                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("${item.namn} dismissed")));
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                          content: Text(
+                                              "Tog bort ${item.namn} ur skafferiet"),
+                                          action: SnackBarAction(
+                                            label: "Undo",
+                                            onPressed: () {
+                                              setState(() {
+                                                data.insert(index, item);
+                                              });
+                                            },
+                                          ),
+                                        ));
                                       },
+                                      background: Container(color: Colors.red),
                                       child: Padding(
                                         padding: EdgeInsets.only(top: 9.0),
                                         child: Container(
@@ -208,7 +222,8 @@ class PantryState extends State<Pantry> {
                                                   color: Colors.black,
                                                 ))),
                                             onTap: () {
-                                              BlocProvider.of<AppCubits>(context)
+                                              BlocProvider.of<AppCubits>(
+                                                      context)
                                                   .ProduktPage(data[index]);
                                             },
                                           ),
