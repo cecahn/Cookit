@@ -69,7 +69,6 @@ class _TestHomePageState extends State<TestHomePage> {
 
   @override
   void initState(){
-    fetchProduct();
     super.initState();
   }
 
@@ -125,12 +124,10 @@ class _TestHomePageState extends State<TestHomePage> {
                     onPressed: () {
                       setState(() async {
                         inputmj = _textController.text;
+                        fetchProduct();
                         _textController.clear();
                         initState();
-                          
                         });
-
-                        
                       }
                     ),  
                   ),
@@ -166,9 +163,6 @@ class _TestHomePageState extends State<TestHomePage> {
                   ),
           ),
         ),
-          
-        
-                
                 /*Container(
                   height: 200,
                   width: 300,
@@ -178,18 +172,10 @@ class _TestHomePageState extends State<TestHomePage> {
                      child: mapResponse == null? const Text("") :Text(mapResponse!["namn"].toString()),
                     ), 
                   ),*/
-                  
             ]
         ),
       ),
-      
-      
-        
-        
-        
     );
   }
-
-    
 }
 
