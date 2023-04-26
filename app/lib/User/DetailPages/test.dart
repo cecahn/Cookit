@@ -12,16 +12,16 @@ import '../../Constants/Utils/image_constants.dart';
 import '../../cubit/appCubit.dart';
 import '../../cubit/appCubitStates.dart';
 
-class ProductPage extends StatefulWidget {
-  const ProductPage({Key? key}) : super(key: key);
+class RecipePage extends StatefulWidget {
+  const RecipePage({Key? key}) : super(key: key);
 
   @override
-  State<ProductPage> createState() => _ProductPageState();
+  State<RecipePage> createState() => _RecipePageState();
 }
 
 
 
-class _ProductPageState extends State<ProductPage> {
+class _RecipePageState extends State<RecipePage> {
 
   late Response deleted; 
       void deleteProduct( String produktid) async {
@@ -64,7 +64,7 @@ class _ProductPageState extends State<ProductPage> {
               right:0,
               child: Container(
                 width:double.maxFinite,
-                height: 100,
+                height: 50,
                 
               )
             ),
@@ -73,7 +73,7 @@ class _ProductPageState extends State<ProductPage> {
               top:20,
               child: Row(
             children: [
-              IconButton(onPressed: () { BlocProvider.of<AppCubits>(context).goHome(); }, icon: Icon(Icons.arrow_back_ios), color:Colors.teal)
+              IconButton(onPressed: () { BlocProvider.of<AppCubits>(context).goHome2(); }, icon: Icon(Icons.arrow_back_ios), color:Colors.white)
             ],
               )
             ),
@@ -82,16 +82,17 @@ class _ProductPageState extends State<ProductPage> {
               top:20,
               child: Row(
             children: [
-              IconButton(onPressed: () { deleteProduct(detail.produkt.gtin); BlocProvider.of<AppCubits>(context).goHome(); }, icon: Icon(Icons.delete_outline), color:Colors.teal)
+              IconButton(onPressed: () { deleteProduct(detail.produkt.gtin); }, icon: Icon(Icons.arrow_back_ios), color:Colors.white)
             ],
               )
             ),
 
-            Positioned(
-              top: 50,
+            SingleChildScrollView(
+            child: Positioned(
+              top: 200,
               child: Container(
                   
-                  padding: const EdgeInsets.only(left:20, right:20, top:10),
+                  padding: const EdgeInsets.only(left:20, right:20, top:50),
                   //color: Colors.white,
                   width: MediaQuery.of(context).size.width,
                   height: 1000,
@@ -122,16 +123,25 @@ class _ProductPageState extends State<ProductPage> {
                           ),
                         ),
 
-                        
+                        /*Text(detail.recept.betyg.toString(),
+                        style: GoogleFonts.alfaSlabOne(
+                        textStyle: const TextStyle(
+                        color: Colors.teal,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),*/
                       ],
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: 2),
                     Row(children: [
                       Text("Bäst före datum",
                                 style: GoogleFonts.alfaSlabOne(
                                 textStyle: const TextStyle(
                                 color: Colors.black,
-                                fontSize: 20,
+                                fontSize: 30,
                                 fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -140,7 +150,6 @@ class _ProductPageState extends State<ProductPage> {
 
                                 IconButton ( onPressed: () {
                                       },
-                                
                                 icon: Icon(Icons.edit, color: Colors.black)
                                 
                                 )
@@ -149,22 +158,23 @@ class _ProductPageState extends State<ProductPage> {
                     ],
                   ),
 
+                  SizedBox(height: 20),
+
 
 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                       Text(detail.produkt.bastforedatum,
-                                style: GoogleFonts.breeSerif(
+                                style: GoogleFonts.alfaSlabOne(
                                 textStyle: const TextStyle(
                                 color: Colors.black,
-                                fontSize: 20,
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
                     ],),
-
-                    SizedBox(height: 20,),
 
 
                     Row(
@@ -173,7 +183,7 @@ class _ProductPageState extends State<ProductPage> {
                                 style: GoogleFonts.alfaSlabOne(
                                 textStyle: const TextStyle(
                                 color: Colors.black,
-                                fontSize: 20,
+                                fontSize: 30,
                                 fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -181,7 +191,7 @@ class _ProductPageState extends State<ProductPage> {
                               ],
                             ),
 
-                      ListView.builder(
+                     ListView.builder(
                             shrinkWrap: true,
                             //physics: AlwaysScrollableScrollPhysics(),
                             itemCount: detail.produkt.allergener.length,
@@ -190,21 +200,12 @@ class _ProductPageState extends State<ProductPage> {
                                 margin: EdgeInsets.only(right: Dimensions.width20,),
                                 child: Row(
                                   children: [
-                                    Text(detail.produkt.allergener[index],
-                                    style: GoogleFonts.breeSerif(
-                                    textStyle: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 20,
-                                    ),
-                                  ),
-                                    ),
+                                    Text(detail.produkt.allergener[index]),
                                   ],
                                 )
                               );
                             },
                           ),
-
-                        SizedBox(height: 20),
 
                           Row (
                             children: [
@@ -212,7 +213,7 @@ class _ProductPageState extends State<ProductPage> {
                                 style: GoogleFonts.alfaSlabOne(
                                 textStyle: const TextStyle(
                                 color: Colors.black,
-                                fontSize: 20,
+                                fontSize: 30,
                                 fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -223,11 +224,11 @@ class _ProductPageState extends State<ProductPage> {
                           Row (
                             children: [
                               Text(detail.produkt.tillverkare,
-                                style: GoogleFonts.breeSerif(
+                                style: GoogleFonts.alfaSlabOne(
                                 textStyle: const TextStyle(
                                 color: Colors.black,
-                                fontSize: 20,
-                               
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
@@ -240,7 +241,7 @@ class _ProductPageState extends State<ProductPage> {
                   
               )
             )
-            
+            ) 
           ]
         )
       ),

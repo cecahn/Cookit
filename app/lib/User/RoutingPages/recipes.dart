@@ -294,7 +294,7 @@ class RecipesState extends State<Recipes> {
 
 
 Future<List<Recept>> getRecept() async {
-  var r2 = await Requests.get("https://litium.herokuapp.com/get/recomendations?max=1",
+  var r2 = await Requests.get("https://litium.herokuapp.com/get/recomendations?max=5",
       withCredentials: true);
   List<dynamic> list = jsonDecode(r2.body);
   return list.map((e) => Recept.fromJson(e)).toList();
