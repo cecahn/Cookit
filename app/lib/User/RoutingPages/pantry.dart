@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+
 import 'package:first/Widgets/appBar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,6 +10,7 @@ import 'package:requests/requests.dart';
 
 import '../../Constants/Utils/image_constants.dart';
 import '../../cubit/appCubit.dart';
+import '../../Services/server_calls.dart';
 
 bool sortActivated = false;
 bool sortBytime = false;
@@ -175,35 +177,41 @@ class PantryState extends State<Pantry> {
                           width: 400,
                           child: dropdownValue != 'Varugrupp'
                               ? ListView.builder(
-                                  itemCount: data!.length,
+                                  itemCount: data.length,
                                   itemBuilder:
                                       (BuildContext context, int index) {
-                                    return Padding(
-                                      padding: EdgeInsets.only(top: 9.0),
-                                      child: Container(
-                                        height: 80,
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                              width: 0.5, color: Colors.teal),
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                        ),
-                                        child: ListTile(
-                                          /*shape: RoundedRectangleBorder(
-                                            side: const BorderSide(
-                                                color: Colors.teal, width: 0.2),
-                                            borderRadius: BorderRadius.circular(5),
-                                          ),*/
-                                          title: Text(data[index].namn,
-                                              style: GoogleFonts.breeSerif(
-                                                  textStyle: const TextStyle(
-                                                fontSize: 30,
-                                                color: Colors.black,
-                                              ))),
-                                          onTap: () {
-                                            BlocProvider.of<AppCubits>(context)
-                                                .ProduktPage(data[index]);
-                                          },
+                                    final item = data[index];
+                                    return Dismissible(
+                                      key: Key(item.skafferi_id),
+                                      onDismissed: (right) {
+                                        setState(() {
+                                          final response = ServerCall.deleteFromPantry(item.skafferi_id);
+                                          data.removeAt(index);
+                                        });
+                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("${item.namn} dismissed")));
+                                      },
+                                      child: Padding(
+                                        padding: EdgeInsets.only(top: 9.0),
+                                        child: Container(
+                                          height: 80,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                                width: 0.5, color: Colors.teal),
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                          ),
+                                          child: ListTile(
+                                            title: Text(data[index].namn,
+                                                style: GoogleFonts.breeSerif(
+                                                    textStyle: const TextStyle(
+                                                  fontSize: 30,
+                                                  color: Colors.black,
+                                                ))),
+                                            onTap: () {
+                                              BlocProvider.of<AppCubits>(context)
+                                                  .ProduktPage(data[index]);
+                                            },
+                                          ),
                                         ),
                                       ),
                                     );
