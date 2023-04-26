@@ -363,7 +363,7 @@ def db_search_recipe(phrase, limit, db):
 
     return result
 
-def db_get_recomendations(user_id, max_results, db):
+def db_get_recomendations(user_id, max_results, sorting, db):
     '''
     Returnerar en lista av recept sorterat utifrån hur bra rekomendationerna är.
     De bästa rekomendationerna kommer först.
@@ -373,13 +373,16 @@ def db_get_recomendations(user_id, max_results, db):
     # Hämta skafferi
     skafferi = db_get_skafferi(user_id, db)
 
+    # Om tomt skafferi
     if len(skafferi) == 0:
         return []
 
+    # Alla unika varugrupper i skafferiet
     skafferi_varugrupper = set([str(produkt['varugrupp']) for produkt in skafferi])
     
     cursor = db.connection.cursor()
 
+    # Hämta alla recept som innehåller något från skafferiet
     get_recipe_ids = 'SELECT DISTINCT recipeID FROM recipestovarugrupp WHERE varugruppID = ' + ' OR varugruppID = '.join(skafferi_varugrupper)
     cursor.execute(get_recipe_ids)
 
@@ -402,12 +405,18 @@ def db_get_recomendations(user_id, max_results, db):
             varugrupp_row = sql_query_to_json(varugrupp_cursor)
         
         varugrupp_cursor.close()
-
+        
+        # Dessa varugrupper saknas för receptet
         missing_varugrupper = recipe_varugrupper - skafferi_varugrupper
+        
+        # Dessa varugrupper för receptet har vi redan i skafferiet 
         used_varugrupper = recipe_varugrupper.intersection(skafferi_varugrupper)
 
         recipe = db_get_recipe(recipe_id, db)
 
+        earliest_expiration = min([datetime.datetime.strptime(produkt['bästföredatum'], "%Y-%m-%d")for produkt in skafferi if str(produkt['varugrupp']) in used_varugrupper])
+        
+        recipe['earliest_expiration'] = earliest_expiration
         recipe['missing'] = [db_varugrupp_name(missing, db) for missing in missing_varugrupper]
         recipe['used'] = [db_varugrupp_name(used, db) for used in used_varugrupper]
         
@@ -416,6 +425,10 @@ def db_get_recomendations(user_id, max_results, db):
         recipe_id_row = sql_query_to_json(cursor)
 
     cursor.close()
-    sorted_list = sorted(result, key=lambda d: len(d['used']), reverse=True)
+
+    if sorting == 0:
+        sorted_list = sorted(result, key=lambda d: len(d['used']), reverse=True)
+    else:
+        sorted_list = sorted(result, key=lambda d: d['earliest_expiration'])
 
     return sorted_list[:max_results]
