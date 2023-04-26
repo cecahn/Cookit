@@ -13,6 +13,7 @@ import '../../cubit/appCubit.dart';
 import '../../Widgets/app_list_text.dart';
 import '../../Widgets/expansion_tile_text.dart';
 import '../../Widgets/app_list_tile.dart';
+import '../../Services/server_calls.dart';
 
 // bool sortActivated = false;
 // bool sortBytime = false;
@@ -190,34 +191,61 @@ class PantryState extends State<Pantry> {
                                   itemCount: data.length,
                                   itemBuilder:
                                       (BuildContext context, int index) {
-                                    return AppListTile(
-                                        data: data[index],
-                                        namn: data[index].namn);
-                                    /* return Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 4),
-                                      child: Container(
-                                        alignment: Alignment.centerLeft,
-                                        height: 60,
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                              width: 1, color: ColorConstant.primaryColor),
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                        ),
-                                        child: ListTile(
-                                          /*shape: RoundedRectangleBorder(
-                                            side: const BorderSide(
-                                                color: Colors.teal, width: 0.2),
-                                            borderRadius: BorderRadius.circular(5),
-                                          ),*/
-                                          title: AppListText(text: data[index].namn),
-                                          onTap: () {
-                                            BlocProvider.of<AppCubits>(context)
-                                                .ProduktPage(data[index]);
-                                          },
+                                    final item = data[index];
+                                    return Dismissible(
+                                      key: Key(item.skafferi_id),
+                                      onDismissed: (right) {
+                                        setState(() {
+                                          data.removeAt(index);
+                                        });
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                          content: Text(
+                                              "Tog bort ${item.namn} ur skafferiet"),
+                                          action: SnackBarAction(
+                                            label: "Ångra",
+                                            onPressed: () {
+                                              setState(() {
+                                                data.insert(index, item);
+                                              });
+                                            },
+                                          ),
+                                        )).closed.then((value) {
+                                          if (value != SnackBarClosedReason.action) {
+                                            final response =
+                                              ServerCall.deleteFromPantry(
+                                                  item.skafferi_id);
+                                            skafferi = getSkafferi();
+                                          }
+                                        });
+                                      },
+                                      background: Container(color: Colors.red),
+                                      child: Padding(
+                                        padding: EdgeInsets.only(top: 9.0),
+                                        child: Container(
+                                          height: 80,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                                width: 0.5, color: Colors.teal),
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                          ),
+                                          child: ListTile(
+                                            title: Text(data[index].namn,
+                                                style: GoogleFonts.breeSerif(
+                                                    textStyle: const TextStyle(
+                                                  fontSize: 30,
+                                                  color: Colors.black,
+                                                ))),
+                                            onTap: () {
+                                              BlocProvider.of<AppCubits>(
+                                                      context)
+                                                  .ProduktPage(data[index]);
+                                            },
+                                          ),
                                         ),
                                       ),
-                                    ); */
+                                    );
                                   },
                                 )
                               : ListView.builder(
