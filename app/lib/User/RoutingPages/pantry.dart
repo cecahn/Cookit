@@ -11,6 +11,8 @@ import '../../Constants/Utils/image_constants.dart';
 import '../../Constants/Utils/color_constant.dart';
 import '../../cubit/appCubit.dart';
 import '../../Widgets/app_list_text.dart';
+import '../../Widgets/expansion_tile_text.dart';
+import '../../Widgets/app_list_tile.dart';
 
 bool sortActivated = false;
 bool sortBytime = false;
@@ -129,9 +131,11 @@ class PantryState extends State<Pantry> {
                                 }),
                           )),
                     ),
+                    const SizedBox(height: 10),
+                    const SizedBox(child: Text("Sortera efter")),
                     Padding(
                       padding: const EdgeInsets.only(
-                          top: 20.0, left: 20.0, right: 20.0),
+                          top: 5.0, left: 20.0, right: 20.0),
                       child: Container(
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.green),
@@ -139,52 +143,60 @@ class PantryState extends State<Pantry> {
                         ),
                         height: 44,
                         width: 220,
-                        child: Center(child: DropdownButton<String>(
-                            alignment: Alignment.center,
-                            value: dropdownValue,
-                            iconSize: 0,
-                            style: TextStyle(
-                                color: ColorConstant.primaryColor,
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold),
-                            items: const [
-                              DropdownMenuItem(
-                                value: 'Utgångsdatum',
-                                child: Center(child: Text('Utgångsdatum')),
-                              ),
-                              DropdownMenuItem(
-                                value: 'Senast tillagd',
-                                child: Center(child: Text('Senast tillagd')),
-                              ),
-                              DropdownMenuItem(
-                                value: 'Varugrupp',
-                                child: Center(child: Text('Varugrupp')),
-                              ),
-                            ],
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                dropdownValue = newValue!;
-                              });
-                            })),
+                        child: Center(
+                            child: DropdownButton<String>(
+                                alignment: Alignment.center,
+                                value: dropdownValue,
+                                iconSize: 0,
+                                underline: Container(),
+                                style: TextStyle(
+                                    color: ColorConstant.primaryColor,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold),
+                                items: const [
+                                  DropdownMenuItem(
+                                    value: 'Utgångsdatum',
+                                    child: Center(child: Text('Utgångsdatum')),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'Senast tillagd',
+                                    child:
+                                        Center(child: Text('Senast tillagd')),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'Varugrupp',
+                                    child: Center(child: Text('Varugrupp')),
+                                  ),
+                                ],
+                                onChanged: (String? newValue) {
+                                  setState(() {
+                                    dropdownValue = newValue!;
+                                  });
+                                })),
                       ),
                     ),
+                    const SizedBox(height: 20),
                     Padding(
-                        padding: const EdgeInsets.only(top: 7.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
                         child: SizedBox(
                           height: 300,
                           width: 400,
                           child: dropdownValue != 'Varugrupp'
                               ? ListView.builder(
-                                  itemCount: data!.length,
+                                  itemCount: data.length,
                                   itemBuilder:
                                       (BuildContext context, int index) {
-                                    return Padding(
-                                      padding: EdgeInsets.only(top: 9.0),
+                                    return AppListTile(
+                                        data: data[index],
+                                        namn: data[index].namn);
+                                    /* return Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 4),
                                       child: Container(
-                                        height: 80,
+                                        alignment: Alignment.centerLeft,
+                                        height: 60,
                                         decoration: BoxDecoration(
                                           border: Border.all(
-                                              width: 0.5, color: Colors.teal),
+                                              width: 1, color: ColorConstant.primaryColor),
                                           borderRadius:
                                               BorderRadius.circular(15),
                                         ),
@@ -194,19 +206,14 @@ class PantryState extends State<Pantry> {
                                                 color: Colors.teal, width: 0.2),
                                             borderRadius: BorderRadius.circular(5),
                                           ),*/
-                                          title: Text(data[index].namn,
-                                              style: GoogleFonts.breeSerif(
-                                                  textStyle: const TextStyle(
-                                                fontSize: 30,
-                                                color: Colors.black,
-                                              ))),
+                                          title: AppListText(text: data[index].namn),
                                           onTap: () {
                                             BlocProvider.of<AppCubits>(context)
                                                 .ProduktPage(data[index]);
                                           },
                                         ),
                                       ),
-                                    );
+                                    ); */
                                   },
                                 )
                               : ListView.builder(
@@ -216,12 +223,18 @@ class PantryState extends State<Pantry> {
                                     final varugrupp =
                                         unikaVarugrupper.elementAt(index);
                                     return ExpansionTile(
-                                        title: Text(varugrupp),
+                                        title:
+                                            ExpansionTileText(text: varugrupp),
                                         children: data
                                             .where(
                                                 (e) => e.varugrupp == varugrupp)
                                             // .map((e) => Text(e.namn))
-                                            .map((e) => AppListText(text: e.namn, color: ColorConstant.listTextColor))
+                                            // .map((e) => AppListText(text: e.namn, color: ColorConstant.listTextColor))
+                                            .map((e) => AppListText(
+                                                text: e.namn,
+                                                color: ColorConstant
+                                                    .listTextColor))
+                                            // .map((e) => AppListText(text: e.namn))
                                             .toList());
                                   },
                                 ),

@@ -16,7 +16,7 @@ class ColorConstant {
 
   static Color primaryColor = lightGreen700;
 
-  static Color listTextColor = Colors.black87;
+  static Color listTextColor = Colors.red;
 
   static Color fromHex(String hexString) {
     final buffer = StringBuffer();

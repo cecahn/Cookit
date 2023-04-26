@@ -10,6 +10,7 @@ import 'package:requests/requests.dart';
 
 //import '../Routes/routes.dart';
 import '../../Constants/Utils/image_constants.dart';
+import '../../Widgets/app_list_text.dart';
 import '../../Widgets/appBar.dart';
 import 'pantry.dart';
 import 'recipes.dart';
@@ -68,7 +69,7 @@ class _TestHomePageState extends State<TestHomePage> {
 
   @override
   void initState() {
-    fetchProduct();
+    // fetchProduct();
     super.initState();
   }
 
@@ -121,6 +122,7 @@ class _TestHomePageState extends State<TestHomePage> {
                       setState(() async {
                         inputmj = _textController.text;
                         _textController.clear();
+                        fetchProduct();
                         initState();
                       });
                     }),
@@ -141,17 +143,18 @@ class _TestHomePageState extends State<TestHomePage> {
               ),
             ],
           )),
-          Container(
+          SizedBox(
             height: 250,
             width: 300,
             child: Center(
-              child: SizedBox(
+              child: Container(
+                alignment: Alignment.center,
                 height: 70,
                 child: ListView.builder(
                     itemCount: food.length,
                     itemBuilder: (BuildContext context, int index) {
                       return ListTile(
-                        title: Text(food[index]),
+                        title: AppListText(text: food[index]),
                       );
                     }),
               ),
