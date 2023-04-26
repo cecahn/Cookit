@@ -68,8 +68,7 @@ class _TestHomePageState extends State<TestHomePage> {
   }
 
   @override
-  void initState() {
-    // fetchProduct();
+  void initState(){
     super.initState();
   }
 
@@ -121,6 +120,7 @@ class _TestHomePageState extends State<TestHomePage> {
                     onPressed: () {
                       setState(() async {
                         inputmj = _textController.text;
+                        fetchProduct();
                         _textController.clear();
                         fetchProduct();
                         initState();
