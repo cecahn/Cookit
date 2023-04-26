@@ -11,6 +11,7 @@ import '../../Constants/Utils/dimensions.dart';
 import '../../Constants/Utils/image_constants.dart';
 import '../../cubit/appCubit.dart';
 import '../../cubit/appCubitStates.dart';
+import 'package:first/Services/server_calls.dart';
 
 class ProductPage extends StatefulWidget {
   const ProductPage({Key? key}) : super(key: key);
@@ -23,30 +24,21 @@ class ProductPage extends StatefulWidget {
 
 class _ProductPageState extends State<ProductPage> {
 
-  late Response deleted; 
-      void deleteProduct( String produktid) async {
+  String _dateTime = "hej";
 
-      try{
-      var r2 = await Requests.get("https://litium.herokuapp.com/skafferi/delete",
-          withCredentials: true);
-
-      if (r2.statusCode == 200){
+  void _showDatePicker () {
+    showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2025), 
+      
+      ).then((value) {
         setState((){
-          deleted = r2 as Response; 
+          _dateTime = value!.toString(); 
         });
-      }
-
-      else {
-        throw Exception('Failed to change rating');
-      }
-
-      } catch (error) {
-        setState(() {
-          deleted = 0 as Response;
-        });
-      }
-
-    } 
+      });
+  }
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AppCubits, CubitStates>(builder: (context, state) {
@@ -82,7 +74,7 @@ class _ProductPageState extends State<ProductPage> {
               top:20,
               child: Row(
             children: [
-              IconButton(onPressed: () { deleteProduct(detail.produkt.gtin); BlocProvider.of<AppCubits>(context).goHome(); }, icon: Icon(Icons.delete_outline), color:Colors.teal)
+              IconButton(onPressed: () { ServerCall.deleteFromPantry(detail.produkt.skafferi_id); BlocProvider.of<AppCubits>(context).goHome(); }, icon: Icon(Icons.delete_outline), color:Colors.teal)
             ],
               )
             ),
@@ -139,6 +131,9 @@ class _ProductPageState extends State<ProductPage> {
                                 SizedBox(width:30),
 
                                 IconButton ( onPressed: () {
+                                  _showDatePicker();
+                                  ServerCall.changeDate(detail.produkt.skafferi_id, _dateTime);
+                                  //LoadingState();
                                       },
                                 
                                 icon: Icon(Icons.edit, color: Colors.black)
@@ -246,6 +241,10 @@ class _ProductPageState extends State<ProductPage> {
       ),
       )
     ); 
+    
+    },
+    buildWhen: (previousState, state) {
+      return state is ProductState || state is LoadingState;
     }
     );
   }
