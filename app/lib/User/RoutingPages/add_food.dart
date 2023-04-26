@@ -129,11 +129,11 @@ class _TestHomePageState extends State<TestHomePage> {
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 2),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
+            padding: const EdgeInsets.only(left: 10),
             child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Text(
                 "Nyligen skannad mat: ",
