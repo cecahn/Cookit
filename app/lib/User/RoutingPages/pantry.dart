@@ -184,9 +184,6 @@ class PantryState extends State<Pantry> {
                                       key: Key(item.skafferi_id),
                                       onDismissed: (right) {
                                         setState(() {
-                                          final response =
-                                              ServerCall.deleteFromPantry(
-                                                  item.skafferi_id);
                                           data.removeAt(index);
                                         });
                                         ScaffoldMessenger.of(context)
@@ -194,14 +191,21 @@ class PantryState extends State<Pantry> {
                                           content: Text(
                                               "Tog bort ${item.namn} ur skafferiet"),
                                           action: SnackBarAction(
-                                            label: "Undo",
+                                            label: "Ångra",
                                             onPressed: () {
                                               setState(() {
                                                 data.insert(index, item);
                                               });
                                             },
                                           ),
-                                        ));
+                                        )).closed.then((value) {
+                                          if (value != SnackBarClosedReason.action) {
+                                            final response =
+                                              ServerCall.deleteFromPantry(
+                                                  item.skafferi_id);
+                                            skafferi = getSkafferi();
+                                          }
+                                        });
                                       },
                                       background: Container(color: Colors.red),
                                       child: Padding(
