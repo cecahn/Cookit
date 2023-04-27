@@ -1,14 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:first/Constants/export.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
-import 'package:first/Widgets/bottomBar.dart';
 import 'package:requests/requests.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
-//import '../Routes/routes.dart';
+import 'package:first/Constants/export.dart';
+import 'package:first/Widgets/bottomBar.dart';
 import '../../Constants/Utils/image_constants.dart';
 import '../../Widgets/app_list_text.dart';
 import '../../Widgets/appBar.dart';
@@ -26,13 +27,10 @@ import 'recipes.dart';
 
 late String stringResponse;
 late Map<dynamic, dynamic>? mapResponse;
-//late Map mapResponse;
 Map exceptionResponse = "Loading food" as Map;
 final List<String> list = [];
 late String inputmj;
 final _textController = TextEditingController();
-//String inputmj = "07310865001818";
-late String output;
 List<String> food = [];
 
 class TestHomePage extends StatefulWidget {
@@ -43,12 +41,13 @@ class TestHomePage extends StatefulWidget {
 }
 
 class _TestHomePageState extends State<TestHomePage> {
+  late String productGTIN = '';
+
   void fetchProduct() async {
     try {
       final response = await Requests.get(
           "https://litium.herokuapp.com/skafferi/spara?id=$inputmj",
           withCredentials: true);
-      //final response = await http.get(Uri.parse('https://litium.herokuapp.com/get/product?id=$inputmj'));
       if (response.statusCode == 200) {
         // If the call to the server was successful, parse the JSON.
         setState(() {
@@ -69,7 +68,6 @@ class _TestHomePageState extends State<TestHomePage> {
 
   @override
   void initState() {
-    // fetchProduct();
     super.initState();
   }
 
@@ -88,6 +86,25 @@ class _TestHomePageState extends State<TestHomePage> {
     const Recipes(),
   ];
 
+  Future<void> scanBarcode() async {
+      String scanBarcodeRes;
+
+      try {
+        scanBarcodeRes = await FlutterBarcodeScanner.scanBarcode(
+          '#ff6666', 'Cancel', true, ScanMode.BARCODE);
+      } on PlatformException {
+        scanBarcodeRes = 'Failed to get platform version.';
+      }
+      if (!mounted) return;
+
+      setState(() {
+        productGTIN = scanBarcodeRes;
+        // inputmj = scanBarcodeRes;
+        
+        // fetchProduct();
+      });
+    }
+
   @override
   Widget build(BuildContext context) {
     Widget child = Container();
@@ -104,6 +121,8 @@ class _TestHomePageState extends State<TestHomePage> {
       case 2:
         child = Pantry();
     }
+
+    
 
     return Scaffold(
       appBar: customAppBar("CookIt.", ImageConstant.ellips),
@@ -129,6 +148,15 @@ class _TestHomePageState extends State<TestHomePage> {
                       }),
                 ),
               ),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await scanBarcode();
+                fetchProduct();
+              },
+              child: const Text('Scan')),
+            Center(
+              child: Text(productGTIN)
             ),
             const SizedBox(height: 20),
             Padding(
