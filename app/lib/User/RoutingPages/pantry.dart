@@ -13,57 +13,11 @@ import '../../cubit/appCubit.dart';
 import '../../Widgets/app_list_text.dart';
 import '../../Widgets/expansion_tile_text.dart';
 import '../../Widgets/app_list_tile.dart';
+import '../../Services/server_calls.dart';
 
 bool sortActivated = false;
 bool sortBytime = false;
 bool sortByalfabet = false;
-
-// List<String> filter = ['Mejeri', 'Kött'];
-// List<String> selectedCategories = [];
-
-//import 'package:myapp/utils.dart';
-/*class Produkt {
-  final String varugrupp;
-  final String namn;
-  final int utgang;
-  final int tid;
-
-  //final String hållbarhet;
-
-  Produkt(
-      {required this.varugrupp,
-      required this.namn,
-      required this.utgang,
-      required this.tid});
-}*/
-
-// List<Produkt> skafferi = [];
-
-/*int sortByUtgang(Produkt produkta, Produkt produktb) {
-  int a = produkta.utgang;
-  int b = produktb.utgang;
-
-  if (a < b) {
-    return -1;
-  } else if (a > b) {
-    return 1;
-  } else {
-    return 0;
-  }
-}
-
-int sortByTime(Produkt produkta, Produkt produktb) {
-  int a = produkta.tid;
-  int b = produktb.tid;
-
-  if (a < b) {
-    return -1;
-  } else if (a > b) {
-    return 1;
-  } else {
-    return 0;
-  }
-}*/
 
 final _textController = TextEditingController();
 
@@ -186,34 +140,61 @@ class PantryState extends State<Pantry> {
                                   itemCount: data.length,
                                   itemBuilder:
                                       (BuildContext context, int index) {
-                                    return AppListTile(
-                                        data: data[index],
-                                        namn: data[index].namn);
-                                    /* return Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 4),
-                                      child: Container(
-                                        alignment: Alignment.centerLeft,
-                                        height: 60,
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                              width: 1, color: ColorConstant.primaryColor),
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                        ),
-                                        child: ListTile(
-                                          /*shape: RoundedRectangleBorder(
-                                            side: const BorderSide(
-                                                color: Colors.teal, width: 0.2),
-                                            borderRadius: BorderRadius.circular(5),
-                                          ),*/
-                                          title: AppListText(text: data[index].namn),
-                                          onTap: () {
-                                            BlocProvider.of<AppCubits>(context)
-                                                .ProduktPage(data[index]);
-                                          },
+                                    final item = data[index];
+                                    return Dismissible(
+                                      key: Key(item.skafferi_id),
+                                      onDismissed: (right) {
+                                        setState(() {
+                                          data.removeAt(index);
+                                        });
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                          content: Text(
+                                              "Tog bort ${item.namn} ur skafferiet"),
+                                          action: SnackBarAction(
+                                            label: "Ångra",
+                                            onPressed: () {
+                                              setState(() {
+                                                data.insert(index, item);
+                                              });
+                                            },
+                                          ),
+                                        )).closed.then((value) {
+                                          if (value != SnackBarClosedReason.action) {
+                                            final response =
+                                              ServerCall.deleteFromPantry(
+                                                  item.skafferi_id);
+                                            skafferi = getSkafferi();
+                                          }
+                                        });
+                                      },
+                                      background: Container(color: Colors.red),
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(top: 9.0),
+                                        child: Container(
+                                          height: 80,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                                width: 0.5, color: Colors.teal),
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                          ),
+                                          child: ListTile(
+                                            title: Text(data[index].namn,
+                                                style: GoogleFonts.breeSerif(
+                                                    textStyle: const TextStyle(
+                                                  fontSize: 30,
+                                                  color: Colors.black,
+                                                ))),
+                                            onTap: () {
+                                              BlocProvider.of<AppCubits>(
+                                                      context)
+                                                  .ProduktPage(data[index]);
+                                            },
+                                          ),
                                         ),
                                       ),
-                                    ); */
+                                    );
                                   },
                                 )
                               : ListView.builder(
@@ -228,13 +209,10 @@ class PantryState extends State<Pantry> {
                                         children: data
                                             .where(
                                                 (e) => e.varugrupp == varugrupp)
-                                            // .map((e) => Text(e.namn))
-                                            // .map((e) => AppListText(text: e.namn, color: ColorConstant.listTextColor))
                                             .map((e) => AppListText(
                                                 text: e.namn,
                                                 color: ColorConstant
                                                     .listTextColor))
-                                            // .map((e) => AppListText(text: e.namn))
                                             .toList());
                                   },
                                 ),
