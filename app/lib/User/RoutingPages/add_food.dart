@@ -40,9 +40,11 @@ class _TestHomePageState extends State<TestHomePage> {
   late String productGTIN = '';
 
   void fetchProduct() async {
+    String requestParam = productGTIN.padLeft(14, '0');
+    print(requestParam);
     try {
       final response = await Requests.get(
-          "https://litium.herokuapp.com/skafferi/spara?id=$productGTIN",
+          "https://litium.herokuapp.com/skafferi/spara?id=$requestParam",
           withCredentials: true);
       if (response.statusCode == 200) {
         // If the call to the server was successful, parse the JSON.
