@@ -3,14 +3,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:requests/requests.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
 import 'package:first/Constants/export.dart';
-import 'package:first/Widgets/bottomBar.dart';
-import '../../Constants/Utils/image_constants.dart';
 import '../../Widgets/app_list_text.dart';
 import '../../Widgets/appBar.dart';
 import 'pantry.dart';
@@ -29,7 +26,6 @@ late String stringResponse;
 late Map<dynamic, dynamic>? mapResponse;
 Map exceptionResponse = "Loading food" as Map;
 final List<String> list = [];
-late String inputmj;
 final _textController = TextEditingController();
 List<String> food = [];
 
@@ -46,7 +42,7 @@ class _TestHomePageState extends State<TestHomePage> {
   void fetchProduct() async {
     try {
       final response = await Requests.get(
-          "https://litium.herokuapp.com/skafferi/spara?id=$inputmj",
+          "https://litium.herokuapp.com/skafferi/spara?id=$productGTIN",
           withCredentials: true);
       if (response.statusCode == 200) {
         // If the call to the server was successful, parse the JSON.
@@ -99,9 +95,6 @@ class _TestHomePageState extends State<TestHomePage> {
 
       setState(() {
         productGTIN = scanBarcodeRes;
-        // inputmj = scanBarcodeRes;
-        
-        // fetchProduct();
       });
     }
 
@@ -140,7 +133,7 @@ class _TestHomePageState extends State<TestHomePage> {
                       icon: const Icon(Icons.search, color: Colors.black),
                       onPressed: () {
                         setState(() async {
-                          inputmj = _textController.text;
+                          productGTIN = _textController.text;
                           _textController.clear();
                           fetchProduct();
                           initState();
