@@ -16,7 +16,7 @@ def db_get_product(gtin: str, cookit_db):
     cursor = cookit_db.connection.cursor()
 
     # Get product information
-    query = f"SELECT * FROM products WHERE gtin = '{gtin.zfill(14)}'"
+    query = f"SELECT * FROM products WHERE gtin = '{gtin}'"
     cursor.execute(query)
 
     result = sql_query_to_json(cursor)

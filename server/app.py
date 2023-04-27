@@ -97,7 +97,7 @@ def search_recipe():
 @app.route("/skafferi/spara")
 @login_required
 def fetch_product():
-    gtin = request.args.get('id')
+    gtin = request.args.get('id').zfill(14)
 
     # Kolla att input har korrekt format
     if not valid_gtin(gtin):
@@ -159,7 +159,7 @@ def valid_gtin(gtin: str):
     '''
     Checks if 'gtin' is a valid gtin code
     '''
-    return len(gtin) <= 14 and gtin.isdigit()
+    return len(gtin) == 14 and gtin.isdigit()
 
 @app.route('/skafferi/update_exp_date')
 @login_required
