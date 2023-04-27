@@ -47,7 +47,7 @@ int sortByUtgang(Produkt produkta, Produkt produktb) {
   DateTime dateB = DateTime(int.tryParse(splitB.elementAt(0))!,
       int.tryParse(splitB.elementAt(1))!, int.tryParse(splitB.elementAt(2))!);
 
-  return dateA.compareTo(dateB); 
+  return dateA.compareTo(dateB);
 }
 
 int sortByTime(Produkt produkta, Produkt produktb) {
@@ -62,10 +62,27 @@ int sortByTime(Produkt produkta, Produkt produktb) {
   DateTime dateB = DateTime(int.tryParse(splitB.elementAt(0))!,
       int.tryParse(splitB.elementAt(1))!, int.tryParse(splitB.elementAt(2))!);
 
-  return dateA.compareTo(dateB); 
+  return dateA.compareTo(dateB);
 }
 
 final _textController = TextEditingController();
+String input = _textController.text;
+
+List<Produkt> searchList = [];
+
+bool search = false;
+
+void FilterSearch(String textInput, List<Produkt> pantry) {
+  for (var i = 0; i < pantry.length; i++) {
+    if (pantry
+        .elementAt(i)
+        .namn
+        .toLowerCase()
+        .contains(textInput.toLowerCase())) {
+      searchList.add(pantry.elementAt(i));
+    }
+  }
+}
 
 class Pantry extends StatefulWidget {
   const Pantry({Key? key}) : super(key: key);
@@ -77,7 +94,6 @@ class Pantry extends StatefulWidget {
 class PantryState extends State<Pantry> {
   String dropdownValue = 'Varugrupp';
   late final Future<List<Produkt>> skafferi;
-  String input = "";
 
   @override
   void initState() {
@@ -116,17 +132,31 @@ class PantryState extends State<Pantry> {
                           top: 10.0, left: 10.0, right: 10.0),
                       child: TextField(
                           controller: _textController,
+                          onChanged: (input) {
+                            setState(() {
+                              if (input.isEmpty == false) {
+                                searchList = [];
+                                FilterSearch(input, data);
+                                search = true;
+                                dropdownValue = 'Senast tillagd';
+                              } else {
+                                // searchList = [];
+                                search = false;
+                              }
+                            });
+                          },
                           decoration: InputDecoration(
                             hintText: 'Leta efter produkt i skafferiet',
                             border: const OutlineInputBorder(),
                             suffixIcon: IconButton(
-                                icon: const Icon(Icons.search,
-                                    color: Colors.black),
+                                icon: search == false
+                                    ? const Icon(Icons.search,
+                                        color: Color.fromARGB(255, 83, 42, 42))
+                                    : const Icon(Icons.cancel_sharp),
                                 onPressed: () {
-                                  setState(() async {
-                                    input = _textController.text;
+                                  setState(() {
                                     _textController.clear();
-                                    initState();
+                                    search = false;
                                   });
                                 }),
                           )),
@@ -185,7 +215,9 @@ class PantryState extends State<Pantry> {
                           width: 400,
                           child: dropdownValue != 'Varugrupp'
                               ? ListView.builder(
-                                  itemCount: data!.length,
+                                  itemCount: search == false
+                                      ? data!.length
+                                      : searchList.length,
                                   itemBuilder:
                                       (BuildContext context, int index) {
                                     return Padding(
@@ -204,7 +236,10 @@ class PantryState extends State<Pantry> {
                                                 color: Colors.teal, width: 0.2),
                                             borderRadius: BorderRadius.circular(5),
                                           ),*/
-                                          title: Text(data[index].namn,
+                                          title: Text(
+                                              search == false
+                                                  ? data[index].namn
+                                                  : searchList[index].namn,
                                               style: GoogleFonts.breeSerif(
                                                   textStyle: const TextStyle(
                                                 fontSize: 30,
@@ -212,7 +247,9 @@ class PantryState extends State<Pantry> {
                                               ))),
                                           onTap: () {
                                             BlocProvider.of<AppCubits>(context)
-                                                .ProduktPage(data[index]);
+                                                .ProduktPage(search == false
+                                                    ? data[index]
+                                                    : searchList[index]);
                                           },
                                         ),
                                       ),
