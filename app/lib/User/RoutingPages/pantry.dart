@@ -186,6 +186,7 @@ class PantryState extends State<Pantry> {
                                         setState(() {
                                           data.removeAt(index);
                                         });
+                                        ScaffoldMessenger.of(context).removeCurrentSnackBar();
                                         ScaffoldMessenger.of(context)
                                             .showSnackBar(SnackBar(
                                           content: Text(
