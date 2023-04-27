@@ -107,70 +107,72 @@ class _TestHomePageState extends State<TestHomePage> {
 
     return Scaffold(
       appBar: customAppBar("CookIt.", ImageConstant.ellips),
-      body: Center(
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 120.0, left: 10, right: 10),
-            child: TextField(
-              controller: _textController,
-              decoration: InputDecoration(
-                hintText: 'Skriv QR kod för din mat',
-                border: const OutlineInputBorder(),
-                suffixIcon: IconButton(
-                    icon: const Icon(Icons.search, color: Colors.black),
-                    onPressed: () {
-                      setState(() async {
-                        inputmj = _textController.text;
-                        _textController.clear();
-                        fetchProduct();
-                        initState();
-                      });
-                    }),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 120.0, left: 10, right: 10),
+              child: TextField(
+                controller: _textController,
+                decoration: InputDecoration(
+                  hintText: 'Skriv QR kod för din mat',
+                  border: const OutlineInputBorder(),
+                  suffixIcon: IconButton(
+                      icon: const Icon(Icons.search, color: Colors.black),
+                      onPressed: () {
+                        setState(() async {
+                          inputmj = _textController.text;
+                          _textController.clear();
+                          fetchProduct();
+                          initState();
+                        });
+                      }),
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 20),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "Nyligen skannad mat: ",
-                style: GoogleFonts.alfaSlabOne(
-                    textStyle: const TextStyle(fontSize: 16),
-                    color: ColorConstant.primaryColor),
-              ),
-            ],
-          )),
-          SizedBox(
-            height: 250,
-            width: 300,
-            child: Center(
-              child: Container(
-                alignment: Alignment.center,
-                height: 70,
-                child: ListView.builder(
-                    itemCount: food.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return ListTile(
-                        title: AppListText(text: food[index]),
-                      );
-                    }),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Nyligen skannad mat: ",
+                  style: GoogleFonts.alfaSlabOne(
+                      textStyle: const TextStyle(fontSize: 16),
+                      color: ColorConstant.primaryColor),
+                ),
+              ],
+            )),
+            SizedBox(
+              height: 250,
+              width: 300,
+              child: Center(
+                child: Container(
+                  alignment: Alignment.center,
+                  height: 70,
+                  child: ListView.builder(
+                      itemCount: food.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return ListTile(
+                          title: AppListText(text: food[index]),
+                        );
+                      }),
+                ),
               ),
             ),
-          ),
-
-          /*Container(
-                  height: 200,
-                  width: 300,
-                  decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(40), color: Colors.white),
-                  child: Center(
-                     child: mapResponse == null? const Text("") :Text(mapResponse!["namn"].toString()),
-                    ), 
-                  ),*/
-        ]),
+      
+            /*Container(
+                    height: 200,
+                    width: 300,
+                    decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(40), color: Colors.white),
+                    child: Center(
+                       child: mapResponse == null? const Text("") :Text(mapResponse!["namn"].toString()),
+                      ), 
+                    ),*/
+          ]),
+        ),
       ),
     );
   }

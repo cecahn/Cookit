@@ -349,6 +349,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.5"
+  petitparser:
+    dependency: transitive
+    description:
+      name: petitparser
+      sha256: "49392a45ced973e8d94a85fdb21293fbb40ba805fc49f2965101ae748a3683b4"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.1.0"
   platform:
     dependency: transitive
     description:
@@ -389,6 +397,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.2.1"
+  rename_app:
+    dependency: "direct main"
+    description:
+      name: rename_app
+      sha256: "9db1121f65843e27f4e7a2ee3bef54d8cb6bc35fca5e5bda405be2a9e41e983b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
   requests:
     dependency: "direct main"
     description:
@@ -554,6 +570,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
+  xml:
+    dependency: transitive
+    description:
+      name: xml
+      sha256: "80d494c09849dc3f899d227a78c30c5b949b985ededf884cb3f3bcd39f4b447a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.4.1"
 sdks:
   dart: ">=2.18.2 <3.0.0"
   flutter: ">=3.3.0"
