@@ -1,3 +1,4 @@
+import 'package:first/Constants/export.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -56,7 +57,6 @@ class _RecipePageState extends State<RecipePage> {
               child: Container(
                   
                   padding: const EdgeInsets.only(left:20, right:20, top:30),
-                  //color: Colors.white,
                   width: MediaQuery.of(context).size.width,
                   height: 1000,
                   decoration: const BoxDecoration(
@@ -75,8 +75,8 @@ class _RecipePageState extends State<RecipePage> {
                       children:[
                         Text(detail.recept.titel,
                         style: GoogleFonts.alfaSlabOne(
-                        textStyle: const TextStyle(
-                        color: Colors.teal,
+                        textStyle: TextStyle(
+                        color: ColorConstant.primaryColor,
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
                         overflow: TextOverflow.ellipsis,

@@ -19,6 +19,7 @@ class AppListText extends StatelessWidget {
           textStyle: TextStyle(
           fontSize: size,
           color: color,
+          overflow: TextOverflow.ellipsis
         )));
   }
 }
