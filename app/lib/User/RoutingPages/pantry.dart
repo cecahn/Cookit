@@ -113,170 +113,172 @@ class PantryState extends State<Pantry> {
 
             return Scaffold(
                 appBar: customAppBar("Skafferi", ImageConstant.ellips),
-                body: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          top: 10.0, left: 10.0, right: 10.0),
-                      child: TextField(
-                          controller: _textController,
-                          decoration: InputDecoration(
-                            hintText: 'Leta efter produkt i skafferiet',
-                            border: const OutlineInputBorder(),
-                            suffixIcon: IconButton(
-                                icon: const Icon(Icons.search,
-                                    color: Colors.black),
-                                onPressed: () {
-                                  setState(() async {
-                                    input = _textController.text;
-                                    _textController.clear();
-                                    initState();
-                                  });
-                                }),
-                          )),
-                    ),
-                    const SizedBox(height: 10),
-                    const SizedBox(child: Text("Sortera efter")),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          top: 5.0, left: 20.0, right: 20.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.green),
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        height: 44,
-                        width: 220,
-                        child: Center(
-                            child: DropdownButton<String>(
-                                alignment: Alignment.center,
-                                value: dropdownValue,
-                                iconSize: 0,
-                                underline: Container(),
-                                style: TextStyle(
-                                    color: ColorConstant.primaryColor,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold),
-                                items: const [
-                                  DropdownMenuItem(
-                                    value: 'Utgångsdatum',
-                                    child: Center(child: Text('Utgångsdatum')),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'Senast tillagd',
-                                    child:
-                                        Center(child: Text('Senast tillagd')),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'Varugrupp',
-                                    child: Center(child: Text('Varugrupp')),
-                                  ),
-                                ],
-                                onChanged: (String? newValue) {
-                                  setState(() {
-                                    dropdownValue = newValue!;
-                                  });
-                                })),
+                body: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            top: 10.0, left: 10.0, right: 10.0),
+                        child: TextField(
+                            controller: _textController,
+                            decoration: InputDecoration(
+                              hintText: 'Leta efter produkt i skafferiet',
+                              border: const OutlineInputBorder(),
+                              suffixIcon: IconButton(
+                                  icon: const Icon(Icons.search,
+                                      color: Colors.black),
+                                  onPressed: () {
+                                    setState(() async {
+                                      input = _textController.text;
+                                      _textController.clear();
+                                      initState();
+                                    });
+                                  }),
+                            )),
                       ),
-                    ),
-                    const SizedBox(height: 20),
-                    Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: SizedBox(
-                          height: 550,
-                          width: 400,
-                          child: dropdownValue != 'Varugrupp'
-                              ? ListView.builder(
-                                  itemCount: data.length,
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                    final item = data[index];
-                                    return Dismissible(
-                                      key: Key(item.skafferi_id),
-                                      onDismissed: (right) {
-                                        setState(() {
-                                          data.removeAt(index);
-                                        });
-                                        ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(SnackBar(
-                                          content: Text(
-                                              "Tog bort ${item.namn} ur skafferiet"),
-                                          action: SnackBarAction(
-                                            label: "Ångra",
-                                            onPressed: () {
-                                              setState(() {
-                                                data.insert(index, item);
-                                              });
-                                            },
-                                          ),
-                                        )).closed.then((value) {
-                                          if (value != SnackBarClosedReason.action) {
-                                            final response =
-                                              ServerCall.deleteFromPantry(
-                                                  item.skafferi_id);
-                                            skafferi = getSkafferi();
-                                          }
-                                        });
-                                      },
-                                      background: Container(color: Colors.red),
-                                      child: AppListTile(
-                                        data: item,
-                                        namn: item.namn)
-                                    );
-                                  },
-                                )
-                              : ListView.builder(
-                                  itemCount: unikaVarugrupper.length,
-                                  itemBuilder: (_, index) {
-                                    // Vill lägga till produkter efter varugrupp
-                                    final varugrupp =
-                                        unikaVarugrupper.elementAt(index);
-                                    return ExpansionTile(
-                                        title:
-                                            ExpansionTileText(text: varugrupp),
-                                        children: data
-                                            .where(
-                                                (item) => item.varugrupp == varugrupp)
-                                            .map((item) => Dismissible(
-                                      key: Key(item.skafferi_id),
-                                      onDismissed: (right) {
-                                        setState(() {
-                                          data.removeAt(index);
-                                        });
-                                        ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(SnackBar(
-                                          content: Text(
-                                              "Tog bort ${item.namn} ur skafferiet"),
-                                          action: SnackBarAction(
-                                            label: "Ångra",
-                                            onPressed: () {
-                                              setState(() {
-                                                data.insert(index, item);
-                                              });
-                                            },
-                                          ),
-                                        )).closed.then((value) {
-                                          if (value != SnackBarClosedReason.action) {
-                                            final response =
-                                              ServerCall.deleteFromPantry(
-                                                  item.skafferi_id);
-                                            skafferi = getSkafferi();
-                                          }
-                                        });
-                                      },
-                                      background: Container(color: Colors.red),
-                                      child: AppListTile(
-                                        data: item,
-                                        namn: item.namn)
-                                    ))
-                                            .toList());
-                                  },
-                                ),
-                        ))
-                  ],
+                      const SizedBox(height: 10),
+                      const SizedBox(child: Text("Sortera efter")),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            top: 5.0, left: 20.0, right: 20.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.green),
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          height: 44,
+                          width: 220,
+                          child: Center(
+                              child: DropdownButton<String>(
+                                  alignment: Alignment.center,
+                                  value: dropdownValue,
+                                  iconSize: 0,
+                                  underline: Container(),
+                                  style: TextStyle(
+                                      color: ColorConstant.primaryColor,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                  items: const [
+                                    DropdownMenuItem(
+                                      value: 'Utgångsdatum',
+                                      child: Center(child: Text('Utgångsdatum')),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'Senast tillagd',
+                                      child:
+                                          Center(child: Text('Senast tillagd')),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'Varugrupp',
+                                      child: Center(child: Text('Varugrupp')),
+                                    ),
+                                  ],
+                                  onChanged: (String? newValue) {
+                                    setState(() {
+                                      dropdownValue = newValue!;
+                                    });
+                                  })),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: SizedBox(
+                            height: 550,
+                            width: 400,
+                            child: dropdownValue != 'Varugrupp'
+                                ? ListView.builder(
+                                    itemCount: data.length,
+                                    itemBuilder:
+                                        (BuildContext context, int index) {
+                                      final item = data[index];
+                                      return Dismissible(
+                                        key: Key(item.skafferi_id),
+                                        onDismissed: (right) {
+                                          setState(() {
+                                            data.removeAt(index);
+                                          });
+                                          ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
+                                            content: Text(
+                                                "Tog bort ${item.namn} ur skafferiet"),
+                                            action: SnackBarAction(
+                                              label: "Ångra",
+                                              onPressed: () {
+                                                setState(() {
+                                                  data.insert(index, item);
+                                                });
+                                              },
+                                            ),
+                                          )).closed.then((value) {
+                                            if (value != SnackBarClosedReason.action) {
+                                              final response =
+                                                ServerCall.deleteFromPantry(
+                                                    item.skafferi_id);
+                                              skafferi = getSkafferi();
+                                            }
+                                          });
+                                        },
+                                        background: Container(color: Colors.red),
+                                        child: AppListTile(
+                                          data: item,
+                                          namn: item.namn)
+                                      );
+                                    },
+                                  )
+                                : ListView.builder(
+                                    itemCount: unikaVarugrupper.length,
+                                    itemBuilder: (_, index) {
+                                      // Vill lägga till produkter efter varugrupp
+                                      final varugrupp =
+                                          unikaVarugrupper.elementAt(index);
+                                      return ExpansionTile(
+                                          title:
+                                              ExpansionTileText(text: varugrupp),
+                                          children: data
+                                              .where(
+                                                  (item) => item.varugrupp == varugrupp)
+                                              .map((item) => Dismissible(
+                                        key: Key(item.skafferi_id),
+                                        onDismissed: (right) {
+                                          setState(() {
+                                            data.removeAt(index);
+                                          });
+                                          ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
+                                            content: Text(
+                                                "Tog bort ${item.namn} ur skafferiet"),
+                                            action: SnackBarAction(
+                                              label: "Ångra",
+                                              onPressed: () {
+                                                setState(() {
+                                                  data.insert(index, item);
+                                                });
+                                              },
+                                            ),
+                                          )).closed.then((value) {
+                                            if (value != SnackBarClosedReason.action) {
+                                              final response =
+                                                ServerCall.deleteFromPantry(
+                                                    item.skafferi_id);
+                                              skafferi = getSkafferi();
+                                            }
+                                          });
+                                        },
+                                        background: Container(color: Colors.red),
+                                        child: AppListTile(
+                                          data: item,
+                                          namn: item.namn)
+                                      ))
+                                              .toList());
+                                    },
+                                  ),
+                          ))
+                    ],
+                  ),
                 ));
           }
         }
