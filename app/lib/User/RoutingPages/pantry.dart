@@ -170,31 +170,9 @@ class PantryState extends State<Pantry> {
                                         });
                                       },
                                       background: Container(color: Colors.red),
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(top: 9.0),
-                                        child: Container(
-                                          height: 80,
-                                          decoration: BoxDecoration(
-                                            border: Border.all(
-                                                width: 0.5, color: Colors.teal),
-                                            borderRadius:
-                                                BorderRadius.circular(15),
-                                          ),
-                                          child: ListTile(
-                                            title: Text(data[index].namn,
-                                                style: GoogleFonts.breeSerif(
-                                                    textStyle: const TextStyle(
-                                                  fontSize: 30,
-                                                  color: Colors.black,
-                                                ))),
-                                            onTap: () {
-                                              BlocProvider.of<AppCubits>(
-                                                      context)
-                                                  .ProduktPage(data[index]);
-                                            },
-                                          ),
-                                        ),
-                                      ),
+                                      child: AppListTile(
+                                        data: item,
+                                        namn: item.namn)
                                     );
                                   },
                                 )
