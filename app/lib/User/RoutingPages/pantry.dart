@@ -189,31 +189,6 @@ class PantryState extends State<Pantry> {
                                     return AppListTile(
                                         data: data[index],
                                         namn: data[index].namn);
-                                    /* return Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 4),
-                                      child: Container(
-                                        alignment: Alignment.centerLeft,
-                                        height: 60,
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                              width: 1, color: ColorConstant.primaryColor),
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                        ),
-                                        child: ListTile(
-                                          /*shape: RoundedRectangleBorder(
-                                            side: const BorderSide(
-                                                color: Colors.teal, width: 0.2),
-                                            borderRadius: BorderRadius.circular(5),
-                                          ),*/
-                                          title: AppListText(text: data[index].namn),
-                                          onTap: () {
-                                            BlocProvider.of<AppCubits>(context)
-                                                .ProduktPage(data[index]);
-                                          },
-                                        ),
-                                      ),
-                                    ); */
                                   },
                                 )
                               : ListView.builder(
@@ -228,13 +203,10 @@ class PantryState extends State<Pantry> {
                                         children: data
                                             .where(
                                                 (e) => e.varugrupp == varugrupp)
-                                            // .map((e) => Text(e.namn))
-                                            // .map((e) => AppListText(text: e.namn, color: ColorConstant.listTextColor))
-                                            .map((e) => AppListText(
-                                                text: e.namn,
-                                                color: ColorConstant
-                                                    .listTextColor))
-                                            // .map((e) => AppListText(text: e.namn))
+                                            .map((e) => AppListTile(
+                                                data: e,
+                                                namn: e.namn
+                                                ))
                                             .toList());
                                   },
                                 ),

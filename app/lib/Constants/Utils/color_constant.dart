@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ColorConstant {
   static Color black900 = fromHex('#000000');
@@ -18,10 +19,28 @@ class ColorConstant {
 
   static Color listTextColor = Colors.red;
 
+  static Color expirationPassedColor = Colors.red;
+
+  static Color expirationApproachingColor = Colors.greenAccent;
+
   static Color fromHex(String hexString) {
     final buffer = StringBuffer();
     if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
     buffer.write(hexString.replaceFirst('#', ''));
     return Color(int.parse(buffer.toString(), radix: 16));
+  }
+
+  static Color expirationDateColor(String date) {
+    DateTime expirationDate = DateTime.parse(date);
+    DateTime today = DateTime.now();
+
+    if (expirationDate.year == today.year &&
+        expirationDate.month == today.month &&
+        expirationDate.day == today.day) {
+          return Colors.black;
+    } else if (expirationDate.isBefore(today)) {
+      return expirationPassedColor;
+    }
+    return Colors.black38;
   }
 }
