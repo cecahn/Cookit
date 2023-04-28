@@ -15,9 +15,60 @@ import '../../Widgets/expansion_tile_text.dart';
 import '../../Widgets/app_list_tile.dart';
 import '../../Services/server_calls.dart';
 
-bool sortActivated = false;
-bool sortBytime = false;
-bool sortByalfabet = false;
+// bool sortActivated = false;
+// bool sortBytime = false;
+// bool sortByalfabet = false;
+
+// List<String> filter = ['Mejeri', 'Kött'];
+// List<String> selectedCategories = [];
+
+//import 'package:myapp/utils.dart';
+/*class Produkt {
+  final String varugrupp;
+  final String namn;
+  final int utgang;
+  final int tid;
+
+  //final String hållbarhet;
+
+  Produkt(
+      {required this.varugrupp,
+      required this.namn,
+      required this.utgang,
+      required this.tid});
+}*/
+
+// List<Produkt> skafferi = [];
+
+int sortByUtgang(Produkt produkta, Produkt produktb) {
+  String produktaString = produkta.bastforedatum;
+  String produktbString = produktb.bastforedatum;
+
+  List<String> splitA = produktaString.split('-');
+  List<String> splitB = produktbString.split('-');
+
+  DateTime dateA = DateTime(int.tryParse(splitA.elementAt(0))!,
+      int.tryParse(splitA.elementAt(1))!, int.tryParse(splitA.elementAt(2))!);
+  DateTime dateB = DateTime(int.tryParse(splitB.elementAt(0))!,
+      int.tryParse(splitB.elementAt(1))!, int.tryParse(splitB.elementAt(2))!);
+
+  return dateA.compareTo(dateB); 
+}
+
+int sortByTime(Produkt produkta, Produkt produktb) {
+  String produktaString = produkta.tillagning_datum;
+  String produktbString = produktb.tillagning_datum;
+
+  List<String> splitA = produktaString.split('-');
+  List<String> splitB = produktbString.split('-');
+
+  DateTime dateA = DateTime(int.tryParse(splitA.elementAt(0))!,
+      int.tryParse(splitA.elementAt(1))!, int.tryParse(splitA.elementAt(2))!);
+  DateTime dateB = DateTime(int.tryParse(splitB.elementAt(0))!,
+      int.tryParse(splitB.elementAt(1))!, int.tryParse(splitB.elementAt(2))!);
+
+  return dateA.compareTo(dateB); 
+}
 
 final _textController = TextEditingController();
 
@@ -133,7 +184,7 @@ class PantryState extends State<Pantry> {
                     Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         child: SizedBox(
-                          height: 300,
+                          height: 550,
                           width: 400,
                           child: dropdownValue != 'Varugrupp'
                               ? ListView.builder(

@@ -17,4 +17,22 @@ class ServerCall {
       print("Inget resultat");
     }
   }
+
+  static changeDate (pantryID, expiration) async {
+    try {
+      final response = await Requests.get(
+          "https://litium.herokuapp.com/skafferi/update_exp_date?skafferi_id=$pantryID&expiration-date=$expiration",
+          withCredentials: true);
+      if (response.statusCode == 200) {
+        print(response);
+      } else {
+        print(response);
+        throw Exception('Failed to load data');
+      }
+    } catch (error) {
+      print("Inget resultat");
+    }
+  }
+
+
 }
