@@ -1,3 +1,4 @@
+import 'package:first/Constants/export.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -58,7 +59,6 @@ class _ProductPageState extends State<ProductPage> {
                   child: Container(
                       
                       padding: const EdgeInsets.only(left:20, right:20, top:30),
-                      //color: Colors.white,
                       width: MediaQuery.of(context).size.width,
                       height: 1000,
                       decoration: const BoxDecoration(
@@ -77,8 +77,8 @@ class _ProductPageState extends State<ProductPage> {
                           children:[
                             Text(detail.produkt.namn,
                             style: GoogleFonts.alfaSlabOne(
-                            textStyle: const TextStyle(
-                            color: Colors.teal,
+                            textStyle: TextStyle(
+                            color: ColorConstant.primaryColor,
                             fontSize: 30,
                             fontWeight: FontWeight.bold,
                                 ),

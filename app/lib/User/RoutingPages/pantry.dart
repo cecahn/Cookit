@@ -210,10 +210,10 @@ class PantryState extends State<Pantry> {
                                         children: data
                                             .where(
                                                 (e) => e.varugrupp == varugrupp)
-                                            .map((e) => AppListText(
-                                                text: e.namn,
-                                                color: ColorConstant
-                                                    .listTextColor))
+                                            .map((e) => AppListTile(
+                                                data: e,
+                                                namn: e.namn
+                                                ))
                                             .toList());
                                   },
                                 ),
