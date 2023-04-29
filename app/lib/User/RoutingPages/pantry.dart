@@ -189,6 +189,7 @@ class PantryState extends State<Pantry> {
                             width: 400,
                             child: dropdownValue != 'Varugrupp'
                                 ? ListView.builder(
+                                    physics: const NeverScrollableScrollPhysics(),
                                     itemCount: data.length,
                                     itemBuilder:
                                         (BuildContext context, int index) {
@@ -229,6 +230,7 @@ class PantryState extends State<Pantry> {
                                     },
                                   )
                                 : ListView.builder(
+                                    physics: const NeverScrollableScrollPhysics(),
                                     itemCount: unikaVarugrupper.length,
                                     itemBuilder: (_, index) {
                                       // Vill lägga till produkter efter varugrupp
