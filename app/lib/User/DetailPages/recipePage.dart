@@ -115,7 +115,6 @@ class _RecipePageState extends State<RecipePage> {
                         textStyle: TextStyle(
                         color: ColorConstant.primaryColor,
                         fontSize: 30,
-                        // fontWeight: FontWeight.bold,
                         //overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -126,7 +125,6 @@ class _RecipePageState extends State<RecipePage> {
                         textStyle: const TextStyle(
                         color: Colors.teal,
                         fontSize: 10,
-                        fontWeight: FontWeight.bold,
                         overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -156,7 +154,6 @@ class _RecipePageState extends State<RecipePage> {
                         textStyle: TextStyle(
                         color: ColorConstant.primaryColor,
                         fontSize: 10,
-                        fontWeight: FontWeight.bold,
                         overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -176,7 +173,7 @@ class _RecipePageState extends State<RecipePage> {
                         textStyle: const TextStyle(
                         color: Colors.black,
                         fontSize: 20,
-                        fontWeight: FontWeight.bold,
+                        // fontWeight: FontWeight.bold,
                         overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -240,7 +237,6 @@ class _RecipePageState extends State<RecipePage> {
                                 textStyle: const TextStyle(
                                 color: Colors.black,
                                 fontSize: 10,
-                                fontWeight: FontWeight.bold,
                                 overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -282,7 +278,6 @@ class _RecipePageState extends State<RecipePage> {
                                 textStyle: const TextStyle(
                                 color: Colors.black,
                                 fontSize: 10,
-                                fontWeight: FontWeight.bold,
                             ),
                           ),
                                 ),]
