@@ -28,8 +28,6 @@ class Recipes extends StatefulWidget {
 }
 
 class RecipesState extends State<Recipes> {
-  String dropdownValue = 'Filter';
-  String dropdownValue2 = 'Sortera';
   late final Future<List<Recept>> recept;
 
   @override
@@ -38,76 +36,26 @@ class RecipesState extends State<Recipes> {
     recept = getRecept();
   }
 
-  Widget buildDropdownButton(List<String> items, initValue, variableName) {
-    return DropdownButton<String>(
-      alignment: Alignment.center,
-      value: initValue,
-      icon: Transform.scale(
-        scale: 0.0,
-        child: const Icon(Icons.menu),
-      ),
-      iconSize: 0,
-      elevation: 16,
-      style: TextStyle(
-        color: ColorConstant.primaryColor,
-        fontSize: 16,
-        fontWeight: FontWeight.bold
-      ),
-      underline: Container(),
-      onChanged: (String? newValue) {
-        setState(() {
-          if (variableName == "dropdownValue") {
-            dropdownValue = newValue!;
-          } else if (variableName == "dropdownValue2") {
-            dropdownValue2 = newValue!;
-          }
-        });
-      },
-      items: items.map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Center(child: Text(value)),
-        );
-      }).toList(),
-    );
+  // Filter
+  List<String> filterOptions = ["Filter","Vegan","Vegetarian","Mjölkfri","Äggfri","Gluten","Laktosfri"];
+  String _filterValue = 'Filter';
+  void _updateFilterValue(String value) {
+    setState(() {
+      _filterValue = value;
+    });
+  }
+
+  // Sort
+  List<String> sortOptions = ["Sortera","Senast tillagd","Utgångsdatum"];
+  String _sortValue = 'Sortera';
+  void _updateSortValue(String value) {
+    setState(() {
+      _sortValue = value;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    // Filter Dropdown List
-    List<String> filterOptions = ["Filter","Vegan","Vegetarian","Mjölkfri","Äggfri","Gluten","Laktosfri"];
-    Widget filterDropdownButton = buildDropdownButton(filterOptions, dropdownValue, "dropdownValue");
-
-    Widget filterDropdown = Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: ColorConstant.primaryColor),
-          borderRadius: BorderRadius.circular(5),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-        height: 44,
-        width: 170,
-        child: Center(child: filterDropdownButton));
-
-// Sort Dropdown List
-    List<String> sortOptions = ["Sortera","Senast tillagd","Utgångsdatum"];
-    Widget sortDropdownButton = buildDropdownButton(sortOptions, dropdownValue2, "dropdownValue2");
-
-
-    Widget sortDropdown = Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: ColorConstant.primaryColor),
-        borderRadius: BorderRadius.circular(5),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      /* padding: EdgeInsets.only(
-        left: 50.0,
-        top: 8,
-      ), */
-      height: 44,
-      width: 170,
-      child: Center(child: sortDropdownButton)
-    );
-
     return FutureBuilder(
       builder: (ctx, snapshot) {
         // Checking if future is resolved or not
@@ -136,10 +84,7 @@ class RecipesState extends State<Recipes> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Padding(
-                              padding: const EdgeInsets.only(
-                                  // top: 10.0, left: 10.0, right: 10.0),
-                                  top: 10.0,
-                                  bottom: 10.0),
+                              padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
                               child: TextField(
                                 controller: _textController,
                                 decoration: InputDecoration(
@@ -165,10 +110,23 @@ class RecipesState extends State<Recipes> {
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
-                                children: [ // DROPDOWN_BUTTONS
-                                  Expanded(child: filterDropdown),
+                                children: [ 
+                                  
+                                  // Filter dropdown
+                                  Expanded(child: AppDropdownMenu(
+                                    menuOptions: filterOptions,
+                                    value: _filterValue,
+                                    callback: _updateFilterValue,
+                                  )),
+
                                   const SizedBox(width: 10),
-                                  Expanded(child: sortDropdown)
+
+                                  // Sort dropdown
+                                  Expanded(child: AppDropdownMenu(
+                                    menuOptions: sortOptions,
+                                    value: _sortValue,
+                                    callback: _updateSortValue,
+                                  ))
                                 ],
                               ),
                             ),
