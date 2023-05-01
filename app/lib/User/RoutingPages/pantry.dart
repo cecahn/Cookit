@@ -138,7 +138,7 @@ class PantryState extends State<Pantry> {
                           top: 5.0, left: 20.0, right: 20.0),
                       child: Container(
                         decoration: BoxDecoration(
-                          border: Border.all(color: Colors.green),
+                          border: Border.all(color: ColorConstant.primaryColor),
                           borderRadius: BorderRadius.circular(5),
                         ),
                         height: 44,
