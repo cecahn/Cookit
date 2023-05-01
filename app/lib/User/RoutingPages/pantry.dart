@@ -13,10 +13,11 @@ import '../../cubit/appCubit.dart';
 import '../../Widgets/app_list_text.dart';
 import '../../Widgets/expansion_tile_text.dart';
 import '../../Widgets/app_list_tile.dart';
+import '../../Services/server_calls.dart';
 
-bool sortActivated = false;
-bool sortBytime = false;
-bool sortByalfabet = false;
+// bool sortActivated = false;
+// bool sortBytime = false;
+// bool sortByalfabet = false;
 
 // List<String> filter = ['Mejeri', 'Kött'];
 // List<String> selectedCategories = [];
@@ -39,31 +40,35 @@ bool sortByalfabet = false;
 
 // List<Produkt> skafferi = [];
 
-/*int sortByUtgang(Produkt produkta, Produkt produktb) {
-  int a = produkta.utgang;
-  int b = produktb.utgang;
+int sortByUtgang(Produkt produkta, Produkt produktb) {
+  String produktaString = produkta.bastforedatum;
+  String produktbString = produktb.bastforedatum;
 
-  if (a < b) {
-    return -1;
-  } else if (a > b) {
-    return 1;
-  } else {
-    return 0;
-  }
+  List<String> splitA = produktaString.split('-');
+  List<String> splitB = produktbString.split('-');
+
+  DateTime dateA = DateTime(int.tryParse(splitA.elementAt(0))!,
+      int.tryParse(splitA.elementAt(1))!, int.tryParse(splitA.elementAt(2))!);
+  DateTime dateB = DateTime(int.tryParse(splitB.elementAt(0))!,
+      int.tryParse(splitB.elementAt(1))!, int.tryParse(splitB.elementAt(2))!);
+
+  return dateA.compareTo(dateB); 
 }
 
 int sortByTime(Produkt produkta, Produkt produktb) {
-  int a = produkta.tid;
-  int b = produktb.tid;
+  String produktaString = produkta.tillagning_datum;
+  String produktbString = produktb.tillagning_datum;
 
-  if (a < b) {
-    return -1;
-  } else if (a > b) {
-    return 1;
-  } else {
-    return 0;
-  }
-}*/
+  List<String> splitA = produktaString.split('-');
+  List<String> splitB = produktbString.split('-');
+
+  DateTime dateA = DateTime(int.tryParse(splitA.elementAt(0))!,
+      int.tryParse(splitA.elementAt(1))!, int.tryParse(splitA.elementAt(2))!);
+  DateTime dateB = DateTime(int.tryParse(splitB.elementAt(0))!,
+      int.tryParse(splitB.elementAt(1))!, int.tryParse(splitB.elementAt(2))!);
+
+  return dateA.compareTo(dateB); 
+}
 
 final _textController = TextEditingController();
 
@@ -179,16 +184,68 @@ class PantryState extends State<Pantry> {
                     Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         child: SizedBox(
-                          height: 300,
+                          height: 550,
                           width: 400,
                           child: dropdownValue != 'Varugrupp'
                               ? ListView.builder(
                                   itemCount: data.length,
                                   itemBuilder:
                                       (BuildContext context, int index) {
-                                    return AppListTile(
-                                        data: data[index],
-                                        namn: data[index].namn);
+                                    final item = data[index];
+                                    return Dismissible(
+                                      key: Key(item.skafferi_id),
+                                      onDismissed: (right) {
+                                        setState(() {
+                                          data.removeAt(index);
+                                        });
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                          content: Text(
+                                              "Tog bort ${item.namn} ur skafferiet"),
+                                          action: SnackBarAction(
+                                            label: "Ångra",
+                                            onPressed: () {
+                                              setState(() {
+                                                data.insert(index, item);
+                                              });
+                                            },
+                                          ),
+                                        )).closed.then((value) {
+                                          if (value != SnackBarClosedReason.action) {
+                                            final response =
+                                              ServerCall.deleteFromPantry(
+                                                  item.skafferi_id);
+                                            skafferi = getSkafferi();
+                                          }
+                                        });
+                                      },
+                                      background: Container(color: Colors.red),
+                                      child: Padding(
+                                        padding: EdgeInsets.only(top: 9.0),
+                                        child: Container(
+                                          height: 80,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                                width: 0.5, color: Colors.teal),
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                          ),
+                                          child: ListTile(
+                                            title: Text(data[index].namn,
+                                                style: GoogleFonts.breeSerif(
+                                                    textStyle: const TextStyle(
+                                                  fontSize: 30,
+                                                  color: Colors.black,
+                                                ))),
+                                            onTap: () {
+                                              BlocProvider.of<AppCubits>(
+                                                      context)
+                                                  .ProduktPage(data[index]);
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                    );
                                   },
                                 )
                               : ListView.builder(
