@@ -1,17 +1,22 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:first/cubit/appCubitStates.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:requests/requests.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:first/Constants/export.dart';
 import '../../Widgets/app_list_text.dart';
 import '../../Widgets/appBar.dart';
 import 'pantry.dart';
 import 'recipes.dart';
+import '../../cubit/appCubit.dart';
 
 //köttfärs 7350054730198
 // halloumi 07340062810241
@@ -37,6 +42,7 @@ class TestHomePage extends StatefulWidget {
 }
 
 class _TestHomePageState extends State<TestHomePage> {
+  final GoogleSignIn googleSignIn = GoogleSignIn();
   late String productGTIN = '';
 
   void fetchProduct() async {
@@ -120,7 +126,22 @@ class _TestHomePageState extends State<TestHomePage> {
     
 
     return Scaffold(
-      appBar: customAppBar("CookIt.", ImageConstant.ellips),
+      // appBar: customAppBar("CookIt.", ImageConstant.ellips),
+      appBar: AppBar(
+        title: const Text("Add Food"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              // TODO: LOGGA UT PÅ NÅT JÄVLA SÄTT
+              // ...
+
+              // Gå tillbaks till login-sidan
+              BlocProvider.of<AppCubits>(context).emit(WelcomeState());
+            },
+          )
+        ],
+      ),
       body: SingleChildScrollView(
         child: Center(
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [

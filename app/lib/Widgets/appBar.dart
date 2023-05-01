@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 customAppBar(String header, String image) { 
     return AppBar(
+        elevation: 0,
         title: Padding(
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(header,
@@ -11,7 +12,6 @@ customAppBar(String header, String image) {
                     textStyle: const TextStyle(
                       fontSize: 30,
                     ),
-                    // color: Colors.teal))),
                     color: ColorConstant.primaryColor))),
         actions: [
           IconButton(

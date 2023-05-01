@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
       title: "CookIt",
       debugShowCheckedModeBanner: false,
       theme:ThemeData(
-        primarySwatch: Colors.purple,
+        primarySwatch: Colors.green,
         ),
         home: BlocProvider<AppCubits>(
           create: (context) => AppCubits(),
