@@ -26,6 +26,7 @@ class AppDropdownMenu extends StatelessWidget {
         width: 170,
         child: Center(
             child: DropdownButton<String>(
+          borderRadius: BorderRadius.circular(10),
           alignment: Alignment.center,
           value: value,
           icon: Transform.scale(

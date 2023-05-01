@@ -202,7 +202,7 @@ class PantryState extends State<Pantry> {
                                             }
                                           });
                                         },
-                                        background: Container(color: Colors.red),
+                                        background: Container(color: ColorConstant.primaryColor),
                                         child: AppListTile(
                                             data: item,
                                             namn: item.namn
@@ -252,7 +252,7 @@ class PantryState extends State<Pantry> {
                                               }
                                             });
                                           },
-                                          background: Container(color: Colors.red),
+                                          background: Container(color: ColorConstant.primaryColor),
                                           child: AppListTile(
                                             data: item,
                                             namn: item.namn)
