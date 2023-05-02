@@ -71,7 +71,6 @@ int sortByTime(Produkt produkta, Produkt produktb) {
   return dateA.compareTo(dateB);
 }
 
-final _textController = TextEditingController();
 
 class Pantry extends StatefulWidget {
   const Pantry({Key? key}) : super(key: key);
@@ -84,28 +83,33 @@ class PantryState extends State<Pantry> {
   String _sortValue = 'Varugrupp';
   List<String> _sortOptions = ["Varugrupp", "Utgångsdatum", "Senast tillagd"];
 
-  void _updateSortValue(String value) {
+  void _updateSortValue(String value) async {
+    List<Produkt> varor = search ? searchList : await skafferi;
     setState(() {
       _sortValue = value;
+
       if (_sortValue == 'Utgångsdatum') {
-        skafferi.then((value) => {
-          value.sort(sortByUtgang)
-        });
+        varor.sort(sortByUtgang);
       }
-      if (_sortValue == 'Senast tillagd') {
-        skafferi.then((value) => {
-          value.sort(sortByTime)
-        });
+      else if (_sortValue == 'Senast tillagd') {
+        varor.sort(sortByTime);
       }
     });
   }
 
   late final Future<List<Produkt>> skafferi;
-  String input = "";
+  final _textController = TextEditingController();
+  // String input = _textController.text;
+
   List<Produkt> searchList = [];
   bool search = false;
 
   void FilterSearch(String textInput, List<Produkt> pantry) {
+
+    skafferi.then((value) => {
+      value.where((element) => element.namn.contains(textInput))
+    });
+    
     for (var i = 0; i < pantry.length; i++) {
       if (pantry
           .elementAt(i)
@@ -162,14 +166,18 @@ class PantryState extends State<Pantry> {
                                   icon: const Icon(Icons.search,
                                       color: Colors.black),
                                   onPressed: () {
-                                    if (input.isEmpty == false) {
+                                    if (_textController.text.isEmpty == false) {
                                       searchList = [];
-                                      FilterSearch(input, data);
-                                      search = true;
+                                      FilterSearch(_textController.text, data);
+                                      setState(() {
+                                        search = true;
+                                      });
                                       _sortValue = 'Senast tillagd';
                                     } else {
                                       // searchList = [];
-                                      search = false;
+                                       setState(() {
+                                        search = false;
+                                      });
                                     }
                                   }),
                             )),
@@ -200,10 +208,12 @@ class PantryState extends State<Pantry> {
                                 ? ListView.builder(
                                     physics:
                                         const NeverScrollableScrollPhysics(),
-                                    itemCount: data.length,
+                                    itemCount: search == false
+                                      ? data.length
+                                      : searchList.length,
                                     itemBuilder:
                                         (BuildContext context, int index) {
-                                      final item = data[index];
+                                      final item = search == false ? data[index]: searchList[index];
                                       return Dismissible(
                                         key: Key(item.skafferi_id),
                                         onDismissed: (right) {
