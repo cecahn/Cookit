@@ -12,6 +12,7 @@ import '../../Constants/Utils/image_constants.dart';
 import '../../cubit/appCubit.dart';
 import '../../cubit/appCubitStates.dart';
 import 'package:first/Services/server_calls.dart';
+import 'package:intl/intl.dart';
 
 class ProductPage extends StatefulWidget {
   const ProductPage({Key? key}) : super(key: key);
@@ -24,7 +25,10 @@ class ProductPage extends StatefulWidget {
 
 class _ProductPageState extends State<ProductPage> {
 
-  String _dateTime = "hej";
+
+  late String _dateTime;
+  late DateTime date;
+  late String showDate;
 
   void _showDatePicker () {
     showDatePicker(
@@ -35,15 +39,25 @@ class _ProductPageState extends State<ProductPage> {
       
       ).then((value) {
         setState((){
-          _dateTime = value!.toString(); 
+          date = value!;
+          showDate = value.toString();
+          _dateTime = DateFormat('yyyyMMdd').format(date); 
         });
       });
+  }
+
+  void _changeDate (skafferi_id, date, detail) {
+    setState(() {
+      ServerCall.changeDate(skafferi_id, date);
+
+      });
+    
   }
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AppCubits, CubitStates>(builder: (context, state) {
       ProductState detail = state as ProductState;
-
+      showDate = detail.produkt.bastforedatum;
       return Scaffold(
       body: SingleChildScrollView(
        child: Container(
@@ -132,7 +146,8 @@ class _ProductPageState extends State<ProductPage> {
 
                                 IconButton ( onPressed: () {
                                   _showDatePicker();
-                                  ServerCall.changeDate(detail.produkt.skafferi_id, _dateTime);
+                                  _changeDate(detail.produkt.skafferi_id, _dateTime, detail.produkt);
+                                  //ServerCall.changeDate(detail.produkt.skafferi_id, _dateTime);
                                   //LoadingState();
                                       },
                                 
@@ -149,7 +164,7 @@ class _ProductPageState extends State<ProductPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                      Text(detail.produkt.bastforedatum,
+                      Text(showDate,
                                 style: GoogleFonts.breeSerif(
                                 textStyle: const TextStyle(
                                 color: Colors.black,

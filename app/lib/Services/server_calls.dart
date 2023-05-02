@@ -4,9 +4,11 @@ import 'package:requests/requests.dart';
 class ServerCall {
   static deleteFromPantry(pantryID) async {
     try {
+
       final response = await Requests.get(
           "https://litium.herokuapp.com/skafferi/ta_bort?skafferi_id=$pantryID",
           withCredentials: true);
+          
       if (response.statusCode == 200) {
         print(response);
       } else {
@@ -20,9 +22,12 @@ class ServerCall {
 
   static changeDate (pantryID, expiration) async {
     try {
+      print(expiration);
+      print(pantryID);
       final response = await Requests.get(
           "https://litium.herokuapp.com/skafferi/update_exp_date?skafferi_id=$pantryID&expiration-date=$expiration",
           withCredentials: true);
+      print(response);
       if (response.statusCode == 200) {
         print(response);
       } else {

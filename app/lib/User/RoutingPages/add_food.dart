@@ -122,7 +122,7 @@ class _TestHomePageState extends State<TestHomePage> {
                         inputmj = _textController.text;
                         fetchProduct();
                         _textController.clear();
-                        fetchProduct();
+                        //fetchProduct();
                         initState();
                       });
                     }),

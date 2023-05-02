@@ -35,6 +35,7 @@ class RecipesState extends State<Recipes> {
   void initState() {
     super.initState();
     recept = getRecept();
+    
   }
 
   Widget buildDropdownButton(List<String> items, initValue, variableName) {
@@ -282,5 +283,6 @@ Future<List<Recept>> getRecept() async {
       "https://litium.herokuapp.com/get/recomendations?max=1",
       withCredentials: true);
   List<dynamic> list = jsonDecode(r2.body);
+  print(list);
   return list.map((e) => Recept.fromJson(e)).toList();
 }

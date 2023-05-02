@@ -139,6 +139,7 @@ class _RecipePageState extends State<RecipePage> {
                         minRating:1,
                         maxRating: 5,
                         tapOnlyMode: true,
+                        initialRating: detail.recept.betyg.toDouble(),
                         onRatingUpdate: (rating) 
                         {_saveRating(rating as int, detail.recept.id as int ); },
                         ratingWidget: RatingWidget(
@@ -187,18 +188,18 @@ class _RecipePageState extends State<RecipePage> {
                      ListView.builder(
                         shrinkWrap: true,
                         //physics: AlwaysScrollableScrollPhysics(),
-                        itemCount: detail.recept.instruktion.length,
+                        itemCount: detail.recept.used.length,
                         itemBuilder: (context,index) {
                             return Container(
                             margin: EdgeInsets.only(right: Dimensions.width20,),
                             child: Wrap(
                               children: [
-                                Text(detail.recept.instruktion[index],
+                                Text(detail.recept.used[index],
                                 maxLines: 3,
                                 style: GoogleFonts.breeSerif(
                                 textStyle: const TextStyle(
                                 color: Colors.black,
-                                fontSize: 10,
+                                fontSize: 15,
                                 
                             ),
                           ),
@@ -239,7 +240,7 @@ class _RecipePageState extends State<RecipePage> {
                                 style: GoogleFonts.breeSerif(
                                 textStyle: const TextStyle(
                                 color: Colors.black,
-                                fontSize: 10,
+                                fontSize: 15,
                                 fontWeight: FontWeight.bold,
                                 overflow: TextOverflow.ellipsis,
                             ),
@@ -270,18 +271,18 @@ class _RecipePageState extends State<RecipePage> {
                      ListView.builder(
                         shrinkWrap: true,
                         //physics: AlwaysScrollableScrollPhysics(),
-                        itemCount: detail.recept.instruktion.length,
+                        itemCount: detail.recept.missing.length,
                         itemBuilder: (context,index) {
                             return Container(
                             margin: EdgeInsets.only(right: Dimensions.width20,),
                             child: Wrap(
                                 
-                                children: [Text(detail.recept.instruktion[index],
+                                children: [Text(detail.recept.missing[index],
                                 softWrap: true,
                                 style: GoogleFonts.breeSerif(
                                 textStyle: const TextStyle(
                                 color: Colors.black,
-                                fontSize: 10,
+                                fontSize: 15,
                                 fontWeight: FontWeight.bold,
                             ),
                           ),
