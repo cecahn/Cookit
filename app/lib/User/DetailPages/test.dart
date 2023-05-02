@@ -1,4 +1,3 @@
-import 'package:first/Constants/export.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -12,34 +11,42 @@ import '../../Constants/Utils/dimensions.dart';
 import '../../Constants/Utils/image_constants.dart';
 import '../../cubit/appCubit.dart';
 import '../../cubit/appCubitStates.dart';
-import 'package:first/Services/server_calls.dart';
 
-class ProductPage extends StatefulWidget {
-  const ProductPage({Key? key}) : super(key: key);
+class RecipePage extends StatefulWidget {
+  const RecipePage({Key? key}) : super(key: key);
 
   @override
-  State<ProductPage> createState() => _ProductPageState();
+  State<RecipePage> createState() => _RecipePageState();
 }
 
 
 
-class _ProductPageState extends State<ProductPage> {
+class _RecipePageState extends State<RecipePage> {
 
-  String _dateTime = "hej";
+  late Response deleted; 
+      void deleteProduct( String produktid) async {
 
-  void _showDatePicker () {
-    showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2025), 
-      
-      ).then((value) {
+      try{
+      var r2 = await Requests.get("https://litium.herokuapp.com/skafferi/delete",
+          withCredentials: true);
+
+      if (r2.statusCode == 200){
         setState((){
-          _dateTime = value!.toString(); 
+          deleted = r2 as Response; 
         });
-      });
-  }
+      }
+
+      else {
+        throw Exception('Failed to change rating');
+      }
+
+      } catch (error) {
+        setState(() {
+          deleted = 0 as Response;
+        });
+      }
+
+    } 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AppCubits, CubitStates>(builder: (context, state) {
@@ -57,7 +64,7 @@ class _ProductPageState extends State<ProductPage> {
               right:0,
               child: Container(
                 width:double.maxFinite,
-                height: 100,
+                height: 50,
                 
               )
             ),
@@ -66,13 +73,7 @@ class _ProductPageState extends State<ProductPage> {
               top:20,
               child: Row(
             children: [
-              IconButton(
-                onPressed: () {
-                  BlocProvider.of<AppCubits>(context).goHome();
-                },
-                icon: Icon(Icons.arrow_back_ios),
-                color:ColorConstant.primaryColor
-              )
+              IconButton(onPressed: () { BlocProvider.of<AppCubits>(context).goHome2(); }, icon: Icon(Icons.arrow_back_ios), color:Colors.white)
             ],
               )
             ),
@@ -81,22 +82,18 @@ class _ProductPageState extends State<ProductPage> {
               top:20,
               child: Row(
             children: [
-              IconButton(
-                onPressed: () {
-                  ServerCall.deleteFromPantry(detail.produkt.skafferi_id);
-                  BlocProvider.of<AppCubits>(context).goHome();
-                },
-                icon: const Icon(Icons.delete_outline),
-                color:ColorConstant.primaryColor)
+              IconButton(onPressed: () { deleteProduct(detail.produkt.gtin); }, icon: Icon(Icons.arrow_back_ios), color:Colors.white)
             ],
               )
             ),
 
-            Positioned(
-              top: 60,
+            SingleChildScrollView(
+            child: Positioned(
+              top: 200,
               child: Container(
                   
-                  padding: const EdgeInsets.only(left:20, right:20, top:10),
+                  padding: const EdgeInsets.only(left:20, right:20, top:50),
+                  //color: Colors.white,
                   width: MediaQuery.of(context).size.width,
                   height: 1000,
                   decoration: const BoxDecoration(
@@ -117,25 +114,34 @@ class _ProductPageState extends State<ProductPage> {
                       children:[
                         Text(detail.produkt.namn,
                         style: GoogleFonts.alfaSlabOne(
-                        textStyle: TextStyle(
-                        color: ColorConstant.primaryColor,
+                        textStyle: const TextStyle(
+                        color: Colors.teal,
                         fontSize: 30,
-                        // fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.bold,
                         overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ),
 
-                        
+                        /*Text(detail.recept.betyg.toString(),
+                        style: GoogleFonts.alfaSlabOne(
+                        textStyle: const TextStyle(
+                        color: Colors.teal,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),*/
                       ],
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: 2),
                     Row(children: [
                       Text("Bäst före datum",
                                 style: GoogleFonts.alfaSlabOne(
                                 textStyle: const TextStyle(
                                 color: Colors.black,
-                                fontSize: 20,
+                                fontSize: 30,
                                 fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -143,11 +149,7 @@ class _ProductPageState extends State<ProductPage> {
                                 SizedBox(width:30),
 
                                 IconButton ( onPressed: () {
-                                  _showDatePicker();
-                                  ServerCall.changeDate(detail.produkt.skafferi_id, _dateTime);
-                                  //LoadingState();
                                       },
-                                
                                 icon: Icon(Icons.edit, color: Colors.black)
                                 
                                 )
@@ -156,22 +158,23 @@ class _ProductPageState extends State<ProductPage> {
                     ],
                   ),
 
+                  SizedBox(height: 20),
+
 
 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                       Text(detail.produkt.bastforedatum,
-                                style: GoogleFonts.breeSerif(
+                                style: GoogleFonts.alfaSlabOne(
                                 textStyle: const TextStyle(
                                 color: Colors.black,
-                                fontSize: 20,
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
                     ],),
-
-                    SizedBox(height: 20,),
 
 
                     Row(
@@ -180,7 +183,7 @@ class _ProductPageState extends State<ProductPage> {
                                 style: GoogleFonts.alfaSlabOne(
                                 textStyle: const TextStyle(
                                 color: Colors.black,
-                                fontSize: 20,
+                                fontSize: 30,
                                 fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -188,7 +191,7 @@ class _ProductPageState extends State<ProductPage> {
                               ],
                             ),
 
-                      ListView.builder(
+                     ListView.builder(
                             shrinkWrap: true,
                             //physics: AlwaysScrollableScrollPhysics(),
                             itemCount: detail.produkt.allergener.length,
@@ -197,21 +200,12 @@ class _ProductPageState extends State<ProductPage> {
                                 margin: EdgeInsets.only(right: Dimensions.width20,),
                                 child: Row(
                                   children: [
-                                    Text(detail.produkt.allergener[index],
-                                    style: GoogleFonts.breeSerif(
-                                    textStyle: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 20,
-                                    ),
-                                  ),
-                                    ),
+                                    Text(detail.produkt.allergener[index]),
                                   ],
                                 )
                               );
                             },
                           ),
-
-                        SizedBox(height: 20),
 
                           Row (
                             children: [
@@ -219,7 +213,7 @@ class _ProductPageState extends State<ProductPage> {
                                 style: GoogleFonts.alfaSlabOne(
                                 textStyle: const TextStyle(
                                 color: Colors.black,
-                                fontSize: 20,
+                                fontSize: 30,
                                 fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -230,11 +224,11 @@ class _ProductPageState extends State<ProductPage> {
                           Row (
                             children: [
                               Text(detail.produkt.tillverkare,
-                                style: GoogleFonts.breeSerif(
+                                style: GoogleFonts.alfaSlabOne(
                                 textStyle: const TextStyle(
                                 color: Colors.black,
-                                fontSize: 20,
-                               
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
@@ -247,16 +241,12 @@ class _ProductPageState extends State<ProductPage> {
                   
               )
             )
-            
+            ) 
           ]
         )
       ),
       )
     ); 
-    
-    },
-    buildWhen: (previousState, state) {
-      return state is ProductState || state is LoadingState;
     }
     );
   }
