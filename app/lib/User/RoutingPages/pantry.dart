@@ -53,7 +53,7 @@ int sortByUtgang(Produkt produkta, Produkt produktb) {
   DateTime dateB = DateTime(int.tryParse(splitB.elementAt(0))!,
       int.tryParse(splitB.elementAt(1))!, int.tryParse(splitB.elementAt(2))!);
 
-  return dateA.compareTo(dateB);
+  return dateA.compareTo(dateB); 
 }
 
 int sortByTime(Produkt produkta, Produkt produktb) {
@@ -68,7 +68,7 @@ int sortByTime(Produkt produkta, Produkt produktb) {
   DateTime dateB = DateTime(int.tryParse(splitB.elementAt(0))!,
       int.tryParse(splitB.elementAt(1))!, int.tryParse(splitB.elementAt(2))!);
 
-  return dateA.compareTo(dateB);
+  return dateA.compareTo(dateB); 
 }
 
 
