@@ -1,3 +1,4 @@
+import 'package:first/Constants/export.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
@@ -79,7 +80,13 @@ class _ProductPageState extends State<ProductPage> {
               top:20,
               child: Row(
             children: [
-              IconButton(onPressed: () { BlocProvider.of<AppCubits>(context).goHome(); }, icon: Icon(Icons.arrow_back_ios), color:Colors.teal)
+              IconButton(
+                onPressed: () {
+                  BlocProvider.of<AppCubits>(context).goHome();
+                },
+                icon: Icon(Icons.arrow_back_ios),
+                color:ColorConstant.primaryColor
+              )
             ],
               )
             ),
@@ -88,17 +95,22 @@ class _ProductPageState extends State<ProductPage> {
               top:20,
               child: Row(
             children: [
-              IconButton(onPressed: () { ServerCall.deleteFromPantry(detail.produkt.skafferi_id); BlocProvider.of<AppCubits>(context).goHome(); }, icon: Icon(Icons.delete_outline), color:Colors.teal)
+              IconButton(
+                onPressed: () {
+                  ServerCall.deleteFromPantry(detail.produkt.skafferi_id);
+                  BlocProvider.of<AppCubits>(context).goHome();
+                },
+                icon: const Icon(Icons.delete_outline),
+                color:ColorConstant.primaryColor)
             ],
               )
             ),
 
             Positioned(
-              top: 50,
+              top: 60,
               child: Container(
                   
                   padding: const EdgeInsets.only(left:20, right:20, top:10),
-                  //color: Colors.white,
                   width: MediaQuery.of(context).size.width,
                   height: 1000,
                   decoration: const BoxDecoration(
@@ -119,10 +131,10 @@ class _ProductPageState extends State<ProductPage> {
                       children:[
                         Text(detail.produkt.namn,
                         style: GoogleFonts.alfaSlabOne(
-                        textStyle: const TextStyle(
-                        color: Colors.teal,
+                        textStyle: TextStyle(
+                        color: ColorConstant.primaryColor,
                         fontSize: 30,
-                        fontWeight: FontWeight.bold,
+                        // fontWeight: FontWeight.bold,
                         overflow: TextOverflow.ellipsis,
                             ),
                           ),

@@ -1,15 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:first/Constants/export.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:first/Widgets/bottomBar.dart';
 import 'package:requests/requests.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
-//import '../Routes/routes.dart';
-import '../../Constants/Utils/image_constants.dart';
+import 'package:first/Constants/export.dart';
 import '../../Widgets/app_list_text.dart';
 import '../../Widgets/appBar.dart';
 import 'pantry.dart';
@@ -26,13 +24,9 @@ import 'recipes.dart';
 
 late String stringResponse;
 late Map<dynamic, dynamic>? mapResponse;
-//late Map mapResponse;
 Map exceptionResponse = "Loading food" as Map;
 final List<String> list = [];
-late String inputmj;
 final _textController = TextEditingController();
-//String inputmj = "07310865001818";
-late String output;
 List<String> food = [];
 
 class TestHomePage extends StatefulWidget {
@@ -43,18 +37,28 @@ class TestHomePage extends StatefulWidget {
 }
 
 class _TestHomePageState extends State<TestHomePage> {
+  late String productGTIN = '';
+
   void fetchProduct() async {
+    String requestParam = productGTIN.padLeft(14, '0');
+    print(requestParam);
     try {
       final response = await Requests.get(
-          "https://litium.herokuapp.com/skafferi/spara?id=$inputmj",
+          "https://litium.herokuapp.com/skafferi/spara?id=$requestParam",
           withCredentials: true);
-      //final response = await http.get(Uri.parse('https://litium.herokuapp.com/get/product?id=$inputmj'));
       if (response.statusCode == 200) {
         // If the call to the server was successful, parse the JSON.
         setState(() {
           mapResponse = jsonDecode(response.body);
           String foodName = mapResponse!["namn"].toString();
-          food.add(foodName);
+          // food.add(foodName);
+          food.insert(0, foodName);
+          if(food.length > 5) {
+            food.removeLast();
+          }
+          for (int i = 0; i < food.length; i++) {
+            print(food[i]);
+          }
         });
         // Do something with the data.
       } else {
@@ -68,7 +72,7 @@ class _TestHomePageState extends State<TestHomePage> {
   }
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
   }
 
@@ -87,6 +91,22 @@ class _TestHomePageState extends State<TestHomePage> {
     const Recipes(),
   ];
 
+  Future<void> scanBarcode() async {
+      String scanBarcodeRes;
+
+      try {
+        scanBarcodeRes = await FlutterBarcodeScanner.scanBarcode(
+          '#ff6666', 'Cancel', true, ScanMode.BARCODE);
+      } on PlatformException {
+        scanBarcodeRes = 'Failed to get platform version.';
+      }
+      if (!mounted) return;
+
+      setState(() {
+        productGTIN = scanBarcodeRes;
+      });
+    }
+
   @override
   Widget build(BuildContext context) {
     Widget child = Container();
@@ -104,73 +124,90 @@ class _TestHomePageState extends State<TestHomePage> {
         child = Pantry();
     }
 
+    
+
     return Scaffold(
       appBar: customAppBar("CookIt.", ImageConstant.ellips),
-      body: Center(
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 120.0, left: 10, right: 10),
-            child: TextField(
-              controller: _textController,
-              decoration: InputDecoration(
-                hintText: 'Skriv QR kod för din mat',
-                border: const OutlineInputBorder(),
-                suffixIcon: IconButton(
-                    icon: const Icon(Icons.search, color: Colors.black),
-                    onPressed: () {
-                      setState(() async {
-                        inputmj = _textController.text;
-                        fetchProduct();
-                        _textController.clear();
-                        //fetchProduct();
-                        initState();
-                      });
-                    }),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 120.0, left: 10, right: 10),
+              child: TextField(
+                controller: _textController,
+                decoration: InputDecoration(
+                  hintText: 'Skriv QR kod för din mat',
+                  border: const OutlineInputBorder(),
+                  suffixIcon: IconButton(
+                      icon: const Icon(Icons.search, color: Colors.black),
+                      onPressed: () {
+                        setState(() async {
+                          productGTIN = _textController.text;
+                          _textController.clear();
+                          fetchProduct();
+                          initState();
+                        });
+                      }),
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 2),
-          Padding(
-            padding: const EdgeInsets.only(left: 10),
-            child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                "Nyligen skannad mat: ",
-                style: GoogleFonts.alfaSlabOne(
-                    textStyle: const TextStyle(fontSize: 16),
-                    color: ColorConstant.primaryColor),
-              ),
-            ],
-          )),
-          SizedBox(
-            height: 250,
-            width: 300,
-            child: Center(
-              child: Container(
-                alignment: Alignment.center,
-                height: 70,
-                child: ListView.builder(
-                    itemCount: food.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      return ListTile(
-                        title: AppListText(text: food[index]),
-                      );
-                    }),
-              ),
+            ElevatedButton(
+              onPressed: () async {
+                await scanBarcode();
+                fetchProduct();
+              },
+              child: const Text('Scan')),
+            Center(
+              child: Text(productGTIN)
             ),
-          ),
+            const SizedBox(height: 20),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Nyligen skannad mat: ",
+                  style: GoogleFonts.alfaSlabOne(
+                      textStyle: const TextStyle(fontSize: 16),
+                      color: ColorConstant.primaryColor),
+                ),
+              ],
+            )),
 
-          /*Container(
-                  height: 200,
-                  width: 300,
-                  decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(40), color: Colors.white),
-                  child: Center(
-                     child: mapResponse == null? const Text("") :Text(mapResponse!["namn"].toString()),
-                    ), 
-                  ),*/
-        ]),
+            // Listan av tillagda varor
+            Container(
+              margin: const EdgeInsets.all(20),
+              child: Center(
+                child: Container(
+                  alignment: Alignment.center,
+                  height: 300,
+                  child: ListView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: food.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Opacity(
+                          opacity: 1.0 - 0.2 * index >= 0 ? 1.0 - 0.2 * index : 0,
+                          child: ListTile(
+                            title: AppListText(text: food[index]),
+                          ),
+                        );
+                      }),
+                ),
+              ),
+            ),
+      
+            /*Container(
+                    height: 200,
+                    width: 300,
+                    decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(40), color: Colors.white),
+                    child: Center(
+                       child: mapResponse == null? const Text("") :Text(mapResponse!["namn"].toString()),
+                      ), 
+                    ),*/
+          ]),
+        ),
       ),
     );
   }

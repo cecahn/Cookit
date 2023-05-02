@@ -29,10 +29,11 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   http: ^0.13.4
-  url_launcher: ^6.0.3 
+  url_launcher: ^6.0.3
   flutter:
     sdk: flutter
-
+  flutter_barcode_scanner: ^2.0.0
+  intl: any
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -43,12 +44,13 @@ dependencies:
   requests: ^4.7.0
   google_sign_in: ^6.1.0
   flutter_bloc: ^8.1.2
+  rename_app: ^1.1.0
   flutter_rating_bar: ^4.0.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  
+
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -100,3 +102,4 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
