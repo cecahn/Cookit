@@ -100,14 +100,15 @@ class PantryState extends State<Pantry> {
   String _sortValue = 'Varugrupp';
   List<String> _sortOptions = ["Varugrupp", "Utgångsdatum", "Senast tillagd"];
 
-  void _updateSortValue(String value) {
+  void _updateSortValue(String value) async {
+    List<Produkt> varor = search ? searchList : await skafferi;
     setState(() {
       _sortValue = value;
       if (_sortValue == 'Utgångsdatum') {
-        skafferi.then((value) => {value.sort(sortByUtgang)});
+        varor.sort(sortByUtgang);
       }
       if (_sortValue == 'Senast tillagd') {
-        skafferi.then((value) => {value.sort(sortByTime)});
+        varor.sort(sortByTime);
       }
     });
   }
@@ -158,7 +159,6 @@ class PantryState extends State<Pantry> {
                                   searchList = [];
                                   FilterSearch(input, data);
                                   search = true;
-                                  _sortValue = 'Senast tillagd';
                                 } else {
                                   // searchList = [];
                                   search = false;
