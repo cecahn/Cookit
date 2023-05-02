@@ -53,7 +53,7 @@ int sortByUtgang(Produkt produkta, Produkt produktb) {
   DateTime dateB = DateTime(int.tryParse(splitB.elementAt(0))!,
       int.tryParse(splitB.elementAt(1))!, int.tryParse(splitB.elementAt(2))!);
 
-  return dateA.compareTo(dateB); 
+  return dateA.compareTo(dateB);
 }
 
 int sortByTime(Produkt produkta, Produkt produktb) {
@@ -68,7 +68,7 @@ int sortByTime(Produkt produkta, Produkt produktb) {
   DateTime dateB = DateTime(int.tryParse(splitB.elementAt(0))!,
       int.tryParse(splitB.elementAt(1))!, int.tryParse(splitB.elementAt(2))!);
 
-  return dateA.compareTo(dateB); 
+  return dateA.compareTo(dateB);
 }
 
 final _textController = TextEditingController();
@@ -82,15 +82,40 @@ class Pantry extends StatefulWidget {
 
 class PantryState extends State<Pantry> {
   String _sortValue = 'Varugrupp';
-  List<String> _sortOptions = ["Varugrupp","Utgångsdatum","Senast tillagd"];
+  List<String> _sortOptions = ["Varugrupp", "Utgångsdatum", "Senast tillagd"];
+
   void _updateSortValue(String value) {
     setState(() {
       _sortValue = value;
+      if (_sortValue == 'Utgångsdatum') {
+        skafferi.then((value) => {
+          value.sort(sortByUtgang)
+        });
+      }
+      if (_sortValue == 'Senast tillagd') {
+        skafferi.then((value) => {
+          value.sort(sortByTime)
+        });
+      }
     });
   }
 
   late final Future<List<Produkt>> skafferi;
   String input = "";
+  List<Produkt> searchList = [];
+  bool search = false;
+
+  void FilterSearch(String textInput, List<Produkt> pantry) {
+    for (var i = 0; i < pantry.length; i++) {
+      if (pantry
+          .elementAt(i)
+          .namn
+          .toLowerCase()
+          .contains(textInput.toLowerCase())) {
+        searchList.add(pantry.elementAt(i));
+      }
+    }
+  }
 
   @override
   void initState() {
@@ -137,31 +162,35 @@ class PantryState extends State<Pantry> {
                                   icon: const Icon(Icons.search,
                                       color: Colors.black),
                                   onPressed: () {
-                                    setState(() async {
-                                      input = _textController.text;
-                                      _textController.clear();
-                                      initState();
-                                    });
+                                    if (input.isEmpty == false) {
+                                      searchList = [];
+                                      FilterSearch(input, data);
+                                      search = true;
+                                      _sortValue = 'Senast tillagd';
+                                    } else {
+                                      // searchList = [];
+                                      search = false;
+                                    }
                                   }),
                             )),
                       ),
-                
+
                       const SizedBox(height: 10),
-                
+
                       const SizedBox(child: Text("Sortera efter")),
-                
+
                       // Sorting dropdown
                       Padding(
-                        padding: const EdgeInsets.only(top: 5.0, left: 20.0, right: 20.0),
+                        padding: const EdgeInsets.only(
+                            top: 5.0, left: 20.0, right: 20.0),
                         child: AppDropdownMenu(
-                          menuOptions: _sortOptions,
-                          value: _sortValue,
-                          callback: _updateSortValue
-                        ),
+                            menuOptions: _sortOptions,
+                            value: _sortValue,
+                            callback: _updateSortValue),
                       ),
-                
+
                       const SizedBox(height: 20),
-                
+
                       Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: SizedBox(
@@ -169,7 +198,8 @@ class PantryState extends State<Pantry> {
                             width: 400,
                             child: _sortValue != 'Varugrupp'
                                 ? ListView.builder(
-                                    physics: const NeverScrollableScrollPhysics(),
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
                                     itemCount: data.length,
                                     itemBuilder:
                                         (BuildContext context, int index) {
@@ -180,86 +210,102 @@ class PantryState extends State<Pantry> {
                                           setState(() {
                                             data.removeAt(index);
                                           });
-                                          ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                                          ScaffoldMessenger.of(context)
+                                              .removeCurrentSnackBar();
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(SnackBar(
-                                            content: Text(
-                                                "Tog bort ${item.namn} ur skafferiet"),
-                                            action: SnackBarAction(
-                                              label: "Ångra",
-                                              onPressed: () {
-                                                setState(() {
-                                                  data.insert(index, item);
-                                                });
-                                              },
-                                            ),
-                                          )).closed.then((value) {
-                                            if (value != SnackBarClosedReason.action) {
+                                                content: Text(
+                                                    "Tog bort ${item.namn} ur skafferiet"),
+                                                action: SnackBarAction(
+                                                  label: "Ångra",
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      data.insert(index, item);
+                                                    });
+                                                  },
+                                                ),
+                                              ))
+                                              .closed
+                                              .then((value) {
+                                            if (value !=
+                                                SnackBarClosedReason.action) {
                                               final response =
-                                                ServerCall.deleteFromPantry(
-                                                    item.skafferi_id);
+                                                  ServerCall.deleteFromPantry(
+                                                      item.skafferi_id);
                                               skafferi = getSkafferi();
                                             }
                                           });
                                         },
-                                        background: Container(color: ColorConstant.primaryColor),
+                                        background: Container(
+                                            color: ColorConstant.primaryColor),
                                         child: AppListTile(
-                                            data: item,
-                                            namn: item.namn
-                                          ),
+                                            data: item, namn: item.namn),
                                       );
                                     },
                                   )
                                 : ListView.builder(
-                                      physics: const NeverScrollableScrollPhysics(),
-                                      itemCount: unikaVarugrupper.length,
-                                      itemBuilder: (_, index) {
-                                        // Vill lägga till produkter efter varugrupp
-                                        final varugrupp =
-                                            unikaVarugrupper.elementAt(index);
-                                        return ExpansionTile(
-                                            title:
-                                                ExpansionTileText(text: varugrupp),
-                                            initiallyExpanded: true,
-                                            children: data
-                                                .where(
-                                                    (item) => item.varugrupp == varugrupp)
-                                                .map((item) => Dismissible(
-                                          key: Key(item.skafferi_id),
-                                          onDismissed: (right) {
-                                            setState(() {
-                                              data.removeAt(index);
-                                            });
-                                            ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(SnackBar(
-                                              content: Text(
-                                                  "Tog bort ${item.namn} ur skafferiet"),
-                                              action: SnackBarAction(
-                                                label: "Ångra",
-                                                onPressed: () {
-                                                  setState(() {
-                                                    data.insert(index, item);
-                                                  });
-                                                },
-                                              ),
-                                            )).closed.then((value) {
-                                              if (value != SnackBarClosedReason.action) {
-                                                final response =
-                                                  ServerCall.deleteFromPantry(
-                                                      item.skafferi_id);
-                                                skafferi = getSkafferi();
-                                              }
-                                            });
-                                          },
-                                          background: Container(color: ColorConstant.primaryColor),
-                                          child: AppListTile(
-                                            data: item,
-                                            namn: item.namn)
-                                        ))
-                                                .toList());
-                                      },
-                                    ),
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    itemCount: unikaVarugrupper.length,
+                                    itemBuilder: (_, index) {
+                                      // Vill lägga till produkter efter varugrupp
+                                      final varugrupp =
+                                          unikaVarugrupper.elementAt(index);
+                                      return ExpansionTile(
+                                          title: ExpansionTileText(
+                                              text: varugrupp),
+                                          initiallyExpanded: true,
+                                          children: data
+                                              .where((item) =>
+                                                  item.varugrupp == varugrupp)
+                                              .map((item) => Dismissible(
+                                                  key: Key(item.skafferi_id),
+                                                  onDismissed: (right) {
+                                                    setState(() {
+                                                      data.removeAt(index);
+                                                    });
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .removeCurrentSnackBar();
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(SnackBar(
+                                                          content: Text(
+                                                              "Tog bort ${item.namn} ur skafferiet"),
+                                                          action:
+                                                              SnackBarAction(
+                                                            label: "Ångra",
+                                                            onPressed: () {
+                                                              setState(() {
+                                                                data.insert(
+                                                                    index,
+                                                                    item);
+                                                              });
+                                                            },
+                                                          ),
+                                                        ))
+                                                        .closed
+                                                        .then((value) {
+                                                      if (value !=
+                                                          SnackBarClosedReason
+                                                              .action) {
+                                                        final response = ServerCall
+                                                            .deleteFromPantry(
+                                                                item.skafferi_id);
+                                                        skafferi =
+                                                            getSkafferi();
+                                                      }
+                                                    });
+                                                  },
+                                                  background: Container(
+                                                      color: ColorConstant
+                                                          .primaryColor),
+                                                  child: AppListTile(
+                                                      data: item,
+                                                      namn: item.namn)))
+                                              .toList());
+                                    },
+                                  ),
                           ))
                     ],
                   ),
