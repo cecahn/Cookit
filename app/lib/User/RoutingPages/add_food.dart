@@ -51,7 +51,14 @@ class _TestHomePageState extends State<TestHomePage> {
         setState(() {
           mapResponse = jsonDecode(response.body);
           String foodName = mapResponse!["namn"].toString();
-          food.add(foodName);
+          // food.add(foodName);
+          food.insert(0, foodName);
+          if(food.length > 5) {
+            food.removeLast();
+          }
+          for (int i = 0; i < food.length; i++) {
+            print(food[i]);
+          }
         });
         // Do something with the data.
       } else {
@@ -167,18 +174,23 @@ class _TestHomePageState extends State<TestHomePage> {
                 ),
               ],
             )),
-            SizedBox(
-              height: 250,
-              width: 300,
+
+            // Listan av tillagda varor
+            Container(
+              margin: const EdgeInsets.all(20),
               child: Center(
                 child: Container(
                   alignment: Alignment.center,
-                  height: 70,
+                  height: 300,
                   child: ListView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
                       itemCount: food.length,
                       itemBuilder: (BuildContext context, int index) {
-                        return ListTile(
-                          title: AppListText(text: food[index]),
+                        return Opacity(
+                          opacity: 1.0 - 0.2 * index >= 0 ? 1.0 - 0.2 * index : 0,
+                          child: ListTile(
+                            title: AppListText(text: food[index]),
+                          ),
                         );
                       }),
                 ),
