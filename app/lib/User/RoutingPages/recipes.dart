@@ -11,6 +11,8 @@ import '../../Constants/Utils/dimensions.dart';
 import '../../Constants/Utils/color_constant.dart';
 import '../../Services/receptModel.dart';
 import '../../Widgets/appBar.dart';
+import '../../Widgets/app_dropdown_menu.dart';
+import '../../Widgets/app_recipe_tile.dart';
 import '../../cubit/appCubit.dart';
 import '../../cubit/appCubitStates.dart';
 //import 'package:myapp/utils.dart';
@@ -55,76 +57,26 @@ class RecipesState extends State<Recipes> {
     return list.map((e) => Recept.fromJson(e)).toList();
   }
 
-  Widget buildDropdownButton(List<String> items, initValue, variableName) {
-    return DropdownButton<String>(
-      alignment: Alignment.center,
-      value: initValue,
-      icon: Transform.scale(
-        scale: 0.0,
-        child: const Icon(Icons.menu),
-      ),
-      iconSize: 0,
-      elevation: 16,
-      style: TextStyle(
-        color: ColorConstant.primaryColor,
-        fontSize: 16,
-        fontWeight: FontWeight.bold
-      ),
-      underline: Container(),
-      onChanged: (String? newValue) {
-        setState(() {
-          if (variableName == "dropdownValue") {
-            dropdownValue = newValue!;
-          } else if (variableName == "dropdownValue2") {
-            dropdownValue2 = newValue!;
-          }
-        });
-      },
-      items: items.map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Center(child: Text(value)),
-        );
-      }).toList(),
-    );
+  // Filter
+  List<String> filterOptions = ["Filter","Vegan","Vegetarian","Mjölkfri","Äggfri","Gluten","Laktosfri"];
+  String _filterValue = 'Filter';
+  void _updateFilterValue(String value) {
+    setState(() {
+      _filterValue = value;
+    });
+  }
+
+  // Sort
+  List<String> sortOptions = ["Sortera","Senast tillagd","Utgångsdatum"];
+  String _sortValue = 'Sortera';
+  void _updateSortValue(String value) {
+    setState(() {
+      _sortValue = value;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    // Filter Dropdown List
-    List<String> filterOptions = ["Filter","Vegan","Vegetarian","Mjölkfri","Äggfri","Gluten","Laktosfri"];
-    Widget filterDropdownButton = buildDropdownButton(filterOptions, dropdownValue, "dropdownValue");
-
-    Widget filterDropdown = Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: ColorConstant.primaryColor),
-          borderRadius: BorderRadius.circular(5),
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-        height: 44,
-        width: 170,
-        child: Center(child: filterDropdownButton));
-
-// Sort Dropdown List
-    List<String> sortOptions = ["Sortera","Senast tillagd","Utgångsdatum"];
-    Widget sortDropdownButton = buildDropdownButton(sortOptions, dropdownValue2, "dropdownValue2");
-
-
-    Widget sortDropdown = Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: ColorConstant.primaryColor),
-        borderRadius: BorderRadius.circular(5),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-      /* padding: EdgeInsets.only(
-        left: 50.0,
-        top: 8,
-      ), */
-      height: 44,
-      width: 170,
-      child: Center(child: sortDropdownButton)
-    );
-
     return FutureBuilder(
       builder: (ctx, snapshot) {
         // Checking if future is resolved or not
@@ -153,10 +105,7 @@ class RecipesState extends State<Recipes> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Padding(
-                              padding: const EdgeInsets.only(
-                                  // top: 10.0, left: 10.0, right: 10.0),
-                                  top: 10.0,
-                                  bottom: 10.0),
+                              padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
                               child: TextField(
                                 controller: _textController,
                                 decoration: InputDecoration(
@@ -175,118 +124,58 @@ class RecipesState extends State<Recipes> {
                                 ),
                               ),
                             ),
+
+                            // Raden med dropdown-menyer
                             Padding(
-                              padding: const EdgeInsets.only(
-                                  // top: 15.0, left: 10.0, right: 10.0),
-                                  bottom: 10.0),
+                              padding: const EdgeInsets.only(bottom: 10.0),
+                              
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
-                                children: [ // DROPDOWN_BUTTONS
-                                  Expanded(child: filterDropdown),
+                                children: [ 
+                                  
+                                  // Filter dropdown
+                                  Expanded(child: AppDropdownMenu(
+                                    menuOptions: filterOptions,
+                                    value: _filterValue,
+                                    callback: _updateFilterValue,
+                                  )),
+
                                   const SizedBox(width: 10),
-                                  Expanded(child: sortDropdown)
+
+                                  // Sort dropdown
+                                  Expanded(child: AppDropdownMenu(
+                                    menuOptions: sortOptions,
+                                    value: _sortValue,
+                                    callback: _updateSortValue,
+                                  ))
                                 ],
                               ),
                             ),
+
+                            // Listan av recept
                             Expanded(
-                                child: SingleChildScrollView(
-                                    //listan av recept
-                                    child: Container(
-                              height: 500,
-                              child: Padding(
-                                  padding: EdgeInsets.only(
-                                      top: 30,
-                                      left: Dimensions.width15,
-                                      right: Dimensions.width15),
-                                  child: ListView.builder(
-                                    shrinkWrap: true,
-                                    physics: AlwaysScrollableScrollPhysics(),
-                                    itemCount: data.length,
-                                    itemBuilder: (context, index) {
-                                      return GestureDetector(
-                                        onTap: () {
-                                          BlocProvider.of<AppCubits>(context)
-                                              .ReceptPage(data[index]);
-                                        },
-                                        child: Container(
-                                            margin: EdgeInsets.only(
-                                                left: Dimensions.width20,
-                                                right: Dimensions.width20,
-                                                bottom: Dimensions.width15),
-                                            child: Row(
-                                              children: [
-                                                Container(
-                                                    width: 70,
-                                                    height: 70,
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              Dimensions
-                                                                  .radius20),
-                                                      color: Colors.white,
-                                                      image: DecorationImage(
-                                                          image: NetworkImage(
-                                                              data[index].bild),
-                                                          fit: BoxFit.cover),
-                                                    )),
-                                                Expanded(
-                                                  child: Padding(
-                                                    padding: EdgeInsets.only(
-                                                        top: 30),
-                                                    child: Container(
-                                                        height: 100,
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius.only(
-                                                            topRight:
-                                                                Radius.circular(
-                                                                    Dimensions
-                                                                        .radius20),
-                                                            bottomRight:
-                                                                Radius.circular(
-                                                                    Dimensions
-                                                                        .radius20),
-                                                          ),
-                                                          color: Colors.white,
-                                                        ),
-                                                        child: Padding(
-                                                            padding: EdgeInsets.only(
-                                                                left: Dimensions
-                                                                    .width10,
-                                                                top: Dimensions
-                                                                    .width10),
-                                                            child: Column(
-                                                              children: [
-                                                                Text(
-                                                                    data[index]
-                                                                        .titel,
-                                                                    style: GoogleFonts
-                                                                        .alfaSlabOne(
-                                                                      textStyle:
-                                                                          const TextStyle(
-                                                                        fontSize:
-                                                                            30,
-                                                                      ),
-                                                                      color: Colors
-                                                                          .black,
-                                                                    )),
-                                                              ],
-                                                            ))),
-                                                  ),
-                                                ),
-                                              ],
-                                            )),
-                                      );
-                                    },
-                                  )),
-                            )))
+                              child: SingleChildScrollView(
+                                child: Padding(
+                                    padding: EdgeInsets.only(
+                                      top: 20,
+                                      left: Dimensions.width10,
+                                      right: Dimensions.width10
+                                    ),
+                                    child: ListView.builder(
+                                      shrinkWrap: true,
+                                      physics: const AlwaysScrollableScrollPhysics(),
+                                      itemCount: data.length,
+                                      itemBuilder: (context, index) {
+                                        return AppRecipeTile(recept: data[index]);
+                                      },
+                                    )
+                                  )))
                           ]),
                     )));
           }
         }
-        return Center(
+        return const Center(
           child: CircularProgressIndicator(),
         );
       },

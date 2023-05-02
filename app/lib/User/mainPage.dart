@@ -35,16 +35,16 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:  pages[currentIndex],
+      body: pages[currentIndex],
       
       bottomNavigationBar: BottomNavigationBar(
       unselectedFontSize: 0,
       selectedFontSize: 0,
       type: BottomNavigationBarType.fixed,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white,
       selectedItemColor: Colors.black,
       unselectedItemColor: Colors.grey,
-      showUnselectedLabels: false,  
+      showUnselectedLabels: false,
       showSelectedLabels: false, 
       elevation: 0,
       currentIndex: currentIndex,
@@ -52,24 +52,24 @@ class _MainPageState extends State<MainPage> {
       items: [
         BottomNavigationBarItem(
           icon: SizedBox (
-                width: 40,
-                height: 40,
+                width: 30,
+                height: 30,
                 child: Image.asset(ImageConstant.pantry),
               ),
           label: 'Skafferi',
         ),
         BottomNavigationBarItem(
           icon: SizedBox (
-              width: 40,
-              height: 40,
+              width: 30,
+              height: 30,
               child:  Image.asset(ImageConstant.add),
             ),
           label: 'Lägg till',
         ),
         BottomNavigationBarItem(
           icon: SizedBox (
-              width: 40,
-              height: 40,
+              width: 30,
+              height: 30,
               child: Image.asset(ImageConstant.recipes),
             ),
           label: 'Recept',

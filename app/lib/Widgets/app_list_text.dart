@@ -13,11 +13,13 @@ class AppListText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(text,
+    return Text(
+        text,
         style: GoogleFonts.breeSerif(
-          textStyle: const TextStyle(
-          fontSize: 20,
-          color: Colors.black,
+          textStyle: TextStyle(
+          fontSize: size,
+          color: color,
+          overflow: TextOverflow.ellipsis
         )));
   }
 }
