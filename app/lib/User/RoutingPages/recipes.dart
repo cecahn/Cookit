@@ -105,7 +105,7 @@ class RecipesState extends State<Recipes> {
             //final unikaVarugrupper = data.map((e) => e.varugrupp).toSet();
 
             return Scaffold(
-                appBar: customAppBar("Recept", ImageConstant.logout),
+                appBar: customAppBar("Recept", true, context),
                 body: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),
                     child: Center(

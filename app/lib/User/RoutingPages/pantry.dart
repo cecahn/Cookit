@@ -143,7 +143,7 @@ class PantryState extends State<Pantry> {
             final unikaVarugrupper = data.map((e) => e.varugrupp).toSet();
 
             return Scaffold(
-                appBar: customAppBar("Skafferi", ImageConstant.logout),
+                appBar: customAppBar("Skafferi", true, context),
                 body: SingleChildScrollView(
                   physics: const NeverScrollableScrollPhysics(),
                   child: Column(
