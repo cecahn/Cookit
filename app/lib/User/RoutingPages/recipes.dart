@@ -38,7 +38,15 @@ class RecipesState extends State<Recipes> {
   }
 
   // Filter
-  List<String> filterOptions = ["Filter","Vegan","Vegetarian","Mjölkfri","Äggfri","Gluten","Laktosfri"];
+  List<String> filterOptions = [
+    "Filter",
+    "Vegan",
+    "Vegetarian",
+    "Mjölkfri",
+    "Äggfri",
+    "Gluten",
+    "Laktosfri"
+  ];
   String _filterValue = 'Filter';
   void _updateFilterValue(String value) {
     setState(() {
@@ -47,7 +55,7 @@ class RecipesState extends State<Recipes> {
   }
 
   // Sort
-  List<String> sortOptions = ["Sortera","Senast tillagd","Utgångsdatum"];
+  List<String> sortOptions = ["Sortera", "Senast tillagd", "Utgångsdatum"];
   String _sortValue = 'Sortera';
   void _updateSortValue(String value) {
     setState(() {
@@ -85,7 +93,8 @@ class RecipesState extends State<Recipes> {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Padding(
-                              padding: const EdgeInsets.only(top: 10.0, bottom: 10.0),
+                              padding: const EdgeInsets.only(
+                                  top: 10.0, bottom: 10.0),
                               child: TextField(
                                 controller: _textController,
                                 decoration: InputDecoration(
@@ -108,14 +117,13 @@ class RecipesState extends State<Recipes> {
                             // Raden med dropdown-menyer
                             Padding(
                               padding: const EdgeInsets.only(bottom: 10.0),
-                              
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
-                                children: [ 
-                                  
+                                children: [
                                   // Filter dropdown
-                                  Expanded(child: AppDropdownMenu(
+                                  Expanded(
+                                      child: AppDropdownMenu(
                                     menuOptions: filterOptions,
                                     value: _filterValue,
                                     callback: _updateFilterValue,
@@ -124,7 +132,8 @@ class RecipesState extends State<Recipes> {
                                   const SizedBox(width: 10),
 
                                   // Sort dropdown
-                                  Expanded(child: AppDropdownMenu(
+                                  Expanded(
+                                      child: AppDropdownMenu(
                                     menuOptions: sortOptions,
                                     value: _sortValue,
                                     callback: _updateSortValue,
@@ -135,22 +144,21 @@ class RecipesState extends State<Recipes> {
 
                             // Listan av recept
                             Expanded(
-                              child: SingleChildScrollView(
                                 child: Padding(
                                     padding: EdgeInsets.only(
-                                      top: 20,
-                                      left: Dimensions.width10,
-                                      right: Dimensions.width10
-                                    ),
+                                        top: 20,
+                                        left: Dimensions.width10,
+                                        right: Dimensions.width10),
                                     child: ListView.builder(
                                       shrinkWrap: true,
-                                      physics: const AlwaysScrollableScrollPhysics(),
+                                      physics:
+                                          const AlwaysScrollableScrollPhysics(),
                                       itemCount: data.length,
                                       itemBuilder: (context, index) {
-                                        return AppRecipeTile(recept: data[index]);
+                                        return AppRecipeTile(
+                                            recept: data[index]);
                                       },
-                                    )
-                                  )))
+                                    )))
                           ]),
                     )));
           }
@@ -166,7 +174,7 @@ class RecipesState extends State<Recipes> {
 
 Future<List<Recept>> getRecept() async {
   var r2 = await Requests.get(
-      "https://litium.herokuapp.com/get/recomendations?max=1",
+      "https://litium.herokuapp.com/get/recomendations?max=5",
       withCredentials: true);
   List<dynamic> list = jsonDecode(r2.body);
   return list.map((e) => Recept.fromJson(e)).toList();
