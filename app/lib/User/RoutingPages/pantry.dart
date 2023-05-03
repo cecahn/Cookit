@@ -145,6 +145,7 @@ class PantryState extends State<Pantry> {
             return Scaffold(
                 appBar: customAppBar("Skafferi", ImageConstant.ellips),
                 body: SingleChildScrollView(
+                  physics: const NeverScrollableScrollPhysics(),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
@@ -206,7 +207,7 @@ class PantryState extends State<Pantry> {
                             child: _sortValue != 'Varugrupp'
                                 ? ListView.builder(
                                     physics:
-                                        const NeverScrollableScrollPhysics(),
+                                        const AlwaysScrollableScrollPhysics(),
                                     itemCount: search == false
                                         ? data!.length
                                         : searchList.length,
@@ -262,7 +263,7 @@ class PantryState extends State<Pantry> {
                                   )
                                 : ListView.builder(
                                     physics:
-                                        const NeverScrollableScrollPhysics(),
+                                        const AlwaysScrollableScrollPhysics(),
                                     itemCount: unikaVarugrupper.length,
                                     itemBuilder: (_, index) {
                                       // Vill lägga till produkter efter varugrupp
