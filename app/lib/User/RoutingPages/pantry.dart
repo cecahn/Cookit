@@ -160,6 +160,7 @@ class PantryState extends State<Pantry> {
                                   searchList = [];
                                   FilterSearch(input, data);
                                   search = true;
+                                  _sortValue = 'Senast tillagd';
                                 } else {
                                   // searchList = [];
                                   search = false;

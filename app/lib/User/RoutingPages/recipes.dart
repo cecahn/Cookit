@@ -19,7 +19,6 @@ import '../../cubit/appCubitStates.dart';
 import '../../Constants/Utils/image_constants.dart';
 
 final _textController = TextEditingController();
-String input = "";
 
 class Recipes extends StatefulWidget {
   const Recipes({Key? key}) : super(key: key);
@@ -29,12 +28,33 @@ class Recipes extends StatefulWidget {
 }
 
 class RecipesState extends State<Recipes> {
-  late final Future<List<Recept>> recept;
+  String dropdownValue = 'Filter';
+  String dropdownValue2 = 'Sortera';
+  String input = "";
+
+  late Future<List<Recept>> recept;
 
   @override
   void initState() {
     super.initState();
-    recept = getRecept();
+    recept = getRecomendations();
+  }
+
+  Future<List<Recept>> searchRecipes() async {
+    var res = await Requests.get(
+        "https://litium.herokuapp.com/search?phrase=$input&limit=5",
+        withCredentials: true);
+    List<dynamic> list = jsonDecode(res.body);
+    print(list);
+    return list.map((e) => Recept.fromJson(e)).toList();
+  }
+
+  Future<List<Recept>> getRecomendations() async {
+    var r2 = await Requests.get(
+        "https://litium.herokuapp.com/get/recomendations?max=5",
+        withCredentials: true);
+    List<dynamic> list = jsonDecode(r2.body);
+    return list.map((e) => Recept.fromJson(e)).toList();
   }
 
   // Filter
@@ -104,11 +124,11 @@ class RecipesState extends State<Recipes> {
                                       icon: const Icon(Icons.search,
                                           color: Colors.black),
                                       onPressed: () {
-                                        setState(() async {
                                           input = _textController.text;
-                                          _textController.clear();
-                                          initState();
-                                        });
+                                          setState(() {
+                                            recept = input.isEmpty ? getRecomendations() : searchRecipes();
+                                          });
+                                        //});
                                       }),
                                 ),
                               ),
@@ -170,12 +190,4 @@ class RecipesState extends State<Recipes> {
       future: recept,
     );
   }
-}
-
-Future<List<Recept>> getRecept() async {
-  var r2 = await Requests.get(
-      "https://litium.herokuapp.com/get/recomendations?max=5",
-      withCredentials: true);
-  List<dynamic> list = jsonDecode(r2.body);
-  return list.map((e) => Recept.fromJson(e)).toList();
 }
