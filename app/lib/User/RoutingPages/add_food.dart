@@ -127,7 +127,7 @@ class _TestHomePageState extends State<TestHomePage> {
     
 
     return Scaffold(
-      appBar: customAppBar("CookIt.", ImageConstant.ellips),
+      appBar: customAppBar("CookIt.", true, context),
       body: SingleChildScrollView(
         child: Center(
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [

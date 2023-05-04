@@ -10,6 +10,7 @@ import 'package:first/Constants/Utils/image_constants.dart';
 import 'package:first/Widgets/appBar.dart';
 import 'package:first/cubit/appCubitStates.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get/get.dart';
 import 'package:requests/requests.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -22,11 +23,6 @@ import '../cubit/appCubit.dart';
 /// The scopes required by this application.
 const List<String> scopes = <String>['email', 'profile', 'openid'];
 
-GoogleSignIn _googleSignIn = GoogleSignIn(
-  // Optional clientId
-  // clientId: 'your-client_id.apps.googleusercontent.com',
-  scopes: scopes,
-);
 
 /// The SignInDemo app.
 class SignInDemo extends StatefulWidget {
@@ -40,10 +36,23 @@ class SignInDemo extends StatefulWidget {
 class _SignInDemoState extends State<SignInDemo> {
   GoogleSignInAccount? _currentUser;
   bool _isAuthorized = false; // has granted permissions?
+  
+  GoogleSignIn _googleSignIn = GoogleSignIn(
+    // Optional clientId
+    // clientId: 'your-client_id.apps.googleusercontent.com',
+    scopes: scopes,
+  );
 
   @override
   void initState() {
     super.initState();
+
+    _googleSignIn.isSignedIn().then((loggedIn) {
+      if (loggedIn) {
+        _googleSignIn.signOut();
+        print("loggar ut...");
+      }
+    });
 
     _googleSignIn.onCurrentUserChanged
         .listen((GoogleSignInAccount? account) async {
@@ -95,7 +104,7 @@ class _SignInDemoState extends State<SignInDemo> {
     // It is recommended by Google Identity Services to render both the One Tap UX
     // and the Google Sign In button together to "reduce friction and improve
     // sign-in rates" ([docs](https://developers.google.com/identity/gsi/web/guides/display-button#html)).    
-    _googleSignIn.signInSilently();
+    // _googleSignIn.signInSilently();
   }
 
   // This is the on-click handler for the Sign In button that is rendered by Flutter.
@@ -125,15 +134,6 @@ class _SignInDemoState extends State<SignInDemo> {
     if (isAuthorized) {
       print("Access granted!");
     }
-  }
-
-  Future<void> _handleSignOut() async {
-    await Requests.get("https://litium.herokuapp.com/logout",
-        withCredentials: true);
-
-    await Requests.clearStoredCookies('litium.herokuapp.com');
-
-    _googleSignIn.disconnect();
   }
 
   Widget _buildBody() {
@@ -192,7 +192,7 @@ class _SignInDemoState extends State<SignInDemo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: customAppBar("CookIt.", ImageConstant.ellips),
+        appBar: customAppBar("CookIt.", false, context),
         body: Center(
             child: Column(children: [
           ElevatedButton.icon(
