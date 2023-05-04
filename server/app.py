@@ -88,9 +88,18 @@ def fetch_recipe():
 @login_required
 def search_recipe():
     phrase = request.args.get('phrase')
-    limit = request.args.get('limit')
+    
+    if not phrase:
+        return []
 
-    result = db_search_recipe(phrase, limit, mysql)
+    if request.args.get('max'):
+        limit = int(request.args.get('max'))
+    else:
+        limit = 5
+    
+    filters = request.args.getlist('filter')
+
+    result = db_search_recipe(current_user.id, phrase, limit, filters, mysql)
 
     return result, 200
 

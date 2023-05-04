@@ -344,26 +344,42 @@ def db_get_recipe(recipeID, db):
 
     return result
 
-def db_search_recipe(phrase, limit, db):
-    cursor = db.connection.cursor()
-    
-    query = f"SELECT * FROM recipes WHERE titel LIKE '%{phrase}%' LIMIT {limit}"
+def db_search_recipe(user_id, phrase, limit, filters, db):
+    skafferi = db_get_skafferi(user_id, db)
 
+    cursor = db.connection.cursor()
+
+    query = f"SELECT * FROM recipes WHERE titel LIKE '%{phrase}%'"
     cursor.execute(query)
 
-    row = sql_query_to_json(cursor) 
+    recipe = sql_query_to_json(cursor) 
 
     result = []
 
-    while row:
-        row['instruktion'] = json.loads(row['instruktion'])
-        row['filter'] = json.loads(row['filter'])
-        result.append(row)
-        row = sql_query_to_json(cursor)
+    while recipe and len(result) < limit:
+        # kolla om filter funkar
+        recipe['filter'] = json.loads(recipe['filter'])
+        valid = meets_filter_requierments(recipe['filter'], filters)
+
+        if valid:
+            recipe['instruktion'] = json.loads(recipe['instruktion'])
+
+            missing_varugrupper, used_varugrupper, earliest_expiration = personalized_recipe_info(skafferi, recipe, db)
+                
+            recipe['earliest_expiration'] = earliest_expiration
+            recipe['missing'] = missing_varugrupper
+            recipe['used'] = used_varugrupper
+        
+            result.append(recipe)
+
+        recipe = sql_query_to_json(cursor)
     
     cursor.close()
 
     return result
+
+def meets_filter_requierments(recipe_filters, filters):
+    return all([x in recipe_filters for x in filters])
 
 def db_get_recomendations(user_id, max_results, sorting, filters, db):
     '''
@@ -396,41 +412,16 @@ def db_get_recomendations(user_id, max_results, sorting, filters, db):
         recipe = db_get_recipe(recipe_id, db)
 
         # Kolla så att alla filter finns med i receptet
-        recipe_filters = recipe['filter']
-        valid = all([x in recipe_filters for x in filters])
+        valid = meets_filter_requierments(recipe['filter'], filters)
 
-        if not valid:
-            recipe_id_row = sql_query_to_json(cursor) 
-            continue
-
-        varugrupp_cursor = db.connection.cursor()
-        # Hämta alla varugrupper som receptet kräver
-        get_recipe_varugrupper = f'SELECT varugruppID FROM recipestovarugrupp WHERE recipeID = {recipe_id}'
-        varugrupp_cursor.execute(get_recipe_varugrupper)
-        
-        varugrupp_row = sql_query_to_json(varugrupp_cursor)
-        recipe_varugrupper = set()
-        
-        while varugrupp_row:
-            recipe_varugrupper.add(str(varugrupp_row['varugruppID']))
-            varugrupp_row = sql_query_to_json(varugrupp_cursor)
-        
-        varugrupp_cursor.close()
-        
-        # Dessa varugrupper saknas för receptet
-        missing_varugrupper = recipe_varugrupper - skafferi_varugrupper
-        
-        # Dessa varugrupper för receptet har vi redan i skafferiet 
-        used_varugrupper = recipe_varugrupper.intersection(skafferi_varugrupper)
-
-    
-        earliest_expiration = min([datetime.datetime.strptime(produkt['bästföredatum'], "%Y-%m-%d")for produkt in skafferi if str(produkt['varugrupp']) in used_varugrupper])
-        
-        recipe['earliest_expiration'] = earliest_expiration
-        recipe['missing'] = [db_varugrupp_name(missing, db) for missing in missing_varugrupper]
-        recipe['used'] = [db_varugrupp_name(used, db) for used in used_varugrupper]
-        
-        result.append(recipe)
+        if valid:
+            missing_varugrupper, used_varugrupper, earliest_expiration = personalized_recipe_info(skafferi, recipe, db)
+            
+            recipe['earliest_expiration'] = earliest_expiration
+            recipe['missing'] = missing_varugrupper
+            recipe['used'] = used_varugrupper
+            
+            result.append(recipe)
 
         recipe_id_row = sql_query_to_json(cursor)
 
@@ -442,3 +433,38 @@ def db_get_recomendations(user_id, max_results, sorting, filters, db):
         sorted_list = sorted(result, key=lambda d: d['earliest_expiration'])
 
     return sorted_list[:max_results]
+
+def personalized_recipe_info(skafferi, recipe, db):
+    skafferi_varugrupper = set([str(produkt['varugrupp']) for produkt in skafferi])
+
+    cursor = db.connection.cursor()
+
+    # Hämta alla varugrupper som receptet kräver
+    get_recipe_varugrupper = f'SELECT varugruppID FROM recipestovarugrupp WHERE recipeID = {recipe["id"]}'
+    cursor.execute(get_recipe_varugrupper)
+    
+    varugrupp_row = sql_query_to_json(cursor)
+    recipe_varugrupper = set()
+    
+    while varugrupp_row:
+        recipe_varugrupper.add(str(varugrupp_row['varugruppID']))
+        varugrupp_row = sql_query_to_json(cursor)
+    
+    cursor.close()
+    
+    # Dessa varugrupper saknas för receptet
+    missing_varugrupper = recipe_varugrupper - skafferi_varugrupper
+    
+    # Dessa varugrupper för receptet har vi redan i skafferiet 
+    used_varugrupper = recipe_varugrupper.intersection(skafferi_varugrupper)
+
+    if len(used_varugrupper) > 0:
+        earliest_expiration = min([datetime.datetime.strptime(produkt['bästföredatum'], "%Y-%m-%d")for produkt in skafferi if str(produkt['varugrupp']) in used_varugrupper])
+    else:
+        earliest_expiration = None
+
+    missing_varugrupper = [db_varugrupp_name(missing, db) for missing in missing_varugrupper]
+    used_varugrupper = [db_varugrupp_name(used, db) for used in used_varugrupper]
+
+    return missing_varugrupper, used_varugrupper, earliest_expiration
+        
