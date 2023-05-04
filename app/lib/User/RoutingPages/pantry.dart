@@ -238,7 +238,7 @@ class PantryState extends State<Pantry> {
                                                       data.insert(index, item);
                                                       if (search == true) {
                                                         searchList.insert(
-                                                            index, item); 
+                                                            index, item);
                                                       }
                                                     });
                                                   },
@@ -281,7 +281,7 @@ class PantryState extends State<Pantry> {
                                                   key: Key(item.skafferi_id),
                                                   onDismissed: (right) {
                                                     setState(() {
-                                                      data.removeAt(index);
+                                                      data.remove(item); 
                                                     });
                                                     ScaffoldMessenger.of(
                                                             context)
