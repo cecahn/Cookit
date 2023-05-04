@@ -17,6 +17,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
 
+
+import '../Constants/Utils/color_constant.dart';
 import '../cubit/appCubit.dart';
 
 /// The scopes required by this application.
@@ -192,15 +194,84 @@ class _SignInDemoState extends State<SignInDemo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: customAppBar("CookIt.", ImageConstant.ellips),
-        body: Center(
-            child: Column(children: [
-          ElevatedButton.icon(
-            //icon: const Icon(Icons.Google, color: Colors.black),
-            onPressed: _handleSignIn,
-            icon: const Icon(Icons.android),
-            label: const Text("google"),
-          )
-        ])));
+        //appBar: customAppBar("CookIt.", ImageConstant.ellips),
+        body: Padding(
+          padding: EdgeInsets.only(top: 0),
+          child: Center(            
+            child: Column(
+              children: [
+              Padding( 
+                padding: EdgeInsets.only(top: 70,),
+                  child: SizedBox (
+                    width: 200,
+                    height: 200,
+                      child: Image.asset(ImageConstant.logo),
+                    ),
+                  
+                 ), 
+
+                 SizedBox(
+                  height: 20,
+                 ),
+
+                 
+
+                  Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  
+                  children: [
+
+                    Text("CookIt.",
+                        style: GoogleFonts.alfaSlabOne(
+                        textStyle: TextStyle(
+                        color: Colors.teal,
+                        fontSize: 50,
+                        //overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ),
+                  ],),
+
+                 
+              
+            
+
+            Padding( 
+              padding: EdgeInsets.only(top: 10),
+                child: Container
+                (
+                  child: ElevatedButton.icon(
+                onPressed: () {
+                    _handleSignIn();
+                },
+                icon: Icon(
+                  Icons.login,
+                  color: Colors.white,
+                ),
+                label: Text(
+                  'Sign in with Google',
+                  style: GoogleFonts.lato(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.teal, 
+                  minimumSize: Size(250, 70),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ) 
+            )            
+          )           
+        ]         
+      ),      
+    )
+  )
+);
+        
   }
 }
