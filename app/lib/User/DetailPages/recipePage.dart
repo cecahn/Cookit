@@ -169,7 +169,7 @@ class _RecipePageState extends State<RecipePage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                      Text( "Ingredienser",
+                      Text( "Ingredienser hemma",
                         style: GoogleFonts.alfaSlabOne(
                         textStyle: const TextStyle(
                         color: Colors.black,
@@ -211,47 +211,6 @@ class _RecipePageState extends State<RecipePage> {
                       Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                      Text( "Instruktioner",
-                        style: GoogleFonts.alfaSlabOne(
-                        textStyle: const TextStyle(
-                        color: Colors.black,
-                        fontSize: 20,
-                        overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-
-                      )
-                    ],),
-
-                     ListView.builder(
-                        shrinkWrap: true,
-                        //physics: AlwaysScrollableScrollPhysics(),
-                        itemCount: detail.recept.instruktion.length,
-                        itemBuilder: (context,index) {
-                            return Container(
-                            margin: EdgeInsets.only(right: Dimensions.width20,),
-                            child: Wrap(
-                              children: [
-                                Text(detail.recept.instruktion[index],
-                                maxLines: 3,
-                                style: GoogleFonts.breeSerif(
-                                textStyle: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 10,
-                                overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                                ),
-                              ],)
-                          );
-                        },),
-
-                        SizedBox(height:10),
-
-
-                         Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
                       Text( "Inköpslista",
                         style: GoogleFonts.alfaSlabOne(
                         textStyle: const TextStyle(
@@ -272,8 +231,49 @@ class _RecipePageState extends State<RecipePage> {
                             return Container(
                             margin: EdgeInsets.only(right: Dimensions.width20,),
                             child: Wrap(
+                              children: [
+                                Text(detail.recept.missing[index],
+                                maxLines: 3,
+                                style: GoogleFonts.breeSerif(
+                                textStyle: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 10,
+                                overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                                ),
+                              ],)
+                          );
+                        },),
+
+                        SizedBox(height:10),
+
+
+                         Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                      Text( "Instruktioner",
+                        style: GoogleFonts.alfaSlabOne(
+                        textStyle: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 20,
+                        overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+
+                      )
+                    ],),
+
+                     ListView.builder(
+                        shrinkWrap: true,
+                        //physics: AlwaysScrollableScrollPhysics(),
+                        itemCount: detail.recept.instruktion.length,
+                        itemBuilder: (context,index) {
+                            return Container(
+                            margin: EdgeInsets.only(right: Dimensions.width20,),
+                            child: Wrap(
                                 
-                                children: [Text(detail.recept.missing[index],
+                                children: [Text(detail.recept.instruktion[index],
                                 softWrap: true,
                                 style: GoogleFonts.breeSerif(
                                 textStyle: const TextStyle(
