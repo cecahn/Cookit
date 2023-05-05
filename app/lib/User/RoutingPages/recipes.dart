@@ -1,10 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'dart:ui';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:requests/requests.dart';
 
 import '../../Constants/Utils/dimensions.dart';
@@ -15,12 +11,9 @@ import '../../Widgets/app_dropdown_menu.dart';
 import '../../Widgets/app_recipe_tile.dart';
 import '../../Widgets/app_button.dart';
 import '../../Widgets/app_checkbox_state.dart';
-import '../../cubit/appCubit.dart';
-import '../../cubit/appCubitStates.dart';
-//import 'package:myapp/utils.dart';
-import '../../Constants/Utils/image_constants.dart';
 
 final _textController = TextEditingController();
+const maxSearchResults = 10;
 
 class Recipes extends StatefulWidget {
   const Recipes({Key? key}) : super(key: key);
@@ -30,58 +23,13 @@ class Recipes extends StatefulWidget {
 }
 
 class RecipesState extends State<Recipes> {
-  String input = "";
 
-
+  // Variables
+  String searchPhrase = "";
 
   late Future<List<Recept>> recept;
 
-  @override
-  void initState() {
-    super.initState();
-    recept = getRecomendations();
-  }
-
-  Future<List<Recept>> searchRecipes() async {
-    var res = await Requests.get(
-        "https://litium.herokuapp.com/search?phrase=$input&limit=5",
-        withCredentials: true);
-    List<dynamic> list = jsonDecode(res.body);
-    print(list);
-    return list.map((e) => Recept.fromJson(e)).toList();
-  }
-
-  /* Future<List<Recept>> getRecomendations() async {
-    var r2 = await Requests.get(
-        "https://litium.herokuapp.com/get/recomendations?max=5",
-        withCredentials: true);
-    List<dynamic> list = jsonDecode(r2.body);
-    return list.map((e) => Recept.fromJson(e)).toList();
-  } */
-
-  Future<List<Recept>> getRecomendations() async {
-    var r2 = await Requests.get(
-        "https://litium.herokuapp.com/get/recomendations?max=5",
-        withCredentials: true,
-        queryParameters: activeQueryParameters  
-      );
-    List<dynamic> list = jsonDecode(r2.body);
-    return list.map((e) => Recept.fromJson(e)).toList();
-  }
-
-  Map<String, dynamic> activeQueryParameters = {"max": 5, "filter": []};
-
-
-  void addFilter(String filter) {
-    activeQueryParameters["filter"].add(filter);
-    print(activeQueryParameters);
-  }
-
-  void removeFilter(String filter) {
-    activeQueryParameters["filter"].remove(filter);
-    print(activeQueryParameters);
-  }
-  // Filter
+  Map<String, dynamic> activeQueryParameters = {"max": maxSearchResults, "filter": []};
 
   final filterOptions = [
     CheckboxState(title: "Vegan"),
@@ -93,10 +41,52 @@ class RecipesState extends State<Recipes> {
   ];
 
   bool filterOpen = false;
+
+  List<String> sortOptions = ["Sortera", "Senast tillagd", "Utgångsdatum"];
+  
+  String _sortValue = 'Sortera';
+
+  // Functions
+
+  @override
+  void initState() {
+    super.initState();
+    recept = getRecomendations();
+  }
+
+  Future<List<Recept>> searchRecipes() async {
+    var res = await Requests.get(
+        "https://litium.herokuapp.com/search?phrase=$searchPhrase&limit=5",
+        withCredentials: true);
+    List<dynamic> list = jsonDecode(res.body);
+    print(list);
+    return list.map((e) => Recept.fromJson(e)).toList();
+  }
+
+  Future<List<Recept>> getRecomendations() async {
+    var r2 = await Requests.get(
+        "https://litium.herokuapp.com/get/recomendations",
+        withCredentials: true,
+        queryParameters: activeQueryParameters  
+      );
+    List<dynamic> list = jsonDecode(r2.body);
+    return list.map((e) => Recept.fromJson(e)).toList();
+  }
+
   void toggleFilterMenu() {
     setState(() {
       filterOpen = !filterOpen;
     });
+  }
+
+  void addFilter(String filter) {
+    activeQueryParameters["filter"].add(filter);
+    print(activeQueryParameters);
+  }
+
+  void removeFilter(String filter) {
+    activeQueryParameters["filter"].remove(filter);
+    print(activeQueryParameters);
   }
 
   Widget buildCheckbox(CheckboxState checkbox) => CheckboxListTile(
@@ -112,25 +102,6 @@ class RecipesState extends State<Recipes> {
     },
   );
 
-  /* List<String> filterOptions = [
-    "Filter",
-    "Vegan",
-    "Vegetarian",
-    "Mjölkfri",
-    "Äggfri",
-    "Gluten",
-    "Laktosfri"
-  ]; */
-  // String _filterValue = 'Filter';
-  /* void _updateFilterValue(String value) {
-    setState(() {
-      _filterValue = value;
-    });
-  } */
-
-  // Sort
-  List<String> sortOptions = ["Sortera", "Senast tillagd", "Utgångsdatum"];
-  String _sortValue = 'Sortera';
   void _updateSortValue(String value) {
     setState(() {
       _sortValue = value;
@@ -178,9 +149,9 @@ class RecipesState extends State<Recipes> {
                                       icon: const Icon(Icons.search,
                                           color: Colors.black),
                                       onPressed: () {
-                                          input = _textController.text;
+                                          searchPhrase = _textController.text;
                                           setState(() {
-                                            recept = input.isEmpty ? getRecomendations() : searchRecipes();
+                                            recept = searchPhrase.isEmpty ? getRecomendations() : searchRecipes();
                                           });
                                         //});
                                       }),
