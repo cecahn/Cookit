@@ -1,4 +1,5 @@
 
+import 'package:first/Constants/Utils/color_constant.dart';
 import 'package:first/User/mainPage.dart';
 import 'package:first/User/DetailPages/productPage.dart';
 import 'package:first/cubit/appCubitLogic.dart';
@@ -26,7 +27,8 @@ class MyApp extends StatelessWidget {
       title: "CookIt",
       debugShowCheckedModeBanner: false,
       theme:ThemeData(
-        primarySwatch: Colors.purple,
+        // primarySwatch: Colors.purple,
+        colorSchemeSeed: ColorConstant.primaryColor
         ),
         home: BlocProvider<AppCubits>(
           create: (context) => AppCubits(),

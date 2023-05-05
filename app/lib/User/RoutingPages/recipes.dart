@@ -13,6 +13,8 @@ import '../../Services/receptModel.dart';
 import '../../Widgets/appBar.dart';
 import '../../Widgets/app_dropdown_menu.dart';
 import '../../Widgets/app_recipe_tile.dart';
+import '../../Widgets/app_button.dart';
+import '../../Widgets/app_checkbox_state.dart';
 import '../../cubit/appCubit.dart';
 import '../../cubit/appCubitStates.dart';
 //import 'package:myapp/utils.dart';
@@ -28,9 +30,9 @@ class Recipes extends StatefulWidget {
 }
 
 class RecipesState extends State<Recipes> {
-  String dropdownValue = 'Filter';
-  String dropdownValue2 = 'Sortera';
   String input = "";
+
+
 
   late Future<List<Recept>> recept;
 
@@ -49,16 +51,68 @@ class RecipesState extends State<Recipes> {
     return list.map((e) => Recept.fromJson(e)).toList();
   }
 
-  Future<List<Recept>> getRecomendations() async {
+  /* Future<List<Recept>> getRecomendations() async {
     var r2 = await Requests.get(
         "https://litium.herokuapp.com/get/recomendations?max=5",
         withCredentials: true);
     List<dynamic> list = jsonDecode(r2.body);
     return list.map((e) => Recept.fromJson(e)).toList();
+  } */
+
+  Future<List<Recept>> getRecomendations() async {
+    var r2 = await Requests.get(
+        "https://litium.herokuapp.com/get/recomendations?max=5",
+        withCredentials: true,
+        queryParameters: activeQueryParameters  
+      );
+    List<dynamic> list = jsonDecode(r2.body);
+    return list.map((e) => Recept.fromJson(e)).toList();
   }
 
+  Map<String, dynamic> activeQueryParameters = {"max": 5, "filter": []};
+
+
+  void addFilter(String filter) {
+    activeQueryParameters["filter"].add(filter);
+    print(activeQueryParameters);
+  }
+
+  void removeFilter(String filter) {
+    activeQueryParameters["filter"].remove(filter);
+    print(activeQueryParameters);
+  }
   // Filter
-  List<String> filterOptions = [
+
+  final filterOptions = [
+    CheckboxState(title: "Vegan"),
+    CheckboxState(title: "Vegetarian"),
+    CheckboxState(title: "Mjölkfri"),
+    CheckboxState(title: "Äggfri"),
+    CheckboxState(title: "Glutenfri"),
+    CheckboxState(title: "Laktosfri"),
+  ];
+
+  bool filterOpen = false;
+  void toggleFilterMenu() {
+    setState(() {
+      filterOpen = !filterOpen;
+    });
+  }
+
+  Widget buildCheckbox(CheckboxState checkbox) => CheckboxListTile(
+    controlAffinity: ListTileControlAffinity.leading,
+    title: Text(checkbox.title),
+    activeColor: ColorConstant.primaryColor,
+    value: checkbox.value,
+    onChanged: (value) {
+      value! ? addFilter(checkbox.title) : removeFilter(checkbox.title);
+      setState(() {
+        checkbox.value = value;
+      });
+    },
+  );
+
+  /* List<String> filterOptions = [
     "Filter",
     "Vegan",
     "Vegetarian",
@@ -66,13 +120,13 @@ class RecipesState extends State<Recipes> {
     "Äggfri",
     "Gluten",
     "Laktosfri"
-  ];
-  String _filterValue = 'Filter';
-  void _updateFilterValue(String value) {
+  ]; */
+  // String _filterValue = 'Filter';
+  /* void _updateFilterValue(String value) {
     setState(() {
       _filterValue = value;
     });
-  }
+  } */
 
   // Sort
   List<String> sortOptions = ["Sortera", "Senast tillagd", "Utgångsdatum"];
@@ -141,13 +195,13 @@ class RecipesState extends State<Recipes> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  // Filter dropdown
+                                  // Button for opening the filter menu
                                   Expanded(
-                                      child: AppDropdownMenu(
-                                    menuOptions: filterOptions,
-                                    value: _filterValue,
-                                    callback: _updateFilterValue,
-                                  )),
+                                    child: AppButton(
+                                      text: "Filtrera",
+                                      onTap: toggleFilterMenu,
+                                    )
+                                  ),
 
                                   const SizedBox(width: 10),
 
@@ -169,7 +223,26 @@ class RecipesState extends State<Recipes> {
                                         top: 20,
                                         left: Dimensions.width10,
                                         right: Dimensions.width10),
-                                    child: ListView.builder(
+                                    child: filterOpen ?
+                                    // Filter checkboxes
+                                    ListView(
+                                      padding: const EdgeInsets.all(20),
+                                      children: [
+                                        ...filterOptions.map(buildCheckbox),
+                                        ElevatedButton(
+                                          
+                                          onPressed: () {
+                                            toggleFilterMenu();
+                                            setState(() {
+                                              recept = getRecomendations();
+                                            });
+                                          },
+                                          child: const Text("Sök")
+                                        )
+                                      ]
+                                    )
+                                    // Recipe list
+                                    : ListView.builder(
                                       shrinkWrap: true,
                                       physics:
                                           const AlwaysScrollableScrollPhysics(),
@@ -178,7 +251,10 @@ class RecipesState extends State<Recipes> {
                                         return AppRecipeTile(
                                             recept: data[index]);
                                       },
-                                    )))
+                                    )
+
+                                  )
+                                )
                           ]),
                     )));
           }
