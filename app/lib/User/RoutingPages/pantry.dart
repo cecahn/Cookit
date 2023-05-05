@@ -7,7 +7,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:first/Services/dataModel.dart';
 import 'package:requests/requests.dart';
 
+import '../../Constants/Utils/color_constant.dart';
 import '../../Constants/Utils/image_constants.dart';
+import '../../Services/server_calls.dart';
+import '../../Widgets/app_dropdown_menu.dart';
+import '../../Widgets/app_list_tile.dart';
+import '../../Widgets/expansion_tile_text.dart';
 import '../../cubit/appCubit.dart';
 
 // bool sortActivated = false;
@@ -95,14 +100,15 @@ class PantryState extends State<Pantry> {
   String _sortValue = 'Varugrupp';
   List<String> _sortOptions = ["Varugrupp", "Utgångsdatum", "Senast tillagd"];
 
-  void _updateSortValue(String value) {
+  void _updateSortValue(String value) async {
+    List<Produkt> varor = search ? searchList : await skafferi;
     setState(() {
       _sortValue = value;
       if (_sortValue == 'Utgångsdatum') {
-        skafferi.then((value) => {value.sort(sortByUtgang)});
+        varor.sort(sortByUtgang);
       }
       if (_sortValue == 'Senast tillagd') {
-        skafferi.then((value) => {value.sort(sortByTime)});
+        varor.sort(sortByTime);
       }
     });
   }
@@ -137,8 +143,9 @@ class PantryState extends State<Pantry> {
             final unikaVarugrupper = data.map((e) => e.varugrupp).toSet();
 
             return Scaffold(
-                appBar: customAppBar("Skafferi", ImageConstant.ellips),
+                appBar: customAppBar("Skafferi", true, context),
                 body: SingleChildScrollView(
+                  physics: const NeverScrollableScrollPhysics(),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
@@ -201,7 +208,7 @@ class PantryState extends State<Pantry> {
                             child: _sortValue != 'Varugrupp'
                                 ? ListView.builder(
                                     physics:
-                                        const NeverScrollableScrollPhysics(),
+                                        const AlwaysScrollableScrollPhysics(),
                                     itemCount: search == false
                                         ? data!.length
                                         : searchList.length,
@@ -231,7 +238,7 @@ class PantryState extends State<Pantry> {
                                                       data.insert(index, item);
                                                       if (search == true) {
                                                         searchList.insert(
-                                                            index, item); 
+                                                            index, item);
                                                       }
                                                     });
                                                   },
@@ -257,7 +264,7 @@ class PantryState extends State<Pantry> {
                                   )
                                 : ListView.builder(
                                     physics:
-                                        const NeverScrollableScrollPhysics(),
+                                        const AlwaysScrollableScrollPhysics(),
                                     itemCount: unikaVarugrupper.length,
                                     itemBuilder: (_, index) {
                                       // Vill lägga till produkter efter varugrupp
@@ -274,7 +281,7 @@ class PantryState extends State<Pantry> {
                                                   key: Key(item.skafferi_id),
                                                   onDismissed: (right) {
                                                     setState(() {
-                                                      data.removeAt(index);
+                                                      data.remove(item); 
                                                     });
                                                     ScaffoldMessenger.of(
                                                             context)

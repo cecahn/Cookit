@@ -1,8 +1,15 @@
 import 'package:first/Constants/export.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:requests/requests.dart';
 
-customAppBar(String header, String image) { 
+import '../cubit/appCubit.dart';
+import '../cubit/appCubitStates.dart';
+
+
+
+customAppBar(String header, bool showLogout, context) { 
     return AppBar(
         title: Padding(
             padding: const EdgeInsets.only(left: 20.0),
@@ -16,11 +23,18 @@ customAppBar(String header, String image) {
         actions: [
           IconButton(
             icon: Image.asset(
-              image,
+              showLogout ? ImageConstant.logout : ImageConstant.ellips,
               width: 100,
               height: 100,
             ),
-            onPressed: () {},
+            onPressed: () async {
+              if (showLogout) {
+                await Requests.get("https://litium.herokuapp.com/logout", withCredentials: true);
+                await Requests.clearStoredCookies('litium.herokuapp.com');
+                
+                BlocProvider.of<AppCubits>(context).emit(WelcomeState());
+              }
+            },
           ),
         ],
         backgroundColor: Colors.white);

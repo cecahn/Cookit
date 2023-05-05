@@ -17,5 +17,7 @@ class ImageConstant {
   static String saknas = "assets/Images/png/Bild_saknas.png";
   
   static String tacos = "assets/Images/png/tacos.png";
+  
+  static String logout = "assets/Images/png/logout.png";
 
 }
