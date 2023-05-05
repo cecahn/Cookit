@@ -29,7 +29,11 @@ class RecipesState extends State<Recipes> {
 
   late Future<List<Recept>> recept;
 
-  Map<String, dynamic> activeQueryParameters = {"max": maxSearchResults, "filter": []};
+  Map<String, dynamic> activeQueryParameters = {
+    "max": maxSearchResults, 
+    "filter": [],
+    "sorting": 1 // 0: Antal varor hemma - 1: Kortast utgångsdatum
+  };
 
   final filterOptions = [
     CheckboxState(title: "Vegan"),
@@ -42,7 +46,7 @@ class RecipesState extends State<Recipes> {
 
   bool filterOpen = false;
 
-  List<String> sortOptions = ["Sortera", "Senast tillagd", "Utgångsdatum"];
+  List<String> sortOptions = ["Sortera", "Antal varor hemma", "Utgångsdatum"];
   
   String _sortValue = 'Sortera';
 
@@ -104,7 +108,11 @@ class RecipesState extends State<Recipes> {
 
   void _updateSortValue(String value) {
     setState(() {
-      _sortValue = value;
+      activeQueryParameters["sorting"] = value == "Utgångsdatum" ? 1 : 0;
+      if (value != _sortValue) {
+        _sortValue = value;
+        recept = getRecomendations();
+      }
     });
   }
 
