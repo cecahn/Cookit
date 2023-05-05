@@ -37,7 +37,7 @@ class RecipesState extends State<Recipes> {
 
   final filterOptions = [
     CheckboxState(title: "Vegan"),
-    CheckboxState(title: "Vegetarian"),
+    CheckboxState(title: "Vegetarisk"),
     CheckboxState(title: "Mjölkfri"),
     CheckboxState(title: "Äggfri"),
     CheckboxState(title: "Glutenfri"),
