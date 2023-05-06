@@ -20,12 +20,10 @@ class RecipePage extends StatefulWidget {
   State<RecipePage> createState() => _RecipePageState();
 }
 
-
-
 class _RecipePageState extends State<RecipePage> {
 
-  // late Response betyg;
-  late double betyg = 0;
+  // late double betyg;
+  double? betyg;
 
   void _saveRating(int rating, int receptid) async {
 
@@ -59,6 +57,8 @@ class _RecipePageState extends State<RecipePage> {
   Widget build(BuildContext context) {
     return BlocBuilder<AppCubits, CubitStates>(builder: (context, state) {
       RecipeState detail = state as RecipeState;
+
+      
 
       return Scaffold(
       body: SingleChildScrollView(
@@ -147,8 +147,7 @@ class _RecipePageState extends State<RecipePage> {
                     // Betyg siffror
                     SizedBox(width: 10,),
                     Text(
-                        // "("+detail.recept.betyg.toString()+")",
-                        betyg.toString(),
+                        betyg != null ? betyg.toString() : detail.recept.betyg.toString(),
                         style: GoogleFonts.alfaSlabOne(
                         textStyle: TextStyle(
                         color: ColorConstant.primaryColor,
