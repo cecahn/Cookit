@@ -22,8 +22,7 @@ class RecipePage extends StatefulWidget {
 
 class _RecipePageState extends State<RecipePage> {
 
-  // late double betyg;
-  double? betyg;
+  double? betyg; // OBS! Snittbetyget - inte användarens betyg
 
   void _saveRating(int rating, int receptid) async {
 
@@ -57,8 +56,6 @@ class _RecipePageState extends State<RecipePage> {
   Widget build(BuildContext context) {
     return BlocBuilder<AppCubits, CubitStates>(builder: (context, state) {
       RecipeState detail = state as RecipeState;
-
-      
 
       return Scaffold(
       body: SingleChildScrollView(
@@ -132,6 +129,7 @@ class _RecipePageState extends State<RecipePage> {
                         minRating:1,
                         maxRating: 5,
                         tapOnlyMode: true,
+                        // TODO: Användarens betyg istället för genomsnittsbetyg - måste skickas med av servern
                         initialRating: detail.recept.betyg.toDouble(),
                         onRatingUpdate: (rating) 
                         {_saveRating(rating.round(), detail.recept.id.round() ); },
@@ -144,7 +142,7 @@ class _RecipePageState extends State<RecipePage> {
                         itemPadding: EdgeInsets.only(left: 5, ),
                       ),
                     
-                    // Betyg siffror
+                    // Genomsnittsbetyget (med siffror)
                     SizedBox(width: 10,),
                     Text(
                         betyg != null ? betyg.toString() : detail.recept.betyg.toString(),
