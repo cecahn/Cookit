@@ -23,42 +23,34 @@ class ProductPage extends StatefulWidget {
 }
 
 
-
 class _ProductPageState extends State<ProductPage> {
-
-
-  late String _dateTime;
+  String? _dateTime;
+  String? showDate;
   late DateTime date;
-  late String showDate;
 
-  void _showDatePicker () {
-    showDatePicker(
+  Future<void> _showDatePicker () async {
+    await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2025), 
+      initialDate: DateTime.now(), // Ändra till nuvarande utgångsdatum?
+      firstDate: DateTime.now(), // Ändra så att man kan sätta ett datum innan dagens datum
+      lastDate: DateTime(2025), // Ta bort hårdkodning
       
       ).then((value) {
         setState((){
           date = value!;
-          showDate = value.toString();
+          showDate = DateFormat('yyyy-MM-dd').format(date);
           _dateTime = DateFormat('yyyyMMdd').format(date); 
         });
       });
   }
 
-  void _changeDate (skafferi_id, date, detail) {
-    setState(() {
-      ServerCall.changeDate(skafferi_id, date);
-
-      });
-    
-  }
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AppCubits, CubitStates>(builder: (context, state) {
       ProductState detail = state as ProductState;
-      showDate = detail.produkt.bastforedatum;
+
+      // showDate = detail.produkt.bastforedatum;
+
       return Scaffold(
       body: SingleChildScrollView(
        child: Container(
@@ -125,136 +117,110 @@ class _ProductPageState extends State<ProductPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      
-                      children:[
-                        Text(detail.produkt.namn,
-                        style: GoogleFonts.alfaSlabOne(
+
+                    // VARUNAMN
+                    Text(detail.produkt.namn,
+                      style: GoogleFonts.alfaSlabOne(
                         textStyle: TextStyle(
-                        color: ColorConstant.primaryColor,
-                        fontSize: 30,
-                        // fontWeight: FontWeight.bold,
-                        overflow: TextOverflow.ellipsis,
+                          color: ColorConstant.primaryColor,
+                          fontSize: 30,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    Row(
+                      children: [
+                        
+                        Text("Bäst före datum",
+                          style: GoogleFonts.alfaSlabOne(
+                            textStyle: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
 
-                        
+                        const SizedBox(width:30),
+
+                        // DATE PICKER
+                        IconButton (
+                          onPressed: () async {
+                            await _showDatePicker();
+                            ServerCall.changeDate(detail.produkt.skafferi_id, _dateTime);
+                            LoadingState();
+                          },
+                          icon: const Icon(Icons.edit, color: Colors.black)
+                        )
                       ],
                     ),
-                    SizedBox(height: 20),
-                    Row(children: [
-                      Text("Bäst före datum",
-                                style: GoogleFonts.alfaSlabOne(
-                                textStyle: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width:30),
 
-                                IconButton ( onPressed: () {
-                                  _showDatePicker();
-                                  _changeDate(detail.produkt.skafferi_id, _dateTime, detail.produkt);
-                                  //ServerCall.changeDate(detail.produkt.skafferi_id, _dateTime);
-                                  //LoadingState();
-                                      },
-                                
-                                icon: Icon(Icons.edit, color: Colors.black)
-                                
-                                )
-                      
-                    
-                    ],
-                  ),
+                    // UTGÅNGSDATUM STRÄNG
+                    Text(
+                      showDate ?? detail.produkt.bastforedatum.toString(),
+                      style: GoogleFonts.breeSerif(
+                        textStyle: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                        ),
+                      ),
+                    ),
 
+                    const SizedBox(height: 20,),
 
+                    Text("Allergener",
+                      style: GoogleFonts.alfaSlabOne(
+                        textStyle: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                      Text(showDate,
-                                style: GoogleFonts.breeSerif(
-                                textStyle: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                                    ),
-                                  ),
-                                ),
-                    ],),
-
-                    SizedBox(height: 20,),
-
-
-                    Row(
-                              children: [
-                                Text("Allergener",
-                                style: GoogleFonts.alfaSlabOne(
-                                textStyle: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                      ListView.builder(
-                            shrinkWrap: true,
-                            //physics: AlwaysScrollableScrollPhysics(),
-                            itemCount: detail.produkt.allergener.length,
-                            itemBuilder: (context,index) {
-                                return Container(
-                                margin: EdgeInsets.only(right: Dimensions.width20,),
-                                child: Row(
-                                  children: [
-                                    Text(detail.produkt.allergener[index],
-                                    style: GoogleFonts.breeSerif(
-                                    textStyle: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 20,
-                                    ),
-                                  ),
-                                    ),
-                                  ],
-                                )
-                              );
-                            },
-                          ),
-
-                        SizedBox(height: 20),
-
-                          Row (
+                    ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: detail.produkt.allergener.length,
+                      itemBuilder: (context,index) {
+                        return Container(
+                          margin: EdgeInsets.only(right: Dimensions.width20),
+                          child: Row(
                             children: [
-                              Text("Tillverkare",
-                                style: GoogleFonts.alfaSlabOne(
-                                textStyle: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-
-                          Row (
-                            children: [
-                              Text(detail.produkt.tillverkare,
+                              Text(detail.produkt.allergener[index],
                                 style: GoogleFonts.breeSerif(
-                                textStyle: const TextStyle(
-                                color: Colors.black,
-                                fontSize: 20,
-                               
-                                    ),
-                                  ),
+                                  textStyle: const TextStyle(color: Colors.black, fontSize: 20),
                                 ),
+                              ),
                             ],
                           )
+                        );
+                      },
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    Text("Tillverkare",
+                      style: GoogleFonts.alfaSlabOne(
+                        textStyle: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+
+                    // TILLVERKAR-NAMN
+                    Text(detail.produkt.tillverkare,
+                      style: GoogleFonts.breeSerif(
+                        textStyle: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                        ),
+                      ),
+                    )
                     
                       
                     ],

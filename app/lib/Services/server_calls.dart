@@ -27,11 +27,11 @@ class ServerCall {
       final response = await Requests.get(
           "https://litium.herokuapp.com/skafferi/update_exp_date?skafferi_id=$pantryID&expiration-date=$expiration",
           withCredentials: true);
-      print(response);
+      print(response.content());
       if (response.statusCode == 200) {
-        print(response);
+        print(response.content());
       } else {
-        print(response);
+        print(response.content());
         throw Exception('Failed to load data');
       }
     } catch (error) {
