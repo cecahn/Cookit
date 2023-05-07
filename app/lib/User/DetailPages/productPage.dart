@@ -26,20 +26,23 @@ class ProductPage extends StatefulWidget {
 class _ProductPageState extends State<ProductPage> {
   String? _dateTime;
   String? showDate;
-  late DateTime date;
+  DateTime? date;
 
   Future<void> _showDatePicker () async {
+      DateTime now = DateTime.now();
+    
     await showDatePicker(
       context: context,
-      initialDate: DateTime.now(), // Ändra till nuvarande utgångsdatum?
-      firstDate: DateTime.now(), // Ändra så att man kan sätta ett datum innan dagens datum
-      lastDate: DateTime(2025), // Ta bort hårdkodning
+      helpText: "Välj nytt utgångsdatum",
+      initialDate: date ?? now, // Nuvarande utgångsdatum
+      firstDate: now.subtract(const Duration(days: 7)),
+      lastDate: now.add(const Duration(days: 730)),
       
       ).then((value) {
         setState((){
           date = value!;
-          showDate = DateFormat('yyyy-MM-dd').format(date);
-          _dateTime = DateFormat('yyyyMMdd').format(date); 
+          showDate = DateFormat('yyyy-MM-dd').format(date!);
+          _dateTime = DateFormat('yyyyMMdd').format(date!); 
         });
       });
   }
@@ -49,7 +52,11 @@ class _ProductPageState extends State<ProductPage> {
     return BlocBuilder<AppCubits, CubitStates>(builder: (context, state) {
       ProductState detail = state as ProductState;
 
-      // showDate = detail.produkt.bastforedatum;
+      if (date == null) {
+        String dateString = detail.produkt.bastforedatum;
+        DateFormat dateFormat = DateFormat('yyyy-MM-dd');
+        date = dateFormat.parse(dateString);
+      }
 
       return Scaffold(
       body: SingleChildScrollView(
