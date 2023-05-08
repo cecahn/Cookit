@@ -210,7 +210,7 @@ class PantryState extends State<Pantry> {
                                     physics:
                                         const AlwaysScrollableScrollPhysics(),
                                     itemCount: search == false
-                                        ? data!.length
+                                        ? data.length
                                         : searchList.length,
                                     itemBuilder:
                                         (BuildContext context, int index) {
