@@ -10,6 +10,7 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:first/Constants/export.dart';
 import '../../Widgets/app_list_text.dart';
 import '../../Widgets/appBar.dart';
+import '../../Widgets/app_button.dart';
 import 'pantry.dart';
 import 'recipes.dart';
 
@@ -130,7 +131,11 @@ class _TestHomePageState extends State<TestHomePage> {
       appBar: customAppBar("CookIt.", true, context),
       body: SingleChildScrollView(
         child: Center(
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center, 
+            children: [
+            
+            // Sökruta
             Padding(
               padding: const EdgeInsets.only(top: 120.0, left: 10, right: 10),
               child: TextField(
@@ -151,15 +156,16 @@ class _TestHomePageState extends State<TestHomePage> {
                 ),
               ),
             ),
-            ElevatedButton(
-              onPressed: () async {
-                await scanBarcode();
-                fetchProduct();
-              },
-              child: const Text('Scan')),
-            Center(
-              child: Text(productGTIN)
-            ),
+
+            const SizedBox(height: 25),
+
+            // Scan-knapp
+            AppButton(text: "Skanna vara", onTap: () {
+              scanBarcode();
+              fetchProduct();
+            }),
+
+            // "Nyligen skannad mat" 
             const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -174,6 +180,16 @@ class _TestHomePageState extends State<TestHomePage> {
                 ),
               ],
             )),
+
+            const SizedBox(height: 15),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 50),
+              child: Divider(
+                color: ColorConstant.primaryColor,
+                thickness: 2,
+              ),
+            ),
 
             // Listan av tillagda varor
             Container(

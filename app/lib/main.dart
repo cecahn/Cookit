@@ -1,14 +1,9 @@
 
-import 'package:first/User/mainPage.dart';
-import 'package:first/User/DetailPages/productPage.dart';
+import 'package:first/Constants/Utils/color_constant.dart';
 import 'package:first/cubit/appCubitLogic.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'User/RoutingPages/pantry.dart';
-import 'User/RoutingPages/add_food.dart';
-import 'package:bloc/bloc.dart';
 import 'package:first/cubit/appCubit.dart';
-import 'package:first/cubit/appCubitStates.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:first/Constants/Utils/color_constant.dart';
 
