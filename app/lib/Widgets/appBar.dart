@@ -11,6 +11,7 @@ import '../cubit/appCubitStates.dart';
 
 customAppBar(String header, bool showLogout, context) { 
     return AppBar(
+        elevation: 3,
         title: Padding(
             padding: const EdgeInsets.only(left: 20.0),
             child: Text(header,
@@ -18,15 +19,10 @@ customAppBar(String header, bool showLogout, context) {
                     textStyle: const TextStyle(
                       fontSize: 30,
                     ),
-                    // color: Colors.teal))),
                     color: ColorConstant.primaryColor))),
         actions: [
           IconButton(
-            icon: Image.asset(
-              showLogout ? ImageConstant.logout : ImageConstant.ellips,
-              width: 100,
-              height: 100,
-            ),
+            icon: const Icon(Icons.logout, size: 30, color: Colors.black87),
             onPressed: () async {
               if (showLogout) {
                 await Requests.get("https://litium.herokuapp.com/logout", withCredentials: true);
@@ -37,5 +33,6 @@ customAppBar(String header, bool showLogout, context) {
             },
           ),
         ],
-        backgroundColor: Colors.white);
+        backgroundColor: Colors.white,
+    );
   }
