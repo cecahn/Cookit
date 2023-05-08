@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:first/cubit/appCubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:first/Constants/Utils/color_constant.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
       title: "CookIt",
       debugShowCheckedModeBanner: false,
       theme:ThemeData(
-          colorSchemeSeed: ColorConstant.primaryColor
+        colorSchemeSeed: ColorConstant.primaryColor
         ),
         home: BlocProvider<AppCubits>(
           create: (context) => AppCubits(),

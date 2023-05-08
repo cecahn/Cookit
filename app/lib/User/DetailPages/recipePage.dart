@@ -20,36 +20,37 @@ class RecipePage extends StatefulWidget {
   State<RecipePage> createState() => _RecipePageState();
 }
 
-
-
 class _RecipePageState extends State<RecipePage> {
 
-  late Response betyg; 
+  double? betyg; // OBS! Snittbetyget - inte användarens betyg
 
   void _saveRating(int rating, int receptid) async {
 
-  try{
-  var r2 = await Requests.get("https://litium.herokuapp.com/betyg/set?recipe-id=$receptid&betyg=$rating",
-      withCredentials: true);
+    try {
+      var response = await Requests.get(
+        "https://litium.herokuapp.com/betyg/set",
+        queryParameters: {"recipe-id": receptid, "betyg": rating},
+        withCredentials: true
+      );
 
-   if (r2.statusCode == 200){
-    setState((){
-      betyg = r2 as Response; 
-    });
-   }
+       if (response.statusCode == 200) {
+        var json = response.json();
 
-   else {
-    throw Exception('Failed to change rating');
-   }
+        setState((){
+          betyg = double.parse(json["avg_score"]);
+        });
+       }
 
-  } catch (error) {
-    setState(() {
-      betyg = 0 as Response;
-    });
-  }
-  
- 
-}
+       else {
+        throw Exception('Failed to change rating');
+       }
+
+      } catch (error) {
+        setState(() {
+          betyg = 0;
+        });
+      }
+    }
   
   @override
   Widget build(BuildContext context) {
@@ -108,7 +109,6 @@ class _RecipePageState extends State<RecipePage> {
                     children: [
                       Wrap(
                       
-                      
                       children:[
                         Text(detail.recept.titel,
                         style: GoogleFonts.alfaSlabOne(
@@ -119,41 +119,37 @@ class _RecipePageState extends State<RecipePage> {
                             ),
                           ),
                         ),
-
-                        /*Text(detail.recept.betyg.toString(),
-                        style: GoogleFonts.alfaSlabOne(
-                        textStyle: const TextStyle(
-                        color: Colors.teal,
-                        fontSize: 10,
-                        overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ),*/
                       ],
                     ),
                     SizedBox(height: 2),
                     Row(children: [
+
+                      // Betygsstjärnor
                       RatingBar(
                         minRating:1,
                         maxRating: 5,
                         tapOnlyMode: true,
+                        // TODO: Användarens betyg istället för genomsnittsbetyg - måste skickas med av servern
+                        initialRating: detail.recept.betyg.toDouble(),
                         onRatingUpdate: (rating) 
-                        {_saveRating(rating as int, detail.recept.id as int ); },
+                        {_saveRating(rating.round(), detail.recept.id.round() ); },
                         ratingWidget: RatingWidget(
-                          full: Icon(Icons.star, color: Colors.yellow),
+                          full: Icon(Icons.star, color: Colors.yellow[800]),
                           half: Icon(Icons.star, color: Colors.grey),
                           empty: Icon(Icons.star, color: Colors.grey)
                         ),
                         itemSize: 20,
                         itemPadding: EdgeInsets.only(left: 5, ),
                       ),
-                      
+                    
+                    // Genomsnittsbetyget (med siffror)
                     SizedBox(width: 10,),
-                    Text("("+detail.recept.betyg.toString()+")",
+                    Text(
+                        betyg != null ? betyg.toString() : detail.recept.betyg.toString(),
                         style: GoogleFonts.alfaSlabOne(
                         textStyle: TextStyle(
                         color: ColorConstant.primaryColor,
-                        fontSize: 10,
+                        fontSize: 14,
                         overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -161,14 +157,14 @@ class _RecipePageState extends State<RecipePage> {
                     ],
                   ),
 
-                  SizedBox(height: 30),
+                  const SizedBox(height: 30),
 
 
 
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                      Text( "Ingredienser",
+                      Text( "Ingredienser hemma",
                         style: GoogleFonts.alfaSlabOne(
                         textStyle: const TextStyle(
                         color: Colors.black,
@@ -184,18 +180,18 @@ class _RecipePageState extends State<RecipePage> {
                      ListView.builder(
                         shrinkWrap: true,
                         //physics: AlwaysScrollableScrollPhysics(),
-                        itemCount: detail.recept.instruktion.length,
+                        itemCount: detail.recept.used.length,
                         itemBuilder: (context,index) {
                             return Container(
                             margin: EdgeInsets.only(right: Dimensions.width20,),
                             child: Wrap(
                               children: [
-                                Text(detail.recept.instruktion[index],
+                                Text(detail.recept.used[index],
                                 maxLines: 3,
                                 style: GoogleFonts.breeSerif(
                                 textStyle: const TextStyle(
                                 color: Colors.black,
-                                fontSize: 10,
+                                fontSize: 15,
                                 
                             ),
                           ),
@@ -205,12 +201,12 @@ class _RecipePageState extends State<RecipePage> {
                           );
                         },),
 
-                        SizedBox(height:10),
+                        const SizedBox(height:10),
 
                       Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                      Text( "Instruktioner",
+                      Text( "Inköpslista",
                         style: GoogleFonts.alfaSlabOne(
                         textStyle: const TextStyle(
                         color: Colors.black,
@@ -225,13 +221,13 @@ class _RecipePageState extends State<RecipePage> {
                      ListView.builder(
                         shrinkWrap: true,
                         //physics: AlwaysScrollableScrollPhysics(),
-                        itemCount: detail.recept.instruktion.length,
+                        itemCount: detail.recept.missing.length,
                         itemBuilder: (context,index) {
                             return Container(
                             margin: EdgeInsets.only(right: Dimensions.width20,),
                             child: Wrap(
                               children: [
-                                Text(detail.recept.instruktion[index],
+                                Text(detail.recept.missing[index],
                                 maxLines: 3,
                                 style: GoogleFonts.breeSerif(
                                 textStyle: const TextStyle(
@@ -251,7 +247,7 @@ class _RecipePageState extends State<RecipePage> {
                          Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
-                      Text( "Inköpslista",
+                      Text( "Instruktioner",
                         style: GoogleFonts.alfaSlabOne(
                         textStyle: const TextStyle(
                         color: Colors.black,

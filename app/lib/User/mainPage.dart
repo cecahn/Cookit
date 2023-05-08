@@ -1,3 +1,5 @@
+import 'dart:core';
+
 import 'package:first/User/RoutingPages/add_food.dart';
 import 'package:first/User/RoutingPages/recipes.dart';
 import 'package:first/User/RoutingPages/pantry.dart';
