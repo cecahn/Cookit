@@ -35,6 +35,12 @@ class RecipesState extends State<Recipes> {
     "sorting": 1 // 0: Antal varor hemma - 1: Kortast utgångsdatum
   };
 
+  Map<String, dynamic> searchQueryParameters = {
+    "phrase": "",
+    "limit": maxSearchResults, 
+    "filter": [],
+  };
+
   final filterOptions = [
     CheckboxState(title: "Vegan"),
     CheckboxState(title: "Vegetarisk"),
@@ -60,8 +66,10 @@ class RecipesState extends State<Recipes> {
 
   Future<List<Recept>> searchRecipes() async {
     var res = await Requests.get(
-        "https://litium.herokuapp.com/search?phrase=$searchPhrase&limit=5",
-        withCredentials: true);
+        "https://litium.herokuapp.com/search",
+        withCredentials: true,
+        queryParameters: searchQueryParameters
+        );
     List<dynamic> list = jsonDecode(res.body);
     print(list);
     return list.map((e) => Recept.fromJson(e)).toList();
@@ -84,11 +92,13 @@ class RecipesState extends State<Recipes> {
   }
 
   void addFilter(String filter) {
+    searchQueryParameters["filter"].add(filter);
     activeQueryParameters["filter"].add(filter);
     print(activeQueryParameters);
   }
 
   void removeFilter(String filter) {
+    searchQueryParameters["filter"].remove(filter);
     activeQueryParameters["filter"].remove(filter);
     print(activeQueryParameters);
   }
@@ -109,7 +119,7 @@ class RecipesState extends State<Recipes> {
   void _updateSortValue(String value) {
     setState(() {
       activeQueryParameters["sorting"] = value == "Utgångsdatum" ? 1 : 0;
-      if (value != _sortValue) {
+      if (value != _sortValue && searchPhrase.isEmpty) {
         _sortValue = value;
         recept = getRecomendations();
       }
@@ -158,6 +168,7 @@ class RecipesState extends State<Recipes> {
                                           color: Colors.black),
                                       onPressed: () {
                                           searchPhrase = _textController.text;
+                                          searchQueryParameters["phrase"] = searchPhrase;
                                           setState(() {
                                             recept = searchPhrase.isEmpty ? getRecomendations() : searchRecipes();
                                           });
@@ -213,7 +224,7 @@ class RecipesState extends State<Recipes> {
                                           onPressed: () {
                                             toggleFilterMenu();
                                             setState(() {
-                                              recept = getRecomendations();
+                                              recept = searchPhrase.isEmpty ? getRecomendations() : searchRecipes();
                                             });
                                           },
                                           child: const Text("Sök")
