@@ -1,6 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:ui';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:requests/requests.dart';
 
 import '../../Constants/Utils/dimensions.dart';
@@ -9,11 +13,12 @@ import '../../Services/receptModel.dart';
 import '../../Widgets/appBar.dart';
 import '../../Widgets/app_dropdown_menu.dart';
 import '../../Widgets/app_recipe_tile.dart';
-import '../../Widgets/app_button.dart';
-import '../../Widgets/app_checkbox_state.dart';
+import '../../cubit/appCubit.dart';
+import '../../cubit/appCubitStates.dart';
+//import 'package:myapp/utils.dart';
+import '../../Constants/Utils/image_constants.dart';
 
 final _textController = TextEditingController();
-const maxSearchResults = 10;
 
 class Recipes extends StatefulWidget {
   const Recipes({Key? key}) : super(key: key);
@@ -23,40 +28,11 @@ class Recipes extends StatefulWidget {
 }
 
 class RecipesState extends State<Recipes> {
-
-  // Variables
-  String searchPhrase = "";
+  String dropdownValue = 'Filter';
+  String dropdownValue2 = 'Sortera';
+  String input = "";
 
   late Future<List<Recept>> recept;
-
-  Map<String, dynamic> activeQueryParameters = {
-    "max": maxSearchResults, 
-    "filter": [],
-    "sorting": 1 // 0: Antal varor hemma - 1: Kortast utgångsdatum
-  };
-
-  Map<String, dynamic> searchQueryParameters = {
-    "phrase": "",
-    "limit": maxSearchResults, 
-    "filter": [],
-  };
-
-  final filterOptions = [
-    CheckboxState(title: "Vegan"),
-    CheckboxState(title: "Vegetarisk"),
-    CheckboxState(title: "Mjölkfri"),
-    CheckboxState(title: "Äggfri"),
-    CheckboxState(title: "Glutenfri"),
-    CheckboxState(title: "Laktosfri"),
-  ];
-
-  bool filterOpen = false;
-
-  List<String> sortOptions = ["Sortera", "Antal varor hemma", "Utgångsdatum"];
-  
-  String _sortValue = 'Sortera';
-
-  // Functions
 
   @override
   void initState() {
@@ -66,10 +42,8 @@ class RecipesState extends State<Recipes> {
 
   Future<List<Recept>> searchRecipes() async {
     var res = await Requests.get(
-        "https://litium.herokuapp.com/search",
-        withCredentials: true,
-        queryParameters: searchQueryParameters
-        );
+        "https://litium.herokuapp.com/search?phrase=$input&limit=5",
+        withCredentials: true);
     List<dynamic> list = jsonDecode(res.body);
     print(list);
     return list.map((e) => Recept.fromJson(e)).toList();
@@ -77,52 +51,35 @@ class RecipesState extends State<Recipes> {
 
   Future<List<Recept>> getRecomendations() async {
     var r2 = await Requests.get(
-        "https://litium.herokuapp.com/get/recomendations",
-        withCredentials: true,
-        queryParameters: activeQueryParameters  
-      );
+        "https://litium.herokuapp.com/get/recomendations?max=5",
+        withCredentials: true);
     List<dynamic> list = jsonDecode(r2.body);
     return list.map((e) => Recept.fromJson(e)).toList();
   }
 
-  void toggleFilterMenu() {
+  // Filter
+  List<String> filterOptions = [
+    "Filter",
+    "Vegan",
+    "Vegetarian",
+    "Mjölkfri",
+    "Äggfri",
+    "Gluten",
+    "Laktosfri"
+  ];
+  String _filterValue = 'Filter';
+  void _updateFilterValue(String value) {
     setState(() {
-      filterOpen = !filterOpen;
+      _filterValue = value;
     });
   }
 
-  void addFilter(String filter) {
-    searchQueryParameters["filter"].add(filter);
-    activeQueryParameters["filter"].add(filter);
-    print(activeQueryParameters);
-  }
-
-  void removeFilter(String filter) {
-    searchQueryParameters["filter"].remove(filter);
-    activeQueryParameters["filter"].remove(filter);
-    print(activeQueryParameters);
-  }
-
-  Widget buildCheckbox(CheckboxState checkbox) => CheckboxListTile(
-    controlAffinity: ListTileControlAffinity.leading,
-    title: Text(checkbox.title),
-    activeColor: ColorConstant.primaryColor,
-    value: checkbox.value,
-    onChanged: (value) {
-      value! ? addFilter(checkbox.title) : removeFilter(checkbox.title);
-      setState(() {
-        checkbox.value = value;
-      });
-    },
-  );
-
+  // Sort
+  List<String> sortOptions = ["Sortera", "Senast tillagd", "Utgångsdatum"];
+  String _sortValue = 'Sortera';
   void _updateSortValue(String value) {
     setState(() {
-      activeQueryParameters["sorting"] = value == "Utgångsdatum" ? 1 : 0;
-      if (value != _sortValue && searchPhrase.isEmpty) {
-        _sortValue = value;
-        recept = getRecomendations();
-      }
+      _sortValue = value;
     });
   }
 
@@ -167,10 +124,9 @@ class RecipesState extends State<Recipes> {
                                       icon: const Icon(Icons.search,
                                           color: Colors.black),
                                       onPressed: () {
-                                          searchPhrase = _textController.text;
-                                          searchQueryParameters["phrase"] = searchPhrase;
+                                          input = _textController.text;
                                           setState(() {
-                                            recept = searchPhrase.isEmpty ? getRecomendations() : searchRecipes();
+                                            recept = input.isEmpty ? getRecomendations() : searchRecipes();
                                           });
                                         //});
                                       }),
@@ -185,13 +141,13 @@ class RecipesState extends State<Recipes> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  // Button for opening the filter menu
+                                  // Filter dropdown
                                   Expanded(
-                                    child: AppButton(
-                                      text: "Filtrera",
-                                      onTap: toggleFilterMenu,
-                                    )
-                                  ),
+                                      child: AppDropdownMenu(
+                                    menuOptions: filterOptions,
+                                    value: _filterValue,
+                                    callback: _updateFilterValue,
+                                  )),
 
                                   const SizedBox(width: 10),
 
@@ -213,26 +169,7 @@ class RecipesState extends State<Recipes> {
                                         top: 20,
                                         left: Dimensions.width10,
                                         right: Dimensions.width10),
-                                    child: filterOpen ?
-                                    // Filter checkboxes
-                                    ListView(
-                                      padding: const EdgeInsets.all(20),
-                                      children: [
-                                        ...filterOptions.map(buildCheckbox),
-                                        ElevatedButton(
-                                          
-                                          onPressed: () {
-                                            toggleFilterMenu();
-                                            setState(() {
-                                              recept = searchPhrase.isEmpty ? getRecomendations() : searchRecipes();
-                                            });
-                                          },
-                                          child: const Text("Sök")
-                                        )
-                                      ]
-                                    )
-                                    // Recipe list
-                                    : ListView.builder(
+                                    child: ListView.builder(
                                       shrinkWrap: true,
                                       physics:
                                           const AlwaysScrollableScrollPhysics(),
@@ -241,10 +178,7 @@ class RecipesState extends State<Recipes> {
                                         return AppRecipeTile(
                                             recept: data[index]);
                                       },
-                                    )
-
-                                  )
-                                )
+                                    )))
                           ]),
                     )));
           }
