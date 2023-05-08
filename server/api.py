@@ -2,9 +2,20 @@ import requests
 
 BASE_URL = 'https://api.dabas.com/'
 PRODUCT_ENDPOINT = 'DABASService/V2/article/gtin/'
+FRITEXT_ENDPOINT = 'DABASService/V2/articles/basesearchparameter/'
 DATA_FORMAT = '/JSON'
-API_KEY = '10d9b701-e973-42d5-a7cf-ac541f59dcd9'
 CODE_MAX_LEN = 14
+API_KEY = '10d9b701-e973-42d5-a7cf-ac541f59dcd9'
+
+def api_fritext(fras: str):
+    response = requests.get(BASE_URL + FRITEXT_ENDPOINT + fras + DATA_FORMAT + '?apikey=' + API_KEY)
+    
+    if (response.status_code != 200):
+        return None
+
+    response = response.json()
+    
+    return response[0]
 
 def api_get_product(code: str):
     '''
@@ -30,6 +41,7 @@ def api_get_product(code: str):
 
     data['gtin'] = respone_json['GTIN']
     data['varugrupp'] = respone_json['Varugrupp']['VarugruppBenamning']
+    data['huvudvarugrupp'] = respone_json['Varugrupp']['HuvudgruppBenamning']
     data['hållbarhet'] = respone_json['TotalHallbarhetAntalDagar']
     data['namn'] = respone_json['Artikelbenamning']
     data['tillverkare'] = respone_json['Varumarke']['Tillverkare']['Namn']
