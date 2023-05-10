@@ -160,8 +160,8 @@ class _TestHomePageState extends State<TestHomePage> {
             const SizedBox(height: 25),
 
             // Scan-knapp
-            AppButton(text: "Skanna vara", onTap: () {
-              scanBarcode();
+            AppButton(text: "Skanna vara", onTap: () async {
+              await scanBarcode();
               fetchProduct();
             }),
 
